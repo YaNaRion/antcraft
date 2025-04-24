@@ -1,0 +1,11 @@
+#config file for Air 
+[build]
+  cmd = "go build -o main main.go"
+  bin = "main"
+  dir = "."
+  include_ext = ["go"]
+  expluce_dir = ["vendor"]
+  run_after_build = "chmod +x main"
+
+[log]
+  level = "debug"
