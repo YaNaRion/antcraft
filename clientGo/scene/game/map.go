@@ -34,7 +34,8 @@ func NewMap() *Map {
 }
 
 func (m *Map) Draw() {
-	rl.DrawRectangleLines(0, 0, MapWidth, MapHeight, rl.White)
+	// rl.DrawRectangleLines(0, 0, MapWidth, MapHeight, rl.White)
+	rl.DrawRectangle(0, 0, MapWidth, MapHeight, rl.White)
 	for _, build := range m.buildings {
 		build.Draw()
 	}

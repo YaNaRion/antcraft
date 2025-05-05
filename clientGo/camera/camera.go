@@ -1,6 +1,7 @@
 package camera
 
 import (
+	"client/scene/game"
 	"client/window"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -23,7 +24,7 @@ func NewCamera(offset rl.Vector2, target rl.Vector2) *Camera {
 		Cam: &rl.Camera2D{
 			Zoom:   float32(1.0),
 			Target: target,
-			Offset: offset,
+			// Offset: offset,
 		},
 	}
 }
@@ -38,15 +39,23 @@ func (c *Camera) HandlerZoom() {
 func (c *Camera) MoveEdge() {
 	mousePosition := rl.GetMousePosition()
 	if mousePosition.X < float32(edgeThreashold) {
-		c.Cam.Target.X -= cameraSpeed
+		if c.Cam.Target.X > 0 {
+			c.Cam.Target.X -= cameraSpeed
+		}
 	} else if mousePosition.X > float32(window.SCREEN_WIDTH-edgeThreashold) {
-		c.Cam.Target.X += cameraSpeed
+		if c.Cam.Target.X <= game.MapWidth {
+			c.Cam.Target.X += cameraSpeed
+		}
 	}
 
 	if mousePosition.Y < float32(edgeThreashold) {
-		c.Cam.Target.Y -= cameraSpeed
+		if c.Cam.Target.Y > 0 {
+			c.Cam.Target.Y -= cameraSpeed
+		}
 	} else if mousePosition.Y > float32(window.SCREEN_HEIGHT-edgeThreashold) {
-		c.Cam.Target.Y += cameraSpeed
+		if c.Cam.Target.Y <= game.MapHeight {
+			c.Cam.Target.Y += cameraSpeed
+		}
 	}
 
 }

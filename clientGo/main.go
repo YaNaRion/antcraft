@@ -36,7 +36,7 @@ func main() {
 		rl.EndDrawing()
 
 		// Gère le zoom de la caméra
-		camera.HandlerZoom()
+		// camera.HandlerZoom()
 		camera.MoveEdge()
 	}
 }
