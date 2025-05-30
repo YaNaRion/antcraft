@@ -4,12 +4,11 @@ import (
 	"client/camera"
 	"client/scene"
 	"client/window"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func main() {
-	InitialiseWindow(window.SCREEN_WIDTH, window.SCREEN_HEIGHT, "CIVILISATAN", window.MAX_FPS)
+	InitialiseWindow(window.SCREEN_WIDTH, window.SCREEN_HEIGHT, "ANTCRAFT", window.MAX_FPS)
 	defer rl.CloseWindow()
 
 	// Création du SceneManger
@@ -25,8 +24,6 @@ func main() {
 	)
 
 	for !rl.WindowShouldClose() {
-
-		// Initialise la scène
 		InitialiseDrawing()
 
 		// Active la caméra 3D

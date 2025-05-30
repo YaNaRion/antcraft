@@ -18,10 +18,12 @@ func NewSceneManager() *SceneManager {
 }
 
 func (s *SceneManager) DrawScene() {
+	s.gameScene.GenerateNextFrame()
 	if s.sceneState == MENU {
 		s.drawGame()
 	} else if s.sceneState == GAME {
 		s.gameScene.Draw()
+		s.gameScene.HUD.Draw()
 	}
 }
 

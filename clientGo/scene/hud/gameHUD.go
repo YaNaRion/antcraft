@@ -1,9 +1,5 @@
 package hud
 
-import (
-	"client/player"
-)
-
 const ten float32 = 30
 
 const (
@@ -18,16 +14,12 @@ type HUD struct {
 	GameStatus   *GameStatus
 }
 
-func NewHUD(playerAmount int, gameStatus *string) *HUD {
+func NewHUD() *HUD {
 	return &HUD{
-		SwitchPlayer: newSwitchPlayerHUD(playerAmount),
-		ResetGame:    newResetGameHUD(),
-		GameStatus:   newGameStatusHUD(gameStatus),
+		ResetGame: newResetGameHUD(),
 	}
 }
 
-func (h *HUD) Draw(players []*player.Player) {
-	h.SwitchPlayer.Draw(players)
+func (h *HUD) Draw() {
 	h.ResetGame.Draw()
-	h.GameStatus.Draw()
 }

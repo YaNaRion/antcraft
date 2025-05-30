@@ -1,43 +1,28 @@
 package game
 
 import (
-	"client/player"
 	"client/scene/hud"
+	"log"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type GameScene struct {
-	Players      []*player.Player
-	ActivePlayer *player.Player
-	HUD          *hud.HUD
-	Map          *Map
+	HUD *hud.HUD
+	Map *Map
 }
 
 func NewGameScene() *GameScene {
-	gameState := "DEBUT DE LA GAME"
 	game := &GameScene{
-		Players: player.NewPlayers(2),
-		HUD:     hud.NewHUD(2, &gameState),
-		Map:     NewMap(),
+		HUD: hud.NewHUD(),
+		Map: NewMap(),
 	}
-	game.ActivePlayer = game.Players[0]
+	game.Map.PopulateDefaultMap()
 	return game
 }
 
 func (g *GameScene) HandlerInput() {
-	// Switch to player0
-	if rl.CheckCollisionPointRec(rl.GetMousePosition(), *g.HUD.SwitchPlayer.Buttons[0].Rec) &&
-		rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-		g.ActivePlayer = g.Players[0]
-	}
-
-	// Switch to player1
-	// if rl.CheckCollisionPointRec(rl.GetMousePosition(), *g.HUD.SwitchPlayer.Buttons[1].Rec) &&
-	// 	rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
-	// 	g.ActivePlayer = g.Players[1]
-	// }
-
-	// ResetGame
+	// ResetSim
 	if rl.CheckCollisionPointRec(rl.GetMousePosition(), *g.HUD.ResetGame.Button.Rec) &&
 		rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
 		g.ResetGame()
@@ -52,9 +37,14 @@ func (g *GameScene) Draw() {
 }
 
 func (g *GameScene) DrawHUD() {
-	g.HUD.Draw(g.Players)
+	g.HUD.Draw()
 }
 
 func (g *GameScene) ResetGame() {
-	g.ActivePlayer = g.Players[0]
+	log.Println("La simulation est reset")
+	g.Map.PopulateDefaultMap()
+}
+
+func (g *GameScene) GenerateNextFrame() {
+	g.Map.DefaultUnitMove()
 }

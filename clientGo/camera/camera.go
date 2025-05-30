@@ -8,7 +8,7 @@ import (
 )
 
 const edgeThreashold int32 = 5
-const cameraSpeed float32 = 50.0
+const cameraSpeed float32 = 10.0
 
 type Camera struct {
 	Cam *rl.Camera2D

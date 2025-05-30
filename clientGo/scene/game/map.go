@@ -2,8 +2,7 @@ package game
 
 import (
 	"client/scene/game/building"
-
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"client/scene/game/unit"
 )
 
 const (
@@ -15,28 +14,44 @@ type Map struct {
 	width     int
 	heigh     int
 	buildings []building.Building
+	units     []unit.Unit
 }
 
 func NewMap() *Map {
+	buildings := make([]building.Building, 0)
+	units := make([]unit.Unit, 0)
+	return &Map{
+		width:     MapHeight,
+		heigh:     MapWidth,
+		buildings: buildings,
+		units:     units,
+	}
+}
+
+func (m *Map) Draw() {
+	for _, build := range m.buildings {
+		build.Draw()
+	}
+
+	for _, unit := range m.units {
+		unit.Draw()
+	}
+}
+
+func (m *Map) DefaultUnitMove() {
+	for _, unit := range m.units {
+		unit.MoveUnit()
+	}
+}
+
+func (m *Map) PopulateDefaultMap() {
 	defaulBuilding := building.NewBase(
 		500,
 		500,
 		10,
 		10,
 	)
-	buildings := make([]building.Building, 0)
-	buildings = append(buildings, defaulBuilding)
-	return &Map{
-		width:     MapHeight,
-		heigh:     MapWidth,
-		buildings: buildings,
-	}
-}
-
-func (m *Map) Draw() {
-	// rl.DrawRectangleLines(0, 0, MapWidth, MapHeight, rl.White)
-	rl.DrawRectangle(0, 0, MapWidth, MapHeight, rl.White)
-	for _, build := range m.buildings {
-		build.Draw()
-	}
+	m.buildings = append(m.buildings, defaulBuilding)
+	defaultUnit := unit.NewWorker(600, 600, 2, 2)
+	m.units = append(m.units, defaultUnit)
 }
