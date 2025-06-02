@@ -23,3 +23,7 @@ func NewBase(x, y float32, width, height int) *Base {
 func (b *Base) Draw() {
 	rl.DrawRectangleRec(b.rec, rl.Red)
 }
+
+func (b *Base) GetRec() rl.Rectangle {
+	return b.rec
+}

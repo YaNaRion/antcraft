@@ -8,8 +8,9 @@ import (
 )
 
 type GameScene struct {
-	HUD *hud.HUD
-	Map *Map
+	HUD         *hud.HUD
+	Map         *Map
+	isSimStated bool
 }
 
 func NewGameScene() *GameScene {
@@ -27,6 +28,11 @@ func (g *GameScene) HandlerInput() {
 		rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
 		g.ResetGame()
 	}
+	// StartSim
+	if rl.CheckCollisionPointRec(rl.GetMousePosition(), *g.HUD.StartSim.Button.Rec) &&
+		rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		g.StartSim()
+	}
 }
 
 func (g *GameScene) Draw() {
@@ -42,9 +48,18 @@ func (g *GameScene) DrawHUD() {
 
 func (g *GameScene) ResetGame() {
 	log.Println("La simulation est reset")
+	g.isSimStated = false
+	g.Map.RestMap()
 	g.Map.PopulateDefaultMap()
 }
 
+func (g *GameScene) StartSim() {
+	log.Println("La simulation est partie")
+	g.isSimStated = true
+}
+
 func (g *GameScene) GenerateNextFrame() {
-	g.Map.DefaultUnitMove()
+	if g.isSimStated {
+		g.Map.DefaultUnitMove()
+	}
 }

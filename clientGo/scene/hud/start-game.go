@@ -2,25 +2,23 @@ package hud
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
-const gameStatusActionButtonWidth float32 = 90
-
-type ResetGame struct {
+type StartGame struct {
 	Button *RectangleButton
 }
 
-func (rg *ResetGame) Draw() {
+func (rg *StartGame) Draw() {
 	rg.Button.Draw()
 }
 
-func newResetGameHUD() *ResetGame {
-	return &ResetGame{
+func newStartGameHUD() *StartGame {
+	return &StartGame{
 		Button: newButton(
-			400,
+			300,
 			ten,
 			gameStatusActionButtonWidth,
 			buttonHeight,
 			&rl.Pink,
-			"RESET GAME",
+			"START GAME",
 		),
 	}
 }

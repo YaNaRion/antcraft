@@ -8,18 +8,18 @@ const (
 )
 
 type HUD struct {
-	SwitchPlayer *SwitchPlayer
-	ResetGame    *ResetGame
-	Action       *Action
-	GameStatus   *GameStatus
+	ResetGame *ResetGame
+	StartSim  *StartGame
 }
 
 func NewHUD() *HUD {
 	return &HUD{
 		ResetGame: newResetGameHUD(),
+		StartSim:  newStartGameHUD(),
 	}
 }
 
 func (h *HUD) Draw() {
 	h.ResetGame.Draw()
+	h.StartSim.Draw()
 }
