@@ -75,10 +75,14 @@ func (m *Map) PopulateDefaultMap() {
 		10,
 	)
 	m.mapItem.buildings = append(m.mapItem.buildings, defaulBuilding)
-	defaultUnit := unit.NewWorker(600, 600, 2, 2, defaulBuilding)
+	defaultUnit := unit.NewWorker(850, 900, 2, 2, defaulBuilding)
 	m.mapItem.units = append(m.mapItem.units, defaultUnit)
 	m.mapItem.ressources = append(
 		m.mapItem.ressources,
 		ressource.NewFood(30, rl.Rectangle{X: 800, Y: 900}, rl.Yellow),
+	)
+	m.mapItem.ressources = append(
+		m.mapItem.ressources,
+		ressource.NewFood(30, rl.Rectangle{X: 700, Y: 800}, rl.Yellow),
 	)
 }

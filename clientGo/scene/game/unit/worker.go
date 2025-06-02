@@ -4,6 +4,7 @@ import (
 	"client/scene/game/building"
 	"client/scene/game/ressource"
 	"fmt"
+	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -23,7 +24,7 @@ type Worker struct {
 	closedRessource         ressource.Ressource
 	Base                    *building.Base
 	isCarryingRessource     bool
-	distanceClosedRessource float32
+	distanceClosedRessource float64
 	rec                     rl.Rectangle
 	color                   rl.Color
 	Width                   int
@@ -41,7 +42,7 @@ func NewWorker(x, y float32, width, height int, base *building.Base) *Worker {
 		color:                   rl.Pink,
 		Width:                   10,
 		Height:                  10,
-		distanceClosedRessource: 100000,
+		distanceClosedRessource: 1000000,
 		Base:                    base,
 	}
 }
@@ -51,14 +52,19 @@ func (b *Worker) Draw() {
 }
 
 func (w *Worker) FindNextTarget(ressources []ressource.Ressource) {
-	for _, ressource := range ressources {
-		totalDistance := ressource.GetRec().X - w.rec.X
-		totalDistance += ressource.GetRec().Y - w.rec.Y
-		if totalDistance < w.distanceClosedRessource {
-			w.closedRessource = ressource
-			w.currentTarget = ressource
-			w.distanceClosedRessource = totalDistance
-			fmt.Println("NOUS SOMMES DANS UNE RESSOURCE TROUVER")
+	if !w.isCarryingRessource {
+		for _, ressource := range ressources {
+			fmt.Println(ressource.GetRec())
+			totalDistance := math.Abs(float64(ressource.GetRec().X - w.rec.X))
+			totalDistance += math.Abs(float64(ressource.GetRec().Y - w.rec.Y))
+			fmt.Println(totalDistance)
+			if totalDistance < w.distanceClosedRessource {
+				fmt.Println("NOUS SOMMES DANS UNE RESSOURCE TROUVER")
+				fmt.Println(ressource.GetRec().X)
+				w.closedRessource = ressource
+				w.currentTarget = ressource
+				w.distanceClosedRessource = totalDistance
+			}
 		}
 	}
 
@@ -78,8 +84,8 @@ func (w *Worker) FindNextTarget(ressources []ressource.Ressource) {
 			w.isCarryingRessource = false
 			w.color = rl.Pink
 			w.currentTarget = w.closedRessource
+			return
 		}
-		return
 	}
 
 	if len(ressources) <= 0 {
@@ -87,7 +93,6 @@ func (w *Worker) FindNextTarget(ressources []ressource.Ressource) {
 		rl.DrawText("IL NY A AUCUNE RESSOURCE", 500, 10, 12, rl.White)
 	}
 }
-
 func (b *Worker) MoveUnit() {
 	if b.currentTarget != nil {
 		if b.currentTarget.GetRec().X > b.rec.X {
@@ -103,5 +108,3 @@ func (b *Worker) MoveUnit() {
 		}
 	}
 }
-
-// func (w *Worker)
