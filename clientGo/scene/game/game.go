@@ -3,6 +3,7 @@ package game
 import (
 	"client/scene/hud"
 	"log"
+	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -11,14 +12,26 @@ type GameScene struct {
 	HUD         *hud.HUD
 	Map         *Map
 	isSimStated bool
+	GenWork     *time.Timer
 }
 
 func NewGameScene() *GameScene {
 	game := &GameScene{
-		HUD: hud.NewHUD(),
-		Map: NewMap(),
+		HUD:         hud.NewHUD(),
+		Map:         NewMap(),
+		isSimStated: true,
 	}
+
 	game.Map.PopulateDefaultMap()
+	go func() {
+		for {
+			if game.isSimStated {
+				game.Map.GenerateNewWorker()
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
 	return game
 }
 

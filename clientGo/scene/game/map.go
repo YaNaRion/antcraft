@@ -4,6 +4,7 @@ import (
 	"client/scene/game/building"
 	"client/scene/game/ressource"
 	"client/scene/game/unit"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -85,4 +86,9 @@ func (m *Map) PopulateDefaultMap() {
 		m.mapItem.ressources,
 		ressource.NewFood(30, rl.Rectangle{X: 700, Y: 800}, rl.Yellow),
 	)
+}
+
+func (m *Map) GenerateNewWorker() {
+	defaultUnit := unit.NewWorker(850, 900, 2, 2, m.mapItem.buildings[0].(*building.Base))
+	m.mapItem.units = append(m.mapItem.units, defaultUnit)
 }
