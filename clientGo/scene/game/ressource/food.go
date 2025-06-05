@@ -2,6 +2,8 @@ package ressource
 
 import rl "github.com/gen2brain/raylib-go/raylib"
 
+const defaultConsumeValue = 5
+
 var quantityToDimension = map[int]int{
 	0:  5,  // Quantity < 10
 	10: 10, // Quantity < 20
@@ -13,38 +15,53 @@ func findDimension(quantity int) int {
 	return quantityToDimension[(quantity/10)*10]
 }
 
-type Ressource interface {
-	Consume()
+type RessourceMineral interface {
+	Consume() int
 	Draw()
 	GetRec() rl.Rectangle
+	GetQuantity() int
 }
 
-type Food struct {
+type DefaultFood struct {
 	Quantity  int
 	Rec       rl.Rectangle
 	dimension float32
 	color     rl.Color
 }
 
-func NewFood(quantity int, rec rl.Rectangle, color rl.Color) *Food {
-	rec.Height = float32(findDimension(quantity))
+func NewDefaultFood(quantity int, rec rl.Rectangle, color rl.Color) *DefaultFood {
+	dimension := float32(findDimension(quantity))
+	rec.Height = dimension
 	rec.Width = rec.Height
-	return &Food{
-		Quantity: quantity,
-		Rec:      rec,
-		color:    color,
+	return &DefaultFood{
+		Quantity:  quantity,
+		Rec:       rec,
+		color:     color,
+		dimension: dimension,
 	}
 }
 
-func (f *Food) Consume() {
-	f.Quantity -= 1
-	f.dimension = float32(findDimension(f.Quantity))
+func (f *DefaultFood) GetQuantity() int {
+	return f.Quantity
+
 }
 
-func (f *Food) Draw() {
+func (f *DefaultFood) updateStatus() {
+	f.dimension = float32(findDimension(f.Quantity))
+	f.Rec.Height = f.dimension
+	f.Rec.Width = f.dimension
+}
+
+func (f *DefaultFood) Consume() int {
+	f.Quantity -= defaultConsumeValue
+	f.updateStatus()
+	return defaultConsumeValue
+}
+
+func (f *DefaultFood) Draw() {
 	rl.DrawRectangleRec(f.Rec, f.color)
 }
 
-func (f *Food) GetRec() rl.Rectangle {
+func (f *DefaultFood) GetRec() rl.Rectangle {
 	return f.Rec
 }

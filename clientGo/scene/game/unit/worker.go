@@ -16,12 +16,12 @@ type Target interface {
 type Unit interface {
 	Draw()
 	MoveUnit()
-	FindNextTarget(ressources []ressource.Ressource)
+	FindNextTarget(ressources []ressource.RessourceMineral)
 }
 
 type Worker struct {
 	currentTarget           Target
-	closedRessource         ressource.Ressource
+	closedRessource         ressource.RessourceMineral
 	Base                    *building.Base
 	isCarryingRessource     bool
 	distanceClosedRessource float64
@@ -52,7 +52,7 @@ func (b *Worker) Draw() {
 	rl.DrawRectangleRec(b.rec, b.color)
 }
 
-func (w *Worker) FindNextRessource(ressources []ressource.Ressource) {
+func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) {
 	for _, ressource := range ressources {
 		totalDistance := math.Abs(float64(ressource.GetRec().X - w.rec.X))
 		totalDistance += math.Abs(float64(ressource.GetRec().Y - w.rec.Y))
@@ -70,7 +70,23 @@ func (w *Worker) FindNextRessource(ressources []ressource.Ressource) {
 	}
 }
 
-func (w *Worker) FindNextTarget(ressources []ressource.Ressource) {
+func (w *Worker) handlerGadderRessource() {
+	w.isCarryingRessource = true
+	w.closedRessource.Consume()
+	w.closedRessource = nil
+	w.currentTarget = w.Base
+	w.color = rl.Blue
+
+}
+
+func (w *Worker) handlerReturnToBase(ressources []ressource.RessourceMineral) {
+	w.isCarryingRessource = false
+	w.distanceClosedRessource = 100000
+	w.color = rl.Pink
+	w.FindNextRessource(ressources)
+}
+
+func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 	if !w.isCarryingRessource {
 		w.FindNextRessource(ressources)
 	}
@@ -78,19 +94,12 @@ func (w *Worker) FindNextTarget(ressources []ressource.Ressource) {
 	if w.closedRessource != nil {
 		if w.closedRessource.GetRec().X == w.rec.X && w.closedRessource.GetRec().Y == w.rec.Y &&
 			!w.isCarryingRessource {
-			w.isCarryingRessource = true
-			w.closedRessource = nil
-			w.currentTarget = w.Base
-			w.color = rl.Blue
+			w.handlerGadderRessource()
 		}
 	} else {
 		if w.Base != nil && w.isCarryingRessource {
-			if w.Base.GetRec().X == w.rec.X && w.Base.GetRec().Y == w.rec.Y &&
-				w.isCarryingRessource {
-				w.isCarryingRessource = false
-				w.distanceClosedRessource = 100000
-				w.color = rl.Pink
-				w.FindNextRessource(ressources)
+			if w.Base.GetRec().X == w.rec.X && w.Base.GetRec().Y == w.rec.Y && w.isCarryingRessource {
+				w.handlerReturnToBase(ressources)
 			}
 		}
 	}

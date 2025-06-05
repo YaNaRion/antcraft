@@ -16,7 +16,7 @@ const (
 type MapItem struct {
 	buildings  []building.Building
 	units      []unit.Unit
-	ressources []ressource.Ressource
+	ressources []ressource.RessourceMineral
 }
 
 type Map struct {
@@ -28,7 +28,7 @@ type Map struct {
 func NewMap() *Map {
 	buildings := make([]building.Building, 0)
 	units := make([]unit.Unit, 0)
-	ressources := make([]ressource.Ressource, 0)
+	ressources := make([]ressource.RessourceMineral, 0)
 	return &Map{
 		width: MapHeight,
 		heigh: MapWidth,
@@ -50,6 +50,9 @@ func (m *Map) Draw() {
 	}
 
 	for _, ressource := range m.mapItem.ressources {
+		if ressource.GetQuantity() >= 0 {
+			continue
+		}
 		ressource.Draw()
 	}
 }
@@ -65,7 +68,7 @@ func (m *Map) DefaultUnitMove() {
 func (m *Map) RestMap() {
 	m.mapItem.buildings = make([]building.Building, 0)
 	m.mapItem.units = make([]unit.Unit, 0)
-	m.mapItem.ressources = make([]ressource.Ressource, 0)
+	m.mapItem.ressources = make([]ressource.RessourceMineral, 0)
 }
 
 func (m *Map) PopulateDefaultMap() {
@@ -80,11 +83,11 @@ func (m *Map) PopulateDefaultMap() {
 	m.mapItem.units = append(m.mapItem.units, defaultUnit)
 	m.mapItem.ressources = append(
 		m.mapItem.ressources,
-		ressource.NewFood(30, rl.Rectangle{X: 800, Y: 900}, rl.Yellow),
+		ressource.NewDefaultFood(30, rl.Rectangle{X: 800, Y: 900}, rl.Yellow),
 	)
 	m.mapItem.ressources = append(
 		m.mapItem.ressources,
-		ressource.NewFood(30, rl.Rectangle{X: 700, Y: 800}, rl.Yellow),
+		ressource.NewDefaultFood(30, rl.Rectangle{X: 700, Y: 800}, rl.Yellow),
 	)
 }
 
