@@ -3,10 +3,12 @@ package unit
 import (
 	"client/scene/game/building"
 	"client/scene/game/ressource"
+	"errors"
 	"fmt"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
 	"math"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type Target interface {
@@ -55,7 +57,7 @@ func (b *Worker) Draw() {
 func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) error {
 	if len(ressources) <= 0 {
 		w.closedRessource = nil
-		return no_target_found
+		return error_no_target_found
 	}
 
 	for _, ressource := range ressources {
@@ -89,12 +91,18 @@ func (w *Worker) handlerReturnToBase(ressources []ressource.RessourceMineral) {
 	w.isCarryingRessource = false
 	w.distanceClosedRessource = 100000
 	w.color = rl.Pink
-	w.FindNextRessource(ressources)
+	err := w.FindNextRessource(ressources)
+	if errors.Is(err, error_no_target_found) {
+		w.color = rl.White
+	}
 }
 
 func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 	if !w.isCarryingRessource {
-		w.FindNextRessource(ressources)
+		err := w.FindNextRessource(ressources)
+		if errors.Is(err, error_no_target_found) {
+			w.color = rl.White
+		}
 	}
 
 	if w.closedRessource != nil {
@@ -119,7 +127,8 @@ func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 func (w *Worker) MoveUnit(ressources []ressource.RessourceMineral) {
 	if !w.isCarryingRessource {
 		err := w.FindNextRessource(ressources)
-		if err != nil {
+		if errors.Is(err, error_no_target_found) {
+			w.color = rl.White
 			return
 		}
 	}
