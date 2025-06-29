@@ -14,9 +14,9 @@ const (
 )
 
 type MapItem struct {
-	buildings  []building.Building
-	units      []unit.Unit
-	ressources []ressource.RessourceMineral
+	buildings []building.Building
+	units     []unit.Unit
+	ressource *ressource.RessourceMap
 }
 
 type Map struct {
@@ -33,14 +33,15 @@ func NewMap() *Map {
 		width: MapHeight,
 		heigh: MapWidth,
 		mapItem: &MapItem{
-			buildings:  buildings,
-			units:      units,
-			ressources: ressources,
+			buildings: buildings,
+			units:     units,
+			ressource: ressource.NewRessourceMap(ressources),
 		},
 	}
 }
 
 func (m *Map) Draw() {
+	m.mapItem.ressource.ClearEmptyRessource()
 	for _, build := range m.mapItem.buildings {
 		build.Draw()
 	}
@@ -49,10 +50,7 @@ func (m *Map) Draw() {
 		unit.Draw()
 	}
 
-	for _, ressource := range m.mapItem.ressources {
-		if ressource.GetQuantity() >= 0 {
-			continue
-		}
+	for _, ressource := range m.mapItem.ressource.Ressources {
 		ressource.Draw()
 	}
 }
@@ -60,15 +58,15 @@ func (m *Map) Draw() {
 func (m *Map) DefaultUnitMove() {
 	for _, unit := range m.mapItem.units {
 		// unit.
-		unit.FindNextTarget(m.mapItem.ressources)
-		unit.MoveUnit()
+		unit.FindNextTarget(m.mapItem.ressource.Ressources)
+		unit.MoveUnit(m.mapItem.ressource.Ressources)
 	}
 }
 
 func (m *Map) RestMap() {
 	m.mapItem.buildings = make([]building.Building, 0)
 	m.mapItem.units = make([]unit.Unit, 0)
-	m.mapItem.ressources = make([]ressource.RessourceMineral, 0)
+	m.mapItem.ressource.Ressources = make([]ressource.RessourceMineral, 0)
 }
 
 func (m *Map) PopulateDefaultMap() {
@@ -81,12 +79,12 @@ func (m *Map) PopulateDefaultMap() {
 	m.mapItem.buildings = append(m.mapItem.buildings, defaulBuilding)
 	defaultUnit := unit.NewWorker(850, 900, 2, 2, defaulBuilding)
 	m.mapItem.units = append(m.mapItem.units, defaultUnit)
-	m.mapItem.ressources = append(
-		m.mapItem.ressources,
+	m.mapItem.ressource.Ressources = append(
+		m.mapItem.ressource.Ressources,
 		ressource.NewDefaultFood(30, rl.Rectangle{X: 800, Y: 900}, rl.Yellow),
 	)
-	m.mapItem.ressources = append(
-		m.mapItem.ressources,
+	m.mapItem.ressource.Ressources = append(
+		m.mapItem.ressource.Ressources,
 		ressource.NewDefaultFood(30, rl.Rectangle{X: 700, Y: 800}, rl.Yellow),
 	)
 }

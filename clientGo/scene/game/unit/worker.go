@@ -15,7 +15,7 @@ type Target interface {
 
 type Unit interface {
 	Draw()
-	MoveUnit()
+	MoveUnit([]ressource.RessourceMineral)
 	FindNextTarget(ressources []ressource.RessourceMineral)
 }
 
@@ -52,7 +52,12 @@ func (b *Worker) Draw() {
 	rl.DrawRectangleRec(b.rec, b.color)
 }
 
-func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) {
+func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) error {
+	if len(ressources) <= 0 {
+		w.closedRessource = nil
+		return no_target_found
+	}
+
 	for _, ressource := range ressources {
 		totalDistance := math.Abs(float64(ressource.GetRec().X - w.rec.X))
 		totalDistance += math.Abs(float64(ressource.GetRec().Y - w.rec.Y))
@@ -68,6 +73,7 @@ func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) {
 			w.distanceClosedRessource = totalDistance
 		}
 	}
+	return nil
 }
 
 func (w *Worker) handlerGadderRessource() {
@@ -110,18 +116,25 @@ func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 	}
 }
 
-func (b *Worker) MoveUnit() {
-	if b.currentTarget != nil {
-		if b.currentTarget.GetRec().X > b.rec.X {
-			b.rec.X += 1.0
-		} else if b.currentTarget.GetRec().X < b.rec.X {
-			b.rec.X -= 1.0
+func (w *Worker) MoveUnit(ressources []ressource.RessourceMineral) {
+	if !w.isCarryingRessource {
+		err := w.FindNextRessource(ressources)
+		if err != nil {
+			return
+		}
+	}
+
+	if w.currentTarget != nil {
+		if w.currentTarget.GetRec().X > w.rec.X {
+			w.rec.X += 1.0
+		} else if w.currentTarget.GetRec().X < w.rec.X {
+			w.rec.X -= 1.0
 		}
 
-		if b.currentTarget.GetRec().Y > b.rec.Y {
-			b.rec.Y += 1.0
-		} else if b.currentTarget.GetRec().Y < b.rec.Y {
-			b.rec.Y -= 1.0
+		if w.currentTarget.GetRec().Y > w.rec.Y {
+			w.rec.Y += 1.0
+		} else if w.currentTarget.GetRec().Y < w.rec.Y {
+			w.rec.Y -= 1.0
 		}
 	}
 }
