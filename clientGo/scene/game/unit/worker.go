@@ -21,6 +21,13 @@ type Unit interface {
 	FindNextTarget(ressources []ressource.RessourceMineral)
 }
 
+// type WorkerStatus int
+//
+// const (
+// 	CARRYING_RESSOURCE = iota
+// 	LOOKING_FOR_RESSOURCE
+// )
+
 type Worker struct {
 	currentTarget           Target
 	closedRessource         ressource.RessourceMineral

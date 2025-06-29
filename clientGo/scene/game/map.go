@@ -4,6 +4,7 @@ import (
 	"client/scene/game/building"
 	"client/scene/game/ressource"
 	"client/scene/game/unit"
+	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -87,6 +88,13 @@ func (m *Map) PopulateDefaultMap() {
 		m.mapItem.ressource.Ressources,
 		ressource.NewDefaultFood(30, rl.Rectangle{X: 700, Y: 800}, rl.Yellow),
 	)
+	go func() {
+		time.Sleep(40 * time.Second)
+		m.mapItem.ressource.Ressources = append(
+			m.mapItem.ressource.Ressources,
+			ressource.NewDefaultFood(30, rl.Rectangle{X: 1200, Y: 800}, rl.Yellow),
+		)
+	}()
 }
 
 func (m *Map) GenerateNewWorker() {

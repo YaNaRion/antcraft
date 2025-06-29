@@ -24,7 +24,7 @@ func NewGameScene() *GameScene {
 
 	game.Map.PopulateDefaultMap()
 	go func() {
-		for {
+		for i := 0; i < 6; i++ {
 			if game.isSimStated {
 				game.Map.GenerateNewWorker()
 			}
