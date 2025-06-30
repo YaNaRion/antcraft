@@ -4,8 +4,6 @@ import (
 	"client/scene/game/building"
 	"client/scene/game/ressource"
 	"errors"
-	"fmt"
-
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -70,13 +68,7 @@ func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) erro
 	for _, ressource := range ressources {
 		totalDistance := math.Abs(float64(ressource.GetRec().X - w.rec.X))
 		totalDistance += math.Abs(float64(ressource.GetRec().Y - w.rec.Y))
-		fmt.Println("RECHERCHE DE RESSOURCE")
-		fmt.Println(ressource.GetRec())
-		fmt.Println(w.rec)
-		fmt.Println(totalDistance)
 		if totalDistance < w.distanceClosedRessource {
-			fmt.Println("NOUS SOMMES DANS UNE RESSOURCE TROUVER")
-			fmt.Println(ressource.GetRec().X)
 			w.closedRessource = ressource
 			w.currentTarget = ressource
 			w.distanceClosedRessource = totalDistance
@@ -95,9 +87,9 @@ func (w *Worker) handlerGadderRessource() {
 }
 
 func (w *Worker) handlerReturnToBase(ressources []ressource.RessourceMineral) {
+	w.color = rl.Pink
 	w.isCarryingRessource = false
 	w.distanceClosedRessource = 100000
-	w.color = rl.Pink
 	err := w.FindNextRessource(ressources)
 	if errors.Is(err, error_no_target_found) {
 		w.color = rl.White
@@ -125,16 +117,18 @@ func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 		}
 	}
 
-	if len(ressources) <= 0 {
-		// Message d'erreur lorsqu"il n'y a plus de ressources, mais en sorte que l'affichage soit dynamique avec Width et Height
-		rl.DrawText("IL NY A AUCUNE RESSOURCE", 500, 10, 12, rl.White)
-	}
+	// if len(ressources) <= 0 {
+	// 	// Message d'erreur lorsqu"il n'y a plus de ressources, mais en sorte que l'affichage soit dynamique avec Width et Height
+	// 	// rl.DrawText("IL NY A AUCUNE RESSOURCE", 500, 10, 12, rl.White)
+	// }
 }
 
 func (w *Worker) MoveUnit(ressources []ressource.RessourceMineral) {
 	if !w.isCarryingRessource {
 		err := w.FindNextRessource(ressources)
 		if errors.Is(err, error_no_target_found) {
+			w.closedRessource = nil
+			w.currentTarget = nil
 			w.color = rl.White
 			return
 		}

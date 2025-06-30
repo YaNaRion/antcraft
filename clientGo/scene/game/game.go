@@ -19,18 +19,10 @@ func NewGameScene() *GameScene {
 	game := &GameScene{
 		HUD:         hud.NewHUD(),
 		Map:         NewMap(),
-		isSimStated: true,
+		isSimStated: false,
 	}
 
 	game.Map.PopulateDefaultMap()
-	go func() {
-		for i := 0; i < 6; i++ {
-			if game.isSimStated {
-				game.Map.GenerateNewWorker()
-			}
-			time.Sleep(5 * time.Second)
-		}
-	}()
 
 	return game
 }
@@ -69,6 +61,14 @@ func (g *GameScene) ResetGame() {
 func (g *GameScene) StartSim() {
 	log.Println("La simulation est partie")
 	g.isSimStated = true
+	go func() {
+		for range 6 {
+			if g.isSimStated {
+				g.Map.GenerateNewWorker()
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}()
 }
 
 func (g *GameScene) GenerateNextFrame() {
