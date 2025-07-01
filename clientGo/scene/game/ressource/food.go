@@ -15,15 +15,17 @@ func findDimension(quantity int) int {
 	return quantityToDimension[(quantity/10)*10]
 }
 
+type MineralValue int
+
 type RessourceMineral interface {
 	Consume() int
 	Draw()
 	GetRec() rl.Rectangle
-	GetQuantity() int
+	GetQuantity() MineralValue
 }
 
 type DefaultFood struct {
-	Quantity  int
+	Quantity  MineralValue
 	Rec       rl.Rectangle
 	dimension float32
 	color     rl.Color
@@ -34,20 +36,20 @@ func NewDefaultFood(quantity int, rec rl.Rectangle, color rl.Color) *DefaultFood
 	rec.Height = dimension
 	rec.Width = rec.Height
 	return &DefaultFood{
-		Quantity:  quantity,
+		Quantity:  MineralValue(quantity),
 		Rec:       rec,
 		color:     color,
 		dimension: dimension,
 	}
 }
 
-func (f *DefaultFood) GetQuantity() int {
-	return f.Quantity
+func (f *DefaultFood) GetQuantity() MineralValue {
+	return MineralValue(f.Quantity)
 
 }
 
 func (f *DefaultFood) updateStatus() {
-	f.dimension = float32(findDimension(f.Quantity))
+	f.dimension = float32(findDimension(int(f.Quantity)))
 	f.Rec.Height = f.dimension
 	f.Rec.Width = f.dimension
 }

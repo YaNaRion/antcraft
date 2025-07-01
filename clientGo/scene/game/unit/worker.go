@@ -19,18 +19,25 @@ type Unit interface {
 	FindNextTarget(ressources []ressource.RessourceMineral)
 }
 
-// type WorkerStatus int
-//
-// const (
-// 	CARRYING_RESSOURCE = iota
-// 	LOOKING_FOR_RESSOURCE
-// )
+type WorkerStatus int
+
+var mapStatusToRLColor = map[WorkerStatus]rl.Color{
+	CARRYING_RESSOURCE: rl.Blue,
+	GOING_TO_RESSOURCE: rl.Pink,
+	IDLE:               rl.White,
+}
+
+const (
+	CARRYING_RESSOURCE WorkerStatus = iota
+	GOING_TO_RESSOURCE
+	IDLE
+)
 
 type Worker struct {
 	currentTarget           Target
 	closedRessource         ressource.RessourceMineral
 	Base                    *building.Base
-	isCarryingRessource     bool
+	status                  WorkerStatus
 	distanceClosedRessource float64
 	rec                     rl.Rectangle
 	color                   rl.Color
@@ -47,7 +54,7 @@ func NewWorker(x, y float32, width, height int, base *building.Base) *Worker {
 			Height: float32(height),
 		},
 		color:                   rl.Pink,
-		isCarryingRessource:     false,
+		status:                  IDLE,
 		Width:                   10,
 		Height:                  10,
 		distanceClosedRessource: 1000000,
@@ -55,8 +62,8 @@ func NewWorker(x, y float32, width, height int, base *building.Base) *Worker {
 	}
 }
 
-func (b *Worker) Draw() {
-	rl.DrawRectangleRec(b.rec, b.color)
+func (w *Worker) Draw() {
+	rl.DrawRectangleRec(w.rec, mapStatusToRLColor[w.status])
 }
 
 func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) error {
@@ -74,62 +81,56 @@ func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) erro
 			w.distanceClosedRessource = totalDistance
 		}
 	}
+
+	w.status = GOING_TO_RESSOURCE
 	return nil
 }
 
 func (w *Worker) handlerGadderRessource() {
-	w.isCarryingRessource = true
+	w.status = CARRYING_RESSOURCE
 	w.closedRessource.Consume()
 	w.closedRessource = nil
 	w.currentTarget = w.Base
-	w.color = rl.Blue
-
 }
 
-func (w *Worker) handlerReturnToBase(ressources []ressource.RessourceMineral) {
-	w.color = rl.Pink
-	w.isCarryingRessource = false
+func (w *Worker) handlerReturnRessourceToBase(ressources []ressource.RessourceMineral) {
+	w.status = IDLE
 	w.distanceClosedRessource = 100000
-	err := w.FindNextRessource(ressources)
-	if errors.Is(err, error_no_target_found) {
-		w.color = rl.White
-	}
+	_ = w.FindNextRessource(ressources)
 }
 
 func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
-	if !w.isCarryingRessource {
+	if w.status != CARRYING_RESSOURCE {
 		err := w.FindNextRessource(ressources)
 		if errors.Is(err, error_no_target_found) {
-			w.color = rl.White
+			w.status = IDLE
 		}
 	}
 
+	// Lorsque le worker est sur la ressource
 	if w.closedRessource != nil {
 		if w.closedRessource.GetRec().X == w.rec.X && w.closedRessource.GetRec().Y == w.rec.Y &&
-			!w.isCarryingRessource {
+			w.status != CARRYING_RESSOURCE {
 			w.handlerGadderRessource()
 		}
-	} else {
-		if w.Base != nil && w.isCarryingRessource {
-			if w.Base.GetRec().X == w.rec.X && w.Base.GetRec().Y == w.rec.Y && w.isCarryingRessource {
-				w.handlerReturnToBase(ressources)
-			}
-		}
+		return
 	}
 
-	// if len(ressources) <= 0 {
-	// 	// Message d'erreur lorsqu"il n'y a plus de ressources, mais en sorte que l'affichage soit dynamique avec Width et Height
-	// 	// rl.DrawText("IL NY A AUCUNE RESSOURCE", 500, 10, 12, rl.White)
-	// }
+	// Lorsque le worker retourne a la base
+	if w.Base != nil && w.status == CARRYING_RESSOURCE {
+		if w.Base.GetRec().X == w.rec.X && w.Base.GetRec().Y == w.rec.Y &&
+			w.status == CARRYING_RESSOURCE {
+			w.handlerReturnRessourceToBase(ressources)
+		}
+	}
 }
 
 func (w *Worker) MoveUnit(ressources []ressource.RessourceMineral) {
-	if !w.isCarryingRessource {
+	if w.status != CARRYING_RESSOURCE {
 		err := w.FindNextRessource(ressources)
 		if errors.Is(err, error_no_target_found) {
 			w.closedRessource = nil
 			w.currentTarget = nil
-			w.color = rl.White
 			return
 		}
 	}

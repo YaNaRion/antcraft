@@ -15,9 +15,8 @@ const (
 )
 
 type MapItem struct {
-	buildings []building.Building
-	units     []unit.Unit
 	ressource *ressource.RessourceMap
+	hives     []*Hive
 }
 
 type Map struct {
@@ -27,15 +26,13 @@ type Map struct {
 }
 
 func NewMap() *Map {
-	buildings := make([]building.Building, 0)
-	units := make([]unit.Unit, 0)
+	hives := make([]*Hive, 0)
 	ressources := make([]ressource.RessourceMineral, 0)
 	return &Map{
 		width: MapHeight,
 		heigh: MapWidth,
 		mapItem: &MapItem{
-			buildings: buildings,
-			units:     units,
+			hives:     hives,
 			ressource: ressource.NewRessourceMap(ressources),
 		},
 	}
@@ -43,12 +40,9 @@ func NewMap() *Map {
 
 func (m *Map) Draw() {
 	m.mapItem.ressource.ClearEmptyRessource()
-	for _, build := range m.mapItem.buildings {
-		build.Draw()
-	}
 
-	for _, unit := range m.mapItem.units {
-		unit.Draw()
+	for _, hive := range m.mapItem.hives {
+		hive.Draw()
 	}
 
 	for _, ressource := range m.mapItem.ressource.Ressources {
@@ -57,39 +51,47 @@ func (m *Map) Draw() {
 }
 
 func (m *Map) DefaultUnitMove() {
-	for _, unit := range m.mapItem.units {
-		// unit.
-		unit.FindNextTarget(m.mapItem.ressource.Ressources)
-		unit.MoveUnit(m.mapItem.ressource.Ressources)
+	for _, hive := range m.mapItem.hives {
+		for _, unit := range hive.units {
+			// unit.
+			unit.FindNextTarget(m.mapItem.ressource.Ressources)
+			unit.MoveUnit(m.mapItem.ressource.Ressources)
+		}
 	}
 }
 
 func (m *Map) RestMap() {
-	m.mapItem.buildings = make([]building.Building, 0)
-	m.mapItem.units = make([]unit.Unit, 0)
+	m.mapItem.hives = make([]*Hive, 0)
 	m.mapItem.ressource.Ressources = make([]ressource.RessourceMineral, 0)
 }
 
 func (m *Map) PopulateDefaultMap() {
+	hive := newHive()
+	m.mapItem.hives = append(m.mapItem.hives, hive)
+
 	defaulBuilding := building.NewBase(
 		500,
 		500,
 		10,
 		10,
 	)
-	m.mapItem.buildings = append(m.mapItem.buildings, defaulBuilding)
+	hive.buildings = append(hive.buildings, defaulBuilding)
+
 	defaultUnit := unit.NewWorker(850, 900, 2, 2, defaulBuilding)
-	m.mapItem.units = append(m.mapItem.units, defaultUnit)
+	hive.units = append(hive.units, defaultUnit)
+
 	m.mapItem.ressource.Ressources = append(
 		m.mapItem.ressource.Ressources,
 		ressource.NewDefaultFood(30, rl.Rectangle{X: 800, Y: 900}, rl.Yellow),
 	)
+
 	m.mapItem.ressource.Ressources = append(
 		m.mapItem.ressource.Ressources,
 		ressource.NewDefaultFood(30, rl.Rectangle{X: 700, Y: 800}, rl.Yellow),
 	)
+
 	go func() {
-		time.Sleep(40 * time.Second)
+		time.Sleep(30 * time.Second)
 		m.mapItem.ressource.Ressources = append(
 			m.mapItem.ressource.Ressources,
 			ressource.NewDefaultFood(30, rl.Rectangle{X: 1200, Y: 800}, rl.Yellow),
@@ -98,6 +100,6 @@ func (m *Map) PopulateDefaultMap() {
 }
 
 func (m *Map) GenerateNewWorker() {
-	defaultUnit := unit.NewWorker(850, 900, 2, 2, m.mapItem.buildings[0].(*building.Base))
-	m.mapItem.units = append(m.mapItem.units, defaultUnit)
+	defaultUnit := unit.NewWorker(850, 900, 2, 2, m.mapItem.hives[0].buildings[0].(*building.Base))
+	m.mapItem.hives[0].units = append(m.mapItem.hives[0].units, defaultUnit)
 }
