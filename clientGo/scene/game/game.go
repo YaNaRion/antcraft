@@ -66,7 +66,7 @@ func (g *GameScene) StartSim() {
 			if g.isSimStated {
 				g.Map.GenerateNewWorker()
 			}
-			time.Sleep(5 * time.Second)
+			time.Sleep(2 * time.Second)
 		}
 	}()
 }

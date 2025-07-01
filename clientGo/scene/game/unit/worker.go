@@ -19,6 +19,17 @@ type Unit interface {
 	FindNextTarget(ressources []ressource.RessourceMineral)
 }
 
+type Worker struct {
+	currentTarget           Target
+	closedRessource         ressource.RessourceMineral
+	Base                    *building.Base
+	status                  WorkerStatus
+	distanceClosedRessource float64
+	rec                     rl.Rectangle
+	Width                   int
+	Height                  int
+}
+
 type WorkerStatus int
 
 var mapStatusToRLColor = map[WorkerStatus]rl.Color{
@@ -33,18 +44,6 @@ const (
 	IDLE
 )
 
-type Worker struct {
-	currentTarget           Target
-	closedRessource         ressource.RessourceMineral
-	Base                    *building.Base
-	status                  WorkerStatus
-	distanceClosedRessource float64
-	rec                     rl.Rectangle
-	color                   rl.Color
-	Width                   int
-	Height                  int
-}
-
 func NewWorker(x, y float32, width, height int, base *building.Base) *Worker {
 	return &Worker{
 		rec: rl.Rectangle{
@@ -53,7 +52,6 @@ func NewWorker(x, y float32, width, height int, base *building.Base) *Worker {
 			Width:  float32(width),
 			Height: float32(height),
 		},
-		color:                   rl.Pink,
 		status:                  IDLE,
 		Width:                   10,
 		Height:                  10,
@@ -68,7 +66,6 @@ func (w *Worker) Draw() {
 
 func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) error {
 	if len(ressources) <= 0 {
-		w.closedRessource = nil
 		return error_no_target_found
 	}
 
@@ -129,6 +126,7 @@ func (w *Worker) MoveUnit(ressources []ressource.RessourceMineral) {
 	if w.status != CARRYING_RESSOURCE {
 		err := w.FindNextRessource(ressources)
 		if errors.Is(err, error_no_target_found) {
+			w.status = IDLE
 			w.closedRessource = nil
 			w.currentTarget = nil
 			return

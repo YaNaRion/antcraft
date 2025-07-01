@@ -77,9 +77,6 @@ func (m *Map) PopulateDefaultMap() {
 	)
 	hive.buildings = append(hive.buildings, defaulBuilding)
 
-	defaultUnit := unit.NewWorker(850, 900, 2, 2, defaulBuilding)
-	hive.units = append(hive.units, defaultUnit)
-
 	m.mapItem.ressource.Ressources = append(
 		m.mapItem.ressource.Ressources,
 		ressource.NewDefaultFood(30, rl.Rectangle{X: 800, Y: 900}, rl.Yellow),
@@ -91,7 +88,7 @@ func (m *Map) PopulateDefaultMap() {
 	)
 
 	go func() {
-		time.Sleep(30 * time.Second)
+		time.Sleep(20 * time.Second)
 		m.mapItem.ressource.Ressources = append(
 			m.mapItem.ressource.Ressources,
 			ressource.NewDefaultFood(30, rl.Rectangle{X: 1200, Y: 800}, rl.Yellow),
