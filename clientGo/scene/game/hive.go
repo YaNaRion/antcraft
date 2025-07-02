@@ -28,3 +28,7 @@ func (h *Hive) Draw() {
 		unit.Draw()
 	}
 }
+
+func (h *Hive) GetUnits() []unit.Unit {
+	return h.units
+}

@@ -2,10 +2,9 @@ package game
 
 import (
 	"client/scene/hud"
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"log"
 	"time"
-
-	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 type GameScene struct {
@@ -21,9 +20,7 @@ func NewGameScene() *GameScene {
 		Map:         NewMap(),
 		isSimStated: false,
 	}
-
 	game.Map.PopulateDefaultMap()
-
 	return game
 }
 
@@ -62,11 +59,15 @@ func (g *GameScene) StartSim() {
 	log.Println("La simulation est partie")
 	g.isSimStated = true
 	go func() {
-		for range 6 {
-			if g.isSimStated {
-				g.Map.GenerateNewWorker()
-			}
+		for range 5 {
+			g.Map.GenerateNewWorker()
 			time.Sleep(2 * time.Second)
+		}
+	}()
+	go func() {
+		for range 10 {
+			time.Sleep(15 * time.Second)
+			g.Map.GenerateNewRessource()
 		}
 	}()
 }

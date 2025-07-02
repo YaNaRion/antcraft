@@ -15,8 +15,9 @@ type Target interface {
 
 type Unit interface {
 	Draw()
-	MoveUnit([]ressource.RessourceMineral)
+	MoveUnit([]Unit)
 	FindNextTarget(ressources []ressource.RessourceMineral)
+	GetRec() rl.Rectangle
 }
 
 type Worker struct {
@@ -44,6 +45,8 @@ const (
 	IDLE
 )
 
+const BIG_DISTANCE = 1000000
+
 func NewWorker(x, y float32, width, height int, base *building.Base) *Worker {
 	return &Worker{
 		rec: rl.Rectangle{
@@ -55,13 +58,17 @@ func NewWorker(x, y float32, width, height int, base *building.Base) *Worker {
 		status:                  IDLE,
 		Width:                   10,
 		Height:                  10,
-		distanceClosedRessource: 1000000,
+		distanceClosedRessource: BIG_DISTANCE,
 		Base:                    base,
 	}
 }
 
 func (w *Worker) Draw() {
 	rl.DrawRectangleRec(w.rec, mapStatusToRLColor[w.status])
+}
+
+func (w *Worker) GetRec() rl.Rectangle {
+	return w.rec
 }
 
 func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) error {
@@ -92,7 +99,7 @@ func (w *Worker) handlerGadderRessource() {
 
 func (w *Worker) handlerReturnRessourceToBase(ressources []ressource.RessourceMineral) {
 	w.status = IDLE
-	w.distanceClosedRessource = 100000
+	w.distanceClosedRessource = BIG_DISTANCE
 	_ = w.FindNextRessource(ressources)
 }
 
@@ -101,6 +108,9 @@ func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 		err := w.FindNextRessource(ressources)
 		if errors.Is(err, error_no_target_found) {
 			w.status = IDLE
+			w.closedRessource = nil
+			w.currentTarget = w.Base
+			w.distanceClosedRessource = BIG_DISTANCE
 		}
 	}
 
@@ -122,17 +132,7 @@ func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 	}
 }
 
-func (w *Worker) MoveUnit(ressources []ressource.RessourceMineral) {
-	if w.status != CARRYING_RESSOURCE {
-		err := w.FindNextRessource(ressources)
-		if errors.Is(err, error_no_target_found) {
-			w.status = IDLE
-			w.closedRessource = nil
-			w.currentTarget = nil
-			return
-		}
-	}
-
+func (w *Worker) MoveUnit(units []Unit) {
 	if w.currentTarget != nil {
 		if w.currentTarget.GetRec().X > w.rec.X {
 			w.rec.X += 1.0
