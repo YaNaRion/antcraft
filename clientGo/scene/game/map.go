@@ -51,11 +51,7 @@ func (m *Map) Draw() {
 
 func (m *Map) DefaultUnitMove() {
 	for _, hive := range m.mapItem.hives {
-		for _, unit := range hive.units {
-			// unit.
-			unit.FindNextTarget(m.mapItem.ressource.Ressources)
-			unit.MoveUnit(hive.GetUnits())
-		}
+		hive.MoveHiveUnit(m.mapItem.ressource.Ressources)
 	}
 }
 

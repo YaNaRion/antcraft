@@ -15,9 +15,10 @@ type Target interface {
 
 type Unit interface {
 	Draw()
-	MoveUnit([]Unit)
+	MoveUnit()
 	FindNextTarget(ressources []ressource.RessourceMineral)
 	GetRec() rl.Rectangle
+	GetStatus() WorkerStatus
 }
 
 type Worker struct {
@@ -69,6 +70,10 @@ func (w *Worker) Draw() {
 
 func (w *Worker) GetRec() rl.Rectangle {
 	return w.rec
+}
+
+func (w *Worker) GetStatus() WorkerStatus {
+	return w.status
 }
 
 func (w *Worker) FindNextRessource(ressources []ressource.RessourceMineral) error {
@@ -132,18 +137,19 @@ func (w *Worker) FindNextTarget(ressources []ressource.RessourceMineral) {
 	}
 }
 
-func (w *Worker) MoveUnit(units []Unit) {
+func (w *Worker) MoveUnit() {
+	const moveMultiplier = 2
 	if w.currentTarget != nil {
 		if w.currentTarget.GetRec().X > w.rec.X {
-			w.rec.X += 1.0
+			w.rec.X += 1.0 * moveMultiplier
 		} else if w.currentTarget.GetRec().X < w.rec.X {
-			w.rec.X -= 1.0
+			w.rec.X -= 1.0 * moveMultiplier
 		}
 
 		if w.currentTarget.GetRec().Y > w.rec.Y {
-			w.rec.Y += 1.0
+			w.rec.Y += 1.0 * moveMultiplier
 		} else if w.currentTarget.GetRec().Y < w.rec.Y {
-			w.rec.Y -= 1.0
+			w.rec.Y -= 1.0 * moveMultiplier
 		}
 	}
 }

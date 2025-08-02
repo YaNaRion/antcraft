@@ -2,6 +2,7 @@ package game
 
 import (
 	"client/scene/game/building"
+	"client/scene/game/ressource"
 	"client/scene/game/unit"
 )
 
@@ -31,4 +32,15 @@ func (h *Hive) Draw() {
 
 func (h *Hive) GetUnits() []unit.Unit {
 	return h.units
+}
+
+func (h *Hive) MoveHiveUnit(ressources []ressource.RessourceMineral) {
+	for _, unitIns := range h.units {
+		workerStatus := unitIns.GetStatus()
+		unitIns.FindNextTarget(ressources)
+		unitIns.MoveUnit()
+		if workerStatus == unit.IDLE && workerStatus != unitIns.GetStatus() {
+			break
+		}
+	}
 }
