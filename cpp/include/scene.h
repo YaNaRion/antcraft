@@ -1,3 +1,4 @@
+#include "player.h"
 #include <memory>
 #include <vector>
 
@@ -11,6 +12,14 @@ class MenuScene : public IScene {
 public:
   MenuScene();
   ~MenuScene();
+  void Draw() override;
+};
+
+class GameScene : public IScene {
+public:
+  std::vector<std::shared_ptr<Player>> players;
+  GameScene(std::vector<std::shared_ptr<Player>> players);
+  ~GameScene();
   void Draw() override;
 };
 
