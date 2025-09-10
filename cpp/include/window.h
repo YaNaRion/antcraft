@@ -1,5 +1,4 @@
 #include "scene.h"
-
 #include <memory>
 #include <vector>
 

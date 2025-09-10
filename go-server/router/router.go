@@ -13,13 +13,14 @@ const indexFile = "index.html"
 
 type Router struct {
 	Mux *http.ServeMux
+	log *log.Logger
 }
 
 /*
 * Fonction de Setup du router pour le site web
  */
-func Setup(mux *http.ServeMux) *Router {
-	router := newRouter(mux)
+func Setup(mux *http.ServeMux, log *log.Logger) *Router {
+	router := newRouter(mux, log)
 
 	router.Mux.Handle(
 		"/assets/",
@@ -30,9 +31,10 @@ func Setup(mux *http.ServeMux) *Router {
 	return router
 }
 
-func newRouter(mux *http.ServeMux) *Router {
+func newRouter(mux *http.ServeMux, log *log.Logger) *Router {
 	return &Router{
 		Mux: mux,
+		log: log,
 	}
 }
 
@@ -54,13 +56,13 @@ func (rt Router) routeHome(w http.ResponseWriter, r *http.Request) {
 	t, err := rt.RenderTemplate(indexFile)
 	if err != nil {
 		if err == errHTMLNotFound {
-			log.Printf("%s HTML FILE NOT FOUND\n", indexFile)
+			rt.log.Printf("%s HTML FILE NOT FOUND\n", indexFile)
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	err = t.Execute(w, nil)
 	if err != nil {
-		log.Printf("An error occurred while sending HTML file: %s \n", err)
+		rt.log.Printf("An error occurred while sending HTML file: %s \n", err)
 	}
 }

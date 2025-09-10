@@ -6,7 +6,7 @@
 class Player {
 public:
   void Draw();
-  Player(Color color);
+  Player(Color color, std::vector<std::shared_ptr<IUnit>> units);
   ~Player();
   Color GetTeamColor();
 
