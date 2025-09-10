@@ -6,11 +6,11 @@
 class Player {
 public:
   void Draw();
-  Player(Color color, std::vector<std::shared_ptr<IUnit>> units);
+  Player(Color color, std::vector<std::shared_ptr<IScreenElement>> units);
   ~Player();
   Color GetTeamColor();
 
 private:
-  std::vector<std::shared_ptr<IUnit>> units;
+  std::vector<std::shared_ptr<IScreenElement>> units;
   Color color;
 };
