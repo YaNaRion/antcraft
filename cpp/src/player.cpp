@@ -1,7 +1,8 @@
 #include "player.h"
 #include "raylib.h"
 
-Player::Player(Color color, std::vector<std::shared_ptr<IUnit>> units) {
+Player::Player(Color color,
+               std::vector<std::shared_ptr<IScreenElement>> units) {
   this->color = color;
   this->units = units;
 };

@@ -1,22 +1,26 @@
 #include "raylib.h"
 
-class IUnit {
-public:
-  virtual void Draw(Color color) = 0;
-  // virtual void ChangeObjective(Vector2 vec);
-  virtual ~IUnit() {};
-  // virtual void Move();
+enum class ScreenElementType {
+  Unit,
 };
 
-class Unit : public IUnit {
+class IScreenElement {
 public:
-  Unit(Vector2 pos);
+  virtual void Draw(Color color) = 0;
+  virtual ~IScreenElement() {};
+  virtual Vector2 GetPos() = 0;
+  virtual ScreenElementType GetType() = 0;
+};
+
+class Unit : public IScreenElement {
+public:
+  Unit(Rectangle rec);
   ~Unit();
   void Draw(Color color) override;
-  // void ChangeObjective(Vector2 vec) override;
-  // void Move() override;
+  Vector2 GetPos() override;
+  ScreenElementType GetType() override { return ScreenElementType::Unit; };
 
 private:
-  Vector2 position;
+  Rectangle rectangle;
   Vector2 *currentObjective;
 };
