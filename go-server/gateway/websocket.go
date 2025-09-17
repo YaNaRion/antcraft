@@ -19,7 +19,7 @@ func NewWebsocketManager(log *log.Logger) *WebsocketManager {
 	}
 }
 func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
-	// fmt.Println("new incoming connection from client:", ws.RemoteAddr())
+	log.Println("new incoming connection from client:", ws.RemoteAddr())
 
 	// Mettre une protection contre les raiseconditions
 	s.conns[ws] = true
@@ -28,6 +28,7 @@ func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
 
 func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 	buf := make([]byte, 1024)
+	ws.Write([]byte("ECHO DU SERVER"))
 	for {
 		n, err := ws.Read(buf)
 		if err != nil {
@@ -38,9 +39,9 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 		}
 		msg := buf[:n]
 		log.Println(string(msg))
-		_, err = ws.Write([]byte("thx"))
-		if err != nil {
-			s.log.Println(err)
-		}
+		// _, err = ws.Write([]byte("thx"))
+		// if err != nil {
+		// 	s.log.Println(err)
+		// }
 	}
 }
