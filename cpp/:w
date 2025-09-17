@@ -1,4 +1,0 @@
-#include "scene.h"
-#include <iostream>
-
-MenuScene::MenuScene() { std::cout << "MENU SCENE\n"; };
