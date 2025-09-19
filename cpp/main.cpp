@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "websocket.h"
 #include "window.h"
 #include <memory>
 #include <queue>
@@ -18,6 +19,7 @@ void InputHandler() {}
 int main() {
 
   Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
+  WebsocketConnection wsc = WebsocketConnection();
 
   Rectangle rec = {
       .x = 400,
