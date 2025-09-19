@@ -27,8 +27,11 @@ void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr,
 void threadGate() { std::cout << "DANS THREAD\n"; }
 
 void CleanEvenQueue(Gateway *gate) {
-  while (gate->PopEvent() != 0) {
-    std::cout << "DANS CLEAN";
+  size_t queue_size = gate->GetQueueSize();
+  while (queue_size > 0) {
+    std::cout << "CLEAN\n";
+    gate->PopEvent();
+    queue_size = gate->GetQueueSize();
   }
 }
 
@@ -36,7 +39,6 @@ int main() {
   Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
 
   Gateway *gate = new Gateway();
-  std::cout << "Initialisation done" << std::endl;
 
   Rectangle rec = {
       .x = 400,
@@ -70,16 +72,15 @@ int main() {
   vectorScene.push_back(game_shared);
   SceneManager scene_manager = SceneManager(vectorScene);
 
+  std::cout << "Initialisation done" << std::endl;
   while (!window.ShouldWindowClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
-
-    if (gate != nullptr) {
-      InputHandler(units_ptr, gate);
-      CleanEvenQueue(gate);
-    }
-
     scene_manager.Draw();
+
+    InputHandler(units_ptr, gate);
+    CleanEvenQueue(gate);
+
     EndDrawing();
   }
 

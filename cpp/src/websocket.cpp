@@ -1,60 +1,59 @@
 #include "websocket.h"
 #include "./event_name.pb.h"
+#include "raylib.h"
+#include "unit.h"
 #include <iostream>
 
-// enum DataEventCase {
-//   kPlayerData = 1,
-//   kJoinRoomRequest = 2,
-//   kJoinRoomResponse = 3,
-//   kRoomStatusRequest = 4,
-//   DATA_EVENT_NOT_SET = 0,
-// };
 using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 
 // SET URL FOR THE SERVER
 const std::string url = "http://localhost:3000/ws";
+
 void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
                                     client::message_ptr msg) {
-  if (this->hdl != nullptr) {
-    this->hdl = &hdl;
+  try {
+    if (msg->get_opcode() != websocketpp::frame::opcode::binary) {
+      std::cerr << "Received non-binary frame; ignoring" << std::endl;
+      return;
+    }
+
+    Event::Event event;
+    if (!event.ParseFromString(msg->get_payload())) {
+      std::cerr << "Failed to parse protobuf message!" << std::endl;
+      return;
+    }
+
+    switch (event.Data_Event_case()) {
+    case Event::Event::kMoveUnit:
+      if (event.has_move_unit() && event.move_unit().has_new_pos()) {
+        const auto &units = event.move_unit();
+        std::cout << "NEW POS: X:" << units.new_pos().xpos()
+                  << ", Y:" << units.new_pos().ypos() << std::endl;
+
+        Rectangle rec = {
+            .x = (float)units.new_pos().xpos(),
+            .y = (float)units.new_pos().ypos(),
+            .width = 10,
+            .height = 10,
+        };
+        DrawRectangleRec(rec, GREEN);
+      }
+      break;
+
+    case Event::Event::kPlayerData:
+      // handle player data
+      break;
+
+    default:
+      std::cerr << "Unknown event type" << std::endl;
+    }
+
+  } catch (websocketpp::exception const &e) {
+    std::cerr << "WebSocket exception in OnMessage: " << e.what() << std::endl;
   }
-
-  Event::Event eventData;
-  eventData.ParseFromString(msg->get_payload());
-
-  // switch (eventData.Data_Event_case()) {
-  // case Event::Event::kPlayerData:
-  //   std::cout << "DANS CASE PLAYERDATA\n";
-  //   Event::JoinRoomRequest player = eventData.join_room_request();
-  //   std::cout << player.room() << "\n";
-  //   break;
-  // }
 }
-
-// void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
-//                                     client::message_ptr msg) {
-//
-//   // std::cout << "on_message called with hdl: " << hdl.lock().get()
-//   //           << " and message: " << msg->get_payload() << std::endl;
-//   Event::Player player;
-//   player.ParseFromString(msg->get_payload());
-//   //
-//   // player.ParseFromArray(msg->get_raw_payload(),
-//   msg->get_payload().size()); std::cout << player.uniqueid() << "\n";
-//
-//   Event::Player playerResponde;
-//   playerResponde.set_uniqueid("ECHO CLIENT FROM PROTO");
-//
-//   websocketpp::lib::error_code ec;
-//   this->c.send(hdl, playerresponde.serializeasstring(), msg->get_opcode(),
-//   ec);
-//
-//   if (ec) {
-//     std::cout << "Echo failed because: " << ec.message() << std::endl;
-//   }
-// }
 
 WebsocketConnection::WebsocketConnection() {
   try {
@@ -63,13 +62,38 @@ WebsocketConnection::WebsocketConnection() {
     c.clear_access_channels(websocketpp::log::alevel::frame_payload);
 
     c.init_asio();
-
+    c.set_open_handler([this](websocketpp::connection_hdl hdl) {
+      this->hdl = hdl;
+      std::cout << "Connected to server!" << std::endl;
+    });
+    //
     // Register our message handler
     c.set_message_handler(
         bind(&WebsocketConnection::OnMessage, this, ::_1, ::_2));
+    websocketpp::lib::error_code ec;
+    client::connection_ptr con =
+        c.get_connection("http://localhost:3000/ws", ec);
+
+    std::cout << "APRES CONNECTION\n";
+    con->replace_header("Origin", "http://localhost:3000");
+
+    if (ec) {
+      std::cout << "could not create connection because: " << ec.message()
+                << std::endl;
+    }
+
+    // Note that connect here only requests a connection. No network messages
+    // are exchanged until the event loop starts running in the next line.
+    c.connect(con);
+
+    // Start the ASIO io_service run loop
+    // this will cause a single connection to be made to the server. c.run()
+    // will exit when this connection is closed.
+    std::thread([this]() { c.run(); }).detach();
 
   } catch (websocketpp::exception const &e) {
     std::cout << e.what() << std::endl;
+    std::cout << "DANS EXECEP INIT SOCKET\n";
   }
 };
 
@@ -77,14 +101,12 @@ Gateway::~Gateway() {};
 
 void Gateway::PushEvent(std::shared_ptr<IEvent> ev) { this->queue.push(ev); }
 
-size_t Gateway::PopEvent() {
-  if (this->queue.size() == 0) {
-    return 0;
-  }
+size_t Gateway::GetQueueSize() { return this->queue.size(); }
+
+void Gateway::PopEvent() {
   auto event = this->queue.front();
-  event->PostEvent(this->ws.GetClient(), this->ws.GetHDL());
+  event->PostEvent(&this->ws);
   this->queue.pop();
-  return 1;
 }
 
 MoveUnit::MoveUnit(Vector2 old_p, Vector2 new_p, std::string player_ID,
@@ -95,8 +117,27 @@ MoveUnit::MoveUnit(Vector2 old_p, Vector2 new_p, std::string player_ID,
   unitID = unit_ID;
 };
 
-void MoveUnit::PostEvent(client *c, websocketpp::connection_hdl *hdl) {
+void MoveUnit::PostEvent(WebsocketConnection *ws) {
   websocketpp::lib::error_code ec;
-  std::cout << "DANS POST EVENT MOVE UNIT\n";
-  c->send(hdl, "payload", NULL, ec);
+  Event::Event event;
+
+  Event::MoveUnit *unit = event.mutable_move_unit();
+  unit->set_unit_id(this->unitID);
+  unit->set_player_id(this->playerID);
+
+  Event::Vector2 *old_pos = unit->mutable_old_pos();
+  old_pos->set_xpos(this->old_pos.x);
+  old_pos->set_ypos(this->old_pos.y);
+
+  Event::Vector2 *new_pos = unit->mutable_new_pos();
+  new_pos->set_xpos(this->new_pos.x);
+  new_pos->set_ypos(this->new_pos.y);
+
+  std::string eventString = event.SerializeAsString();
+
+  ws->GetClient()->send(*ws->GetHDL(), eventString,
+                        websocketpp::frame::opcode::BINARY, ec);
+  if (ec) {
+    std::cout << "Send Error: " << ec.message() << std::endl;
+  }
 }
