@@ -14,3 +14,18 @@ public:
 private:
   client c;
 };
+
+class Event {};
+
+class Gateway {
+public:
+  Gateway();
+  ~Gateway();
+
+  void PushEvent(Event ev);
+  void PopEvent();
+  std::queue<std::pair<Event, void *>> queue;
+
+private:
+  std::shared_ptr<WebsocketConnection> ws;
+};

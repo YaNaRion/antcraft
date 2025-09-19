@@ -3,11 +3,29 @@
 
 Unit::Unit(Rectangle rec) {
   rectangle = rec;
-  currentObjective = nullptr;
+  current_objective = nullptr;
+  is_selected = false;
 };
 
-Unit::~Unit() { delete currentObjective; }
+Unit::~Unit() { delete current_objective; }
 
-void Unit::Draw(Color color) { DrawRectangleRec(rectangle, color); };
+void Unit::Draw(Color color) {
+  if (this->is_selected) {
+    DrawRectangleRec(rectangle, GREEN);
+  } else {
+    DrawRectangleRec(rectangle, color);
+  }
+};
 
 Vector2 Unit::GetPos() { return Vector2{.x = rectangle.x, .y = rectangle.y}; };
+
+Rectangle Unit::GetRec() { return this->rectangle; };
+
+bool Unit::IsSelected() { return this->is_selected; };
+
+void Unit::SetSelected(bool is_selected) { this->is_selected = is_selected; };
+
+void Unit::SetPos(Vector2 vec2) {
+  this->rectangle.x = vec2.x;
+  this->rectangle.y = vec2.y;
+};

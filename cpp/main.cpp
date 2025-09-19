@@ -2,24 +2,25 @@
 #include "websocket.h"
 #include "window.h"
 #include <memory>
-#include <queue>
 #include <vector>
 
-struct Event {};
+void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr) {
+  for (std::shared_ptr<IScreenElement> element : element_ptr) {
+    Vector2 mouse_position = GetMousePosition();
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
+      element->SetPos(GetMousePosition());
+    }
 
-struct InputQueue {
-  void PushEvent();
-  void PopEvent();
-
-  std::queue<Event> queue;
-};
-
-void InputHandler() {}
+    if (CheckCollisionPointRec(mouse_position, element->GetRec()) &&
+        IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+      element->SetSelected(true);
+    }
+  }
+}
 
 int main() {
-
   Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
-  WebsocketConnection wsc = WebsocketConnection();
+  // WebsocketConnection wsc = WebsocketConnection();
 
   Rectangle rec = {
       .x = 400,
@@ -56,6 +57,8 @@ int main() {
   while (!window.ShouldWindowClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
+
+    InputHandler(units_ptr);
 
     scene_manager.Draw();
     EndDrawing();

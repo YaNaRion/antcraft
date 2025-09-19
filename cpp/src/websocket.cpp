@@ -80,3 +80,12 @@ WebsocketConnection::WebsocketConnection() {
     std::cout << e.what() << std::endl;
   }
 };
+
+Gateway::Gateway() {
+  ws = std::make_shared<WebsocketConnection>(WebsocketConnection());
+};
+
+void Gateway::PushEvent(Event ev) { this->queue.push(ev); }
+void Gateway::PopEvent() { this->queue.pop(); }
+
+void PushEvent(Event ev);
