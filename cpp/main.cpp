@@ -4,11 +4,17 @@
 #include <memory>
 #include <vector>
 
-void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr) {
+void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr,
+                  Gateway *gate) {
   for (std::shared_ptr<IScreenElement> element : element_ptr) {
     Vector2 mouse_position = GetMousePosition();
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
-      element->SetPos(GetMousePosition());
+      element->SetSelected(false);
+      element->SetPos(mouse_position);
+      std::shared_ptr<MoveUnit> move_unit = std::make_shared<MoveUnit>(
+          MoveUnit(element->GetPos(), mouse_position, "playerID", "unitID"));
+
+      gate->PushEvent(move_unit);
     }
 
     if (CheckCollisionPointRec(mouse_position, element->GetRec()) &&
@@ -18,9 +24,19 @@ void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr) {
   }
 }
 
+void threadGate() { std::cout << "DANS THREAD\n"; }
+
+void CleanEvenQueue(Gateway *gate) {
+  while (gate->PopEvent() != 0) {
+    std::cout << "DANS CLEAN";
+  }
+}
+
 int main() {
   Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
-  // WebsocketConnection wsc = WebsocketConnection();
+
+  Gateway *gate = new Gateway();
+  std::cout << "Initialisation done" << std::endl;
 
   Rectangle rec = {
       .x = 400,
@@ -58,7 +74,10 @@ int main() {
     BeginDrawing();
     ClearBackground(BLACK);
 
-    InputHandler(units_ptr);
+    if (gate != nullptr) {
+      InputHandler(units_ptr, gate);
+      CleanEvenQueue(gate);
+    }
 
     scene_manager.Draw();
     EndDrawing();

@@ -17,16 +17,20 @@ using websocketpp::lib::placeholders::_2;
 const std::string url = "http://localhost:3000/ws";
 void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
                                     client::message_ptr msg) {
+  if (this->hdl != nullptr) {
+    this->hdl = &hdl;
+  }
+
   Event::Event eventData;
   eventData.ParseFromString(msg->get_payload());
 
-  switch (eventData.Data_Event_case()) {
-  case Event::Event::kPlayerData:
-    std::cout << "DANS CASE PLAYERDATA\n";
-    Event::JoinRoomRequest player = eventData.join_room_request();
-    std::cout << player.room() << "\n";
-    break;
-  }
+  // switch (eventData.Data_Event_case()) {
+  // case Event::Event::kPlayerData:
+  //   std::cout << "DANS CASE PLAYERDATA\n";
+  //   Event::JoinRoomRequest player = eventData.join_room_request();
+  //   std::cout << player.room() << "\n";
+  //   break;
+  // }
 }
 
 // void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
@@ -44,7 +48,7 @@ void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
 //   playerResponde.set_uniqueid("ECHO CLIENT FROM PROTO");
 //
 //   websocketpp::lib::error_code ec;
-//   this->c.send(hdl, playerResponde.SerializeAsString(), msg->get_opcode(),
+//   this->c.send(hdl, playerresponde.serializeasstring(), msg->get_opcode(),
 //   ec);
 //
 //   if (ec) {
@@ -64,28 +68,35 @@ WebsocketConnection::WebsocketConnection() {
     c.set_message_handler(
         bind(&WebsocketConnection::OnMessage, this, ::_1, ::_2));
 
-    websocketpp::lib::error_code ec;
-    client::connection_ptr con = c.get_connection(url, ec);
-
-    con->replace_header("Origin", "http://localhost:3000");
-
-    if (ec) {
-      std::cout << "could not create connection because: " << ec.message()
-                << std::endl;
-    }
-
-    c.connect(con);
-    c.run();
   } catch (websocketpp::exception const &e) {
     std::cout << e.what() << std::endl;
   }
 };
 
-Gateway::Gateway() {
-  ws = std::make_shared<WebsocketConnection>(WebsocketConnection());
+Gateway::~Gateway() {};
+
+void Gateway::PushEvent(std::shared_ptr<IEvent> ev) { this->queue.push(ev); }
+
+size_t Gateway::PopEvent() {
+  if (this->queue.size() == 0) {
+    return 0;
+  }
+  auto event = this->queue.front();
+  event->PostEvent(this->ws.GetClient(), this->ws.GetHDL());
+  this->queue.pop();
+  return 1;
+}
+
+MoveUnit::MoveUnit(Vector2 old_p, Vector2 new_p, std::string player_ID,
+                   std::string unit_ID) {
+  old_pos = old_p;
+  new_pos = new_p;
+  playerID = player_ID;
+  unitID = unit_ID;
 };
 
-void Gateway::PushEvent(Event ev) { this->queue.push(ev); }
-void Gateway::PopEvent() { this->queue.pop(); }
-
-void PushEvent(Event ev);
+void MoveUnit::PostEvent(client *c, websocketpp::connection_hdl *hdl) {
+  websocketpp::lib::error_code ec;
+  std::cout << "DANS POST EVENT MOVE UNIT\n";
+  c->send(hdl, "payload", NULL, ec);
+}
