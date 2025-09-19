@@ -4,7 +4,18 @@
 # Compiler settings
 CXX = g++
 CXXFLAGS = -Wall -Wextra -g -std=c++23 -I. -Iinclude
-LDFLAGS = 
+
+# Use pkg-config for protobuf if available
+PROTOBUF_CFLAGS := $(shell pkg-config --cflags protobuf 2>/dev/null)
+PROTOBUF_LIBS   := $(shell pkg-config --libs protobuf 2>/dev/null)
+
+ifeq ($(strip $(PROTOBUF_LIBS)),)
+    # Fallback if pkg-config not available
+    PROTOBUF_CFLAGS =
+    PROTOBUF_LIBS = -lprotobuf
+endif
+
+CXXFLAGS += $(PROTOBUF_CFLAGS)
 
 # Directory structure
 SRC_DIR = src
@@ -21,7 +32,7 @@ TARGET = myprogram
 
 # Raylib static library and dependencies
 RAYLIB_STATIC = $(RAYLIB_LIB_DIR)/libraylib.a
-LIBS = $(RAYLIB_STATIC) -lm -ldl -lpthread
+LIBS = $(RAYLIB_STATIC) -lm -ldl -lpthread $(PROTOBUF_LIBS)
 
 # Platform-specific libraries
 UNAME_S := $(shell uname -s)
@@ -36,13 +47,14 @@ endif
 CXXFLAGS += -I$(RAYLIB_INCLUDE_DIR)
 
 # ============== Automatic File Discovery ==============
-# Find all source files recursively
-SRCS = $(shell find $(SRC_DIR) -name '*.cpp')
+# Find all source files recursively (including .pb.cc in src/)
+SRCS = $(shell find $(SRC_DIR) -name '*.cpp' -o -name '*.cc')
 # Main.cpp is treated separately since it's in root
 MAIN_SRC = main.cpp
 
 # Generate object file paths
-OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/$(SRC_DIR)/%.o,$(filter %.cpp,$(SRCS))) \
+       $(patsubst $(SRC_DIR)/%.cc,$(BUILD_DIR)/$(SRC_DIR)/%.o,$(filter %.cc,$(SRCS)))
 MAIN_OBJ = $(BUILD_DIR)/$(MAIN_SRC:.cpp=.o)
 
 # Get all directories needed for object files
@@ -63,7 +75,7 @@ $(BIN_DIR):
 $(OBJ_DIRS):
 	mkdir -p $@
 
-# Link all objects into executable with static Raylib
+# Link all objects into executable with Raylib + Protobuf
 $(BIN_DIR)/$(TARGET): $(MAIN_OBJ) $(OBJS) $(RAYLIB_STATIC)
 	$(CXX) $(CXXFLAGS) $(MAIN_OBJ) $(OBJS) -o $@ $(LIBS)
 
@@ -71,8 +83,10 @@ $(BIN_DIR)/$(TARGET): $(MAIN_OBJ) $(OBJS) $(RAYLIB_STATIC)
 $(BUILD_DIR)/%.o: %.cpp | $(OBJ_DIRS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Compile src files
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIRS)
+# Compile src files (.cpp and .cc, including .pb.cc)
+$(BUILD_DIR)/$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIRS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(BUILD_DIR)/$(SRC_DIR)/%.o: $(SRC_DIR)/%.cc | $(OBJ_DIRS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Check if Raylib static library exists
@@ -94,3 +108,4 @@ debug: all
 	gdb --args ./$(BIN_DIR)/$(TARGET)
 
 .PHONY: all clean run debug
+

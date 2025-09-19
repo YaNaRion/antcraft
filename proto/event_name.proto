@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package Event;
+option go_package = "/gateway";
+
+message Player { string uniqueID = 1; }
+
+message JoinRoomRequest { string room = 1; }
+
+message JoinRoomResponse {
+  string room = 1;
+  string uniqueID = 2;
+  repeated Player player_in_room = 3;
+}
+
+message RoomStatusRequest { bool game_started = 1; }
+
+message Event {
+  oneof Data_Event {
+      Player player_data = 1;
+      JoinRoomRequest join_room_request = 2;
+      JoinRoomResponse join_room_response = 3;
+      RoomStatusRequest room_status_request = 4;
+  }
+}

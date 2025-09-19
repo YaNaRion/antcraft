@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"golang.org/x/net/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 type WebsocketManager struct {
@@ -28,20 +29,25 @@ func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
 
 func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 	buf := make([]byte, 1024)
-	ws.Write([]byte("ECHO DU SERVER"))
+	var event Event
 	for {
-		n, err := ws.Read(buf)
+		_, err := ws.Read(buf)
 		if err != nil {
 			if err == io.EOF {
 				break
 			}
 			s.log.Println("read error", err)
 		}
-		msg := buf[:n]
-		log.Println(string(msg))
-		// _, err = ws.Write([]byte("thx"))
-		// if err != nil {
-		// 	s.log.Println(err)
-		// }
+		err = proto.Unmarshal(buf, &event)
+		if err != nil {
+			s.log.Println(err)
+		}
+		switch x := event.Data_Event.(type) {
+		case *Event_PlayerData:
+			s.log.Println(x.PlayerData.UniqueID)
+		case *Event_JoinRoomRequest:
+		case *Event_JoinRoomResponse:
+		case *Event_RoomStatusRequest:
+		}
 	}
 }
