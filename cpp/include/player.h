@@ -9,6 +9,7 @@ public:
   Player(Color color, std::vector<std::shared_ptr<IScreenElement>> units);
   ~Player();
   Color GetTeamColor();
+  std::vector<std::shared_ptr<IScreenElement>> GetUnit();
 
 private:
   std::vector<std::shared_ptr<IScreenElement>> units;

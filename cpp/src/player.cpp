@@ -13,4 +13,8 @@ void Player::Draw() {
   }
 };
 
+std::vector<std::shared_ptr<IScreenElement>> Player::GetUnit() {
+  return this->units;
+}
+
 Player::~Player() {};

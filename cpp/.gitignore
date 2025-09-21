@@ -1,2 +1,5 @@
-./build/
+build/
+bin/
+proto/
+include/event_name.pb.h
 *.o
