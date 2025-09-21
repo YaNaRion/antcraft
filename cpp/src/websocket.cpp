@@ -1,5 +1,5 @@
 #include "websocket.h"
-#include "./event_name.pb.h"
+#include "event_name.pb.h"
 #include "raylib.h"
 #include "unit.h"
 #include <iostream>
@@ -11,8 +11,8 @@ using websocketpp::lib::placeholders::_2;
 // SET URL FOR THE SERVER
 const std::string url = "http://localhost:3000/ws";
 
-void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
-                                    client::message_ptr msg) {
+void Gateway::OnMessage(websocketpp::connection_hdl hdl,
+                        client::message_ptr msg) {
   try {
     if (msg->get_opcode() != websocketpp::frame::opcode::binary) {
       std::cerr << "Received non-binary frame; ignoring" << std::endl;
@@ -31,14 +31,20 @@ void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
         const auto &units = event.move_unit();
         std::cout << "NEW POS: X:" << units.new_pos().xpos()
                   << ", Y:" << units.new_pos().ypos() << std::endl;
+        MoveUnitPost unitEvent = MoveUnitPost(
+            Vector2{
+                .x = (float)units.new_pos().xpos(),
+                .y = (float)units.new_pos().ypos(),
+            },
+            Vector2{
+                .x = (float)units.old_pos().xpos(),
+                .y = (float)units.old_pos().ypos(),
+            },
+            units.player_id(), units.unit_id());
+        std::shared_ptr<MoveUnitPost> shared_unit =
+            std::make_shared<MoveUnitPost>(unitEvent);
 
-        Rectangle rec = {
-            .x = (float)units.new_pos().xpos(),
-            .y = (float)units.new_pos().ypos(),
-            .width = 10,
-            .height = 10,
-        };
-        DrawRectangleRec(rec, GREEN);
+        this->queue_in.push(shared_unit);
       }
       break;
 
@@ -49,13 +55,12 @@ void WebsocketConnection::OnMessage(websocketpp::connection_hdl hdl,
     default:
       std::cerr << "Unknown event type" << std::endl;
     }
-
   } catch (websocketpp::exception const &e) {
     std::cerr << "WebSocket exception in OnMessage: " << e.what() << std::endl;
   }
 }
 
-WebsocketConnection::WebsocketConnection() {
+Gateway::Gateway() {
   try {
     // Set logging to be pretty verbose (everything except message payloads)
     c.set_access_channels(websocketpp::log::alevel::all);
@@ -68,8 +73,8 @@ WebsocketConnection::WebsocketConnection() {
     });
     //
     // Register our message handler
-    c.set_message_handler(
-        bind(&WebsocketConnection::OnMessage, this, ::_1, ::_2));
+    c.set_message_handler(bind(&Gateway::OnMessage, this, ::_1, ::_2));
+
     websocketpp::lib::error_code ec;
     client::connection_ptr con =
         c.get_connection("http://localhost:3000/ws", ec);
@@ -99,27 +104,40 @@ WebsocketConnection::WebsocketConnection() {
 
 Gateway::~Gateway() {};
 
-void Gateway::PushEvent(std::shared_ptr<IEvent> ev) { this->queue.push(ev); }
+void Gateway::PushEvent(std::shared_ptr<IEvent> ev) {
+  this->queue_out.push(ev);
+};
 
-size_t Gateway::GetQueueSize() { return this->queue.size(); }
+size_t Gateway::GetQueueSize() { return this->queue_out.size(); }
 
 void Gateway::PopEvent() {
-  auto event = this->queue.front();
-  event->PostEvent(&this->ws);
-  this->queue.pop();
+  auto event = this->queue_out.front();
+  Event::Event protoEvent = event->CreateProtoEvent();
+  std::string eventString = protoEvent.SerializeAsString();
+  std::cout << eventString << std::endl;
+  this->SendEvent(eventString);
+  this->queue_out.pop();
+};
+
+void Gateway::SendEvent(std::string eventString) {
+  websocketpp::lib::error_code ec;
+  this->c.send(this->hdl, eventString, websocketpp::frame::opcode::BINARY, ec);
+  if (ec) {
+    std::cout << "Send Error: " << ec.message() << std::endl;
+  }
 }
 
-MoveUnit::MoveUnit(Vector2 old_p, Vector2 new_p, std::string player_ID,
-                   std::string unit_ID) {
+MoveUnitPost::MoveUnitPost(Vector2 old_p, Vector2 new_p, std::string player_ID,
+                           std::string unit_ID) {
   old_pos = old_p;
   new_pos = new_p;
   playerID = player_ID;
   unitID = unit_ID;
 };
 
-void MoveUnit::PostEvent(WebsocketConnection *ws) {
+Event::Event MoveUnitPost::CreateProtoEvent() {
   websocketpp::lib::error_code ec;
-  Event::Event event;
+  Event::Event event = Event::Event();
 
   Event::MoveUnit *unit = event.mutable_move_unit();
   unit->set_unit_id(this->unitID);
@@ -133,11 +151,7 @@ void MoveUnit::PostEvent(WebsocketConnection *ws) {
   new_pos->set_xpos(this->new_pos.x);
   new_pos->set_ypos(this->new_pos.y);
 
-  std::string eventString = event.SerializeAsString();
-
-  ws->GetClient()->send(*ws->GetHDL(), eventString,
-                        websocketpp::frame::opcode::BINARY, ec);
-  if (ec) {
-    std::cout << "Send Error: " << ec.message() << std::endl;
-  }
+  return event;
 }
+
+Vector2 MoveUnitPost::GetNewPos() { return this->new_pos; }

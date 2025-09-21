@@ -64,6 +64,9 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 				},
 			}
 
+			s.log.Println("EVENT SEND UNIT")
+			s.log.Println(eventSend.Data_Event)
+
 			data, err := proto.Marshal(&eventSend)
 			if err != nil {
 				s.log.Println(err)
