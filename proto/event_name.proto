@@ -3,6 +3,14 @@ syntax = "proto3";
 package Event;
 option go_package = "/gateway";
 
+enum GameState {
+  STATE_UNKNOWN = 0;
+  GAME_IN_LOBBY = 1;
+  GAME_IS_STARTING = 2;
+  IN_GAME = 3;
+  END_GAME = 4;
+}
+
 message Vector2 {
   int32 XPos = 1;
   int32 YPos = 2;
@@ -10,29 +18,56 @@ message Vector2 {
 
 message Player { string unique_id = 1; }
 
-message MoveUnit {
+message ConnectToGameRequest {
+  string player_id = 1;
+  string game_id = 2;
+}
+
+message ConnectToGameRespond {
+  string player_id = 1;
+  string game_id = 2;
+  repeated Player player_in_room = 3;
+  SyncGameState Map = 4;
+}
+
+message MoveElement {
   string player_id = 1;
   string unit_id = 2;
-  Vector2 old_pos = 3;
-  Vector2 new_pos = 4;
+  optional Vector2 old_pos = 3;
+  Vector2 pos = 4;
+  Vector2 size = 5;
 }
 
-message JoinRoomRequest { string room = 1; }
-
-message JoinRoomResponse {
-  string room = 1;
-  string uniqueID = 2;
-  repeated Player player_in_room = 3;
+message Element {
+  enum ElementType {
+    UNKNOWN_ELEMENT = 0; // Always start with 0 as a default
+    WORKER = 1;
+    MARINE = 2;
+    BASE = 3;
+    BARRACK = 4;
+    SUPPLY = 5;
+    MINERAL = 6;
+  }
+  MoveElement element = 1;
+  ElementType element_type = 2;
+  optional Player player = 3;
 }
 
-message RoomStatusRequest { bool game_started = 1; }
+message Row {
+  repeated Element values = 1; // one row
+}
+
+message SyncGameState {
+  GameState game_state = 1;
+  repeated Row rows = 2; // multiple rows → forms a 2D array
+}
 
 message Event {
   oneof Data_Event {
     Player player_data = 1;
-    JoinRoomRequest join_room_request = 2;
-    JoinRoomResponse join_room_response = 3;
-    RoomStatusRequest room_status_request = 4;
-    MoveUnit move_unit = 5;
+    ConnectToGameRequest game_request = 2;
+    ConnectToGameRespond game_respond = 3;
+    MoveElement move_element = 4;
+    SyncGameState sync_game_state = 5;
   }
 }

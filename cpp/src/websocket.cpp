@@ -26,9 +26,9 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
     }
 
     switch (event.Data_Event_case()) {
-    case Event::Event::kMoveUnit:
-      if (event.has_move_unit() && event.move_unit().has_new_pos()) {
-        const auto &units = event.move_unit();
+    case Event::Event::kMoveElement:
+      if (event.has_move_element() && event.move_element().has_new_pos()) {
+        const auto &units = event.move_element();
         std::cout << "NEW POS: X:" << units.new_pos().xpos()
                   << ", Y:" << units.new_pos().ypos() << std::endl;
         MoveUnitPost unitEvent = MoveUnitPost(
@@ -110,7 +110,7 @@ void Gateway::PushEvent(std::shared_ptr<IEvent> ev) {
 
 size_t Gateway::GetQueueSize() { return this->queue_out.size(); }
 
-void Gateway::PopEvent() {
+void Gateway::PopAndSendEvent() {
   auto event = this->queue_out.front();
   Event::Event protoEvent = event->CreateProtoEvent();
   std::string eventString = protoEvent.SerializeAsString();
@@ -139,7 +139,7 @@ Event::Event MoveUnitPost::CreateProtoEvent() {
   websocketpp::lib::error_code ec;
   Event::Event event = Event::Event();
 
-  Event::MoveUnit *unit = event.mutable_move_unit();
+  Event::MoveElement *unit = event.mutable_move_element();
   unit->set_unit_id(this->unitID);
   unit->set_player_id(this->playerID);
 

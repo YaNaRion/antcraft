@@ -34,7 +34,7 @@ void CleanEvenOutQueue(Gateway *gate) {
   size_t queue_size = gate->GetQueueSize();
   while (queue_size > 0) {
     std::cout << "CLEAN OUT\n";
-    gate->PopEvent();
+    gate->PopAndSendEvent();
     queue_size = gate->GetQueueSize();
   }
 }

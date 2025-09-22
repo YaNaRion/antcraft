@@ -1,34 +1,157 @@
 package gateway
 
 import (
+	"fmt"
 	"io"
 	"log"
+	"main/service/game"
+	"net"
 
+	"github.com/google/uuid"
 	"golang.org/x/net/websocket"
 	"google.golang.org/protobuf/proto"
 )
 
+type ClientID uuid.UUID
+
+type Client struct {
+	Conn *websocket.Conn
+	id   ClientID
+	addr net.Addr
+}
+
+func newClient(conn *websocket.Conn, id ClientID, addr net.Addr) *Client {
+	return &Client{
+		Conn: conn,
+		id:   id,
+		addr: addr,
+	}
+}
+
+func (c *Client) GetID() ClientID {
+	return c.id
+}
+
+// voir si ya pas mieux que any comme type
+//
+//	type EventManager struct {
+//		eventManager map[*isEvent_Data_Event]any
+//	}
+
+//
+// func newEventManager() *EventManager {
+// 	eventMan := make(map[Event.Data_Event]any)
+// 	// eventMan[Event.Data_Event] = GameRequestHandler
+//
+// 	return &EventManager{
+// 		eventManager: eventMan,
+// 	}
+// }
+
 type WebsocketManager struct {
-	conns map[*websocket.Conn]bool
-	log   *log.Logger
+	clients     map[ClientID]*Client
+	log         *log.Logger
+	gameManager *game.GameManager
+	// eventManager *EventManager
 }
 
 func NewWebsocketManager(log *log.Logger) *WebsocketManager {
 	return &WebsocketManager{
-		conns: make(map[*websocket.Conn]bool),
-		log:   log,
+		clients:     make(map[ClientID]*Client),
+		log:         log,
+		gameManager: game.NewGameManager(),
+		// eventManager: newEventManager(),
 	}
 }
-func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
-	s.log.Println("new incoming connection from client:", ws.RemoteAddr())
 
-	// Mettre une protection contre les raiseconditions
-	s.conns[ws] = true
+func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
+	s.log.Println("New incoming connection from client:", ws.RemoteAddr())
+
+	newClient := newClient(ws, ClientID(uuid.New()), ws.RemoteAddr())
+
+	// Mettre une protection contre les raiseconditions ou prob de sync
+	s.clients[newClient.GetID()] = newClient
 
 	s.readLoop(ws)
 }
 
+func (s *WebsocketManager) SyncGameStateHandler(ws *websocket.Conn, event *Event_SyncGameState) {}
+func (s *WebsocketManager) GameRequestHandler(ws *websocket.Conn, event *Event_GameRequest) {
+	var newPlayer *game.Player
+	var playerID string
+	var gameID string = "Game1"
+
+	playerID = fmt.Sprintf("Player%d", len(s.clients))
+	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
+	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
+
+	var eventRespond Event
+	var mapGrid SyncGameState
+	var players []*Player
+
+	for _, player := range s.gameManager.GetPlayerInAGame(game.GameID(gameID)) {
+		players = append(players, &Player{
+			UniqueId: player.GetPlayerIDString(),
+		})
+	}
+
+	gameMap := s.gameManager.GetGame(game.GameID(gameID))
+	mapGrid = *MapGridToProto(s.gameManager.GetMap(game.GameID(gameID)), GameState(gameMap.GameStat))
+
+	eventRespond.Data_Event = &Event_GameRespond{
+		GameRespond: &ConnectToGameRespond{
+			PlayerId:     playerID,
+			GameId:       gameID,
+			PlayerInRoom: players,
+			Map:          &mapGrid,
+		},
+	}
+
+	marshalData, err := proto.Marshal(&eventRespond)
+	if err != nil {
+		s.log.Println("send error:", err)
+	}
+
+	err = websocket.Message.Send(ws, marshalData)
+	if err != nil {
+		s.log.Println("send error:", err)
+	}
+}
+
+func (s *WebsocketManager) GameRespondHandler(ws *websocket.Conn, event *Event_GameRespond) {}
+func (s *WebsocketManager) PlayerDataHandler(ws *websocket.Conn, event *Event_PlayerData)   {}
+func (s *WebsocketManager) MoveElementHandler(ws *websocket.Conn, unit *Event_MoveElement) {
+	var eventSend Event
+	eventSend.Data_Event = &Event_MoveElement{
+		MoveElement: &MoveElement{
+			UnitId:   unit.MoveElement.UnitId,
+			PlayerId: unit.MoveElement.PlayerId,
+			OldPos:   unit.MoveElement.OldPos,
+			Pos:      unit.MoveElement.Pos,
+		},
+	}
+	data, err := proto.Marshal(&eventSend)
+
+	if err != nil {
+		s.log.Println(err)
+		return
+	}
+
+	for _, client := range s.clients {
+		err = websocket.Message.Send(client.Conn, data)
+		if err != nil {
+			s.log.Println("send error:", err)
+		}
+	}
+}
+
 func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
+	// player := game.NewPlayer(game.NewPlayerConn(ws), "Player0")
+	// s.gameManager.AddPlayerToGame(game.GameID("Game1"), player)
+
+	// Prochaine étape, faire la creation
+	// err := websocket.Message.Send(ws)
+
 	for {
 		var msg []byte
 		err := websocket.Message.Receive(ws, &msg)
@@ -50,35 +173,12 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 		switch x := event.Data_Event.(type) {
 		case *Event_PlayerData:
 			s.log.Println(x.PlayerData.UniqueId)
-		case *Event_MoveUnit:
-			var eventSend Event
-			unit := x.MoveUnit
-			s.log.Println(unit)
-
-			eventSend.Data_Event = &Event_MoveUnit{
-				MoveUnit: &MoveUnit{
-					UnitId:   unit.UnitId,
-					PlayerId: unit.PlayerId,
-					OldPos:   unit.OldPos,
-					NewPos:   unit.NewPos,
-				},
-			}
-
-			s.log.Println("EVENT SEND UNIT")
-			s.log.Println(eventSend.Data_Event)
-
-			data, err := proto.Marshal(&eventSend)
-			if err != nil {
-				s.log.Println(err)
-				continue
-			}
-
-			for con := range s.conns {
-				err = websocket.Message.Send(con, data)
-				if err != nil {
-					s.log.Println("send error:", err)
-				}
-			}
+		case *Event_GameRequest:
+			s.GameRequestHandler(ws, x)
+		case *Event_GameRespond:
+		case *Event_MoveElement:
+			s.MoveElementHandler(ws, x)
+		case *Event_SyncGameState:
 		}
 	}
 }

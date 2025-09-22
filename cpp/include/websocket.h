@@ -36,7 +36,7 @@ public:
 
   void Send(std::shared_ptr<IEvent> ev);
   void PushEvent(std::shared_ptr<IEvent> ev);
-  void PopEvent();
+  void PopAndSendEvent();
   size_t GetQueueSize();
   void SendEvent(std::string eventString);
   void OnMessage(websocketpp::connection_hdl hdl, client::message_ptr msg);
