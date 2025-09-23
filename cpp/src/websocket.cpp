@@ -27,14 +27,14 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
 
     switch (event.Data_Event_case()) {
     case Event::Event::kMoveElement:
-      if (event.has_move_element() && event.move_element().has_new_pos()) {
+      if (event.has_move_element() && event.move_element().has_pos()) {
         const auto &units = event.move_element();
-        std::cout << "NEW POS: X:" << units.new_pos().xpos()
-                  << ", Y:" << units.new_pos().ypos() << std::endl;
+        std::cout << "NEW POS: X:" << units.pos().xpos()
+                  << ", Y:" << units.pos().ypos() << std::endl;
         MoveUnitPost unitEvent = MoveUnitPost(
             Vector2{
-                .x = (float)units.new_pos().xpos(),
-                .y = (float)units.new_pos().ypos(),
+                .x = (float)units.pos().xpos(),
+                .y = (float)units.pos().ypos(),
             },
             Vector2{
                 .x = (float)units.old_pos().xpos(),
@@ -48,7 +48,15 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
       }
       break;
 
-    case Event::Event::kPlayerData:
+    case Event::Event::kGameRespond:
+      if (event.has_game_respond() && event.game_respond().has_map()) {
+        const auto &game = event.game_respond();
+        std::cout << "GAME_ID: X:" << game.game_id() << std::endl;
+
+        CreateUnit unit = CreateUnit(game);
+
+        // this->queue_in.push(shared_unit);
+      }
       // handle player data
       break;
 
@@ -104,7 +112,7 @@ Gateway::Gateway() {
 
 Gateway::~Gateway() {};
 
-void Gateway::PushEvent(std::shared_ptr<IEvent> ev) {
+void Gateway::PushEvent(std::shared_ptr<IEventOut> ev) {
   this->queue_out.push(ev);
 };
 
@@ -147,7 +155,7 @@ Event::Event MoveUnitPost::CreateProtoEvent() {
   old_pos->set_xpos(this->old_pos.x);
   old_pos->set_ypos(this->old_pos.y);
 
-  Event::Vector2 *new_pos = unit->mutable_new_pos();
+  Event::Vector2 *new_pos = unit->mutable_pos();
   new_pos->set_xpos(this->new_pos.x);
   new_pos->set_ypos(this->new_pos.y);
 
@@ -155,3 +163,11 @@ Event::Event MoveUnitPost::CreateProtoEvent() {
 }
 
 Vector2 MoveUnitPost::GetNewPos() { return this->new_pos; }
+
+CreateUnit::CreateUnit(Vector2 pos, std::string playerID, std::string unitID) {
+  this->pos = pos;
+  this->playerID = playerID;
+  this->unitID = unitID;
+}
+
+Vector2 CreateUnit::GetNewPos() { return this->pos; }

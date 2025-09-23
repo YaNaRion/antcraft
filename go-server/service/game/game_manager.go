@@ -5,11 +5,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-type IElement interface {
-	GetPost() Vector2
-	SetPost(Vector2)
-}
-
 type PlayerConn struct {
 	ws *websocket.Conn
 }
@@ -47,7 +42,13 @@ func NewVector2(x, y int) Vector2 {
 	return Vector2{X: x, Y: y}
 }
 
-type ElementID uuid.UUID
+type ElementID string
+
+type IElement interface {
+	GetPost() Vector2
+	SetPost(Vector2)
+	GetID() ElementID
+}
 
 type Unit struct {
 	pos    Vector2
@@ -59,12 +60,13 @@ func NewUnit(pos, size Vector2) *Unit {
 	return &Unit{
 		pos:    pos,
 		size:   size,
-		unitID: ElementID(uuid.New()),
+		unitID: ElementID(uuid.New().String()),
 	}
 }
 
 func (u *Unit) GetPost() Vector2  { return u.pos }
 func (u *Unit) SetPost(v Vector2) { u.pos = v }
+func (u *Unit) GetID() ElementID  { return u.unitID }
 
 type MapGrid struct {
 	Grid     [][]IElement
@@ -93,17 +95,41 @@ const (
 )
 
 type Game struct {
-	grid     *MapGrid
-	players  []*Player
-	GameStat Enum_Game_State
+	MapGrid      *MapGrid
+	players      []*Player
+	GameStat     Enum_Game_State
+	gameElements map[ElementID]IElement
 }
 
 func NewGame(grid *MapGrid) *Game {
 	return &Game{
-		grid:     grid,
-		players:  make([]*Player, 0),
-		GameStat: GAME_STATE_IN_GAME,
+		MapGrid:      grid,
+		players:      make([]*Player, 0),
+		GameStat:     GAME_STATE_IN_GAME,
+		gameElements: map[ElementID]IElement{},
 	}
+}
+
+func (g *Game) GetIElementAt(vec *Vector2) IElement {
+	return g.MapGrid.Grid[vec.X][vec.Y]
+}
+
+func (g *Game) MoveElement(
+	elementID ElementID,
+	playerID PlayerID,
+	newPos Vector2,
+	oldPos Vector2,
+) error {
+	element := g.MapGrid.Grid[oldPos.X][oldPos.Y]
+	if element == nil {
+		// Faire une erreur
+		return nil
+	}
+	element.SetPost(newPos)
+	g.MapGrid.Grid[oldPos.X][oldPos.Y] = nil
+	g.MapGrid.Grid[newPos.X][newPos.X] = element
+
+	return nil
 }
 
 type GameID string
@@ -121,7 +147,29 @@ func (g *GameManager) GetGame(gameID GameID) *Game {
 	return g.games[gameID]
 }
 
+func (g *GameManager) MoveElement(
+	elementID ElementID,
+	playerID PlayerID,
+	gameID GameID,
+	newPos Vector2,
+	oldPos Vector2,
+) error {
+	err := g.games[gameID].MoveElement(elementID, playerID, newPos, oldPos)
+	if err != nil {
+		// Mettre une erreur
+		return nil
+	}
+	return nil
+}
+
 func (g *GameManager) AddPlayerToGame(gameID GameID, player *Player) {
+	player.elements = append(player.elements, NewUnit(Vector2{
+		X: 100,
+		Y: 100,
+	}, Vector2{
+		X: 10,
+		Y: 10,
+	}))
 	g.games[gameID].players = append(g.games[gameID].players, player)
 }
 
@@ -130,7 +178,7 @@ func (g *GameManager) GetPlayerInAGame(gameID GameID) []*Player {
 }
 
 func (g *GameManager) GetMap(gameID GameID) *MapGrid {
-	return g.games[gameID].grid
+	return g.games[gameID].MapGrid
 }
 
 func NewGameManager() *GameManager {
@@ -142,7 +190,7 @@ func NewGameManager() *GameManager {
 	// Game de setup pour accelerer le dev
 	var defaultGameID GameID = "Game1"
 	gameManager.gamesID = append(gameManager.gamesID, defaultGameID)
-	var mapGrid *MapGrid = NewMapGrid(100, 100)
+	var mapGrid *MapGrid = NewMapGrid(10000, 10000)
 	gameManager.games[defaultGameID] = NewGame(mapGrid)
 
 	return gameManager

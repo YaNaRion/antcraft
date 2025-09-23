@@ -7,14 +7,44 @@
 
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 
-class IEvent {
+class IEventIN {
 public:
-  ~IEvent() {};
+  ~IEventIN() {};
+  virtual Vector2 GetNewPos() = 0;
+};
+
+class CreateUnit : public IEventIN {
+public:
+  CreateUnit(Vector2 pos, std::string playerID, std::string unitID);
+  ~CreateUnit() {};
+  Vector2 GetNewPos() override;
+
+private:
+  Vector2 pos;
+  std::string playerID;
+  std::string unitID;
+};
+
+class UpdateMap : public IEventIN {
+public:
+  UpdateMap(Vector2 pos, std::string playerID, std::string unitID);
+  ~UpdateMap() {};
+  Vector2 GetNewPos() override;
+
+private:
+  Vector2 pos;
+  std::string playerID;
+  std::string unitID;
+};
+
+class IEventOut {
+public:
+  ~IEventOut() {};
   virtual Event::Event CreateProtoEvent() = 0;
   virtual Vector2 GetNewPos() = 0;
 };
 
-class MoveUnitPost : public IEvent {
+class MoveUnitPost : public IEventOut {
 public:
   MoveUnitPost(Vector2 old_p, Vector2 new_p, std::string playerID,
                std::string unitID);
@@ -34,8 +64,8 @@ public:
   Gateway();
   ~Gateway();
 
-  void Send(std::shared_ptr<IEvent> ev);
-  void PushEvent(std::shared_ptr<IEvent> ev);
+  void Send(std::shared_ptr<IEventOut> ev);
+  void PushEvent(std::shared_ptr<IEventOut> ev);
   void PopAndSendEvent();
   size_t GetQueueSize();
   void SendEvent(std::string eventString);
@@ -43,8 +73,8 @@ public:
   client *GetClient() { return &this->c; };
 
   websocketpp::connection_hdl *GetHDL() { return &this->hdl; };
-  std::queue<std::shared_ptr<IEvent>> queue_in;
-  std::queue<std::shared_ptr<IEvent>> queue_out;
+  std::queue<std::shared_ptr<IEventOut>> queue_in;
+  std::queue<std::shared_ptr<IEventOut>> queue_out;
 
   client c;
   websocketpp::connection_hdl hdl;

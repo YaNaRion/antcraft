@@ -84,20 +84,18 @@ func (s *WebsocketManager) GameRequestHandler(ws *websocket.Conn, event *Event_G
 	playerID = fmt.Sprintf("Player%d", len(s.clients))
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
 	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
+	gameMap := s.gameManager.GetGame(game.GameID(gameID))
 
 	var eventRespond Event
 	var mapGrid SyncGameState
 	var players []*Player
-
 	for _, player := range s.gameManager.GetPlayerInAGame(game.GameID(gameID)) {
 		players = append(players, &Player{
 			UniqueId: player.GetPlayerIDString(),
 		})
 	}
 
-	gameMap := s.gameManager.GetGame(game.GameID(gameID))
 	mapGrid = *MapGridToProto(s.gameManager.GetMap(game.GameID(gameID)), GameState(gameMap.GameStat))
-
 	eventRespond.Data_Event = &Event_GameRespond{
 		GameRespond: &ConnectToGameRespond{
 			PlayerId:     playerID,
@@ -122,6 +120,28 @@ func (s *WebsocketManager) GameRespondHandler(ws *websocket.Conn, event *Event_G
 func (s *WebsocketManager) PlayerDataHandler(ws *websocket.Conn, event *Event_PlayerData)   {}
 func (s *WebsocketManager) MoveElementHandler(ws *websocket.Conn, unit *Event_MoveElement) {
 	var eventSend Event
+	var gameID = "Game1"
+
+	elementNewPos := game.Vector2{
+		X: int(unit.MoveElement.GetPos().XPos),
+		Y: int(unit.MoveElement.GetPos().YPos),
+	}
+	elementOldPos := game.Vector2{
+		X: int(unit.MoveElement.GetOldPos().XPos),
+		Y: int(unit.MoveElement.GetOldPos().YPos),
+	}
+	err := s.gameManager.MoveElement(
+		game.ElementID(unit.MoveElement.UnitId),
+		game.PlayerID(unit.MoveElement.PlayerId),
+		game.GameID(gameID),
+		elementNewPos,
+		elementOldPos,
+	)
+
+	if err != nil {
+		s.log.Println(err)
+	}
+
 	eventSend.Data_Event = &Event_MoveElement{
 		MoveElement: &MoveElement{
 			UnitId:   unit.MoveElement.UnitId,

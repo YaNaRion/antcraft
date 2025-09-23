@@ -16,7 +16,15 @@ message Vector2 {
   int32 YPos = 2;
 }
 
-message Player { string unique_id = 1; }
+message Player {
+  enum ColorTeam {
+    UNKNOW = 0;
+    RED = 1;
+    BLUE = 2;
+  }
+  string unique_id = 1;
+  ColorTeam color = 2;
+}
 
 message ConnectToGameRequest {
   string player_id = 1;
@@ -60,6 +68,7 @@ message Row {
 message SyncGameState {
   GameState game_state = 1;
   repeated Row rows = 2; // multiple rows → forms a 2D array
+  repeated Element elements = 3;
 }
 
 message Event {
