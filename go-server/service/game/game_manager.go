@@ -1,6 +1,8 @@
 package game
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 	"golang.org/x/net/websocket"
 )
@@ -27,6 +29,10 @@ func NewPlayer(conn *PlayerConn, playerID PlayerID) *Player {
 		conn:     conn,
 		playerID: playerID,
 	}
+}
+
+func (p *Player) AddElement(el IElement) {
+	p.elements = append(p.elements, el)
 }
 
 func (p *Player) GetPlayerIDString() string {
@@ -132,6 +138,19 @@ func (g *Game) MoveElement(
 	return nil
 }
 
+func (g *Game) AddElement(el IElement) error {
+	if g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] == nil {
+		log.Println("DANS ADD ELEMENT APRES NIL")
+		g.gameElements[el.GetID()] = el
+		g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] = el
+		return nil
+	}
+	return nil
+}
+func (g *Game) GetElements() map[ElementID]IElement {
+	return g.gameElements
+}
+
 type GameID string
 
 type GameManager struct {
@@ -190,7 +209,7 @@ func NewGameManager() *GameManager {
 	// Game de setup pour accelerer le dev
 	var defaultGameID GameID = "Game1"
 	gameManager.gamesID = append(gameManager.gamesID, defaultGameID)
-	var mapGrid *MapGrid = NewMapGrid(10000, 10000)
+	var mapGrid *MapGrid = NewMapGrid(1000, 1000)
 	gameManager.games[defaultGameID] = NewGame(mapGrid)
 
 	return gameManager

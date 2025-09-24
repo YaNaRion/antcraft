@@ -1,5 +1,6 @@
 #include "event_name.pb.h"
 #include "raylib.h"
+#include "scene.h"
 #include <iostream>
 #include <vector>
 #include <websocketpp/client.hpp>
@@ -10,29 +11,29 @@ typedef websocketpp::client<websocketpp::config::asio_client> client;
 class IEventIN {
 public:
   ~IEventIN() {};
-  virtual Vector2 GetNewPos() = 0;
+  virtual void HandlerEvent(std::shared_ptr<GameScene> game_scene) = 0;
 };
 
-class CreateUnit : public IEventIN {
+class AddUnitIN : public IEventIN {
 public:
-  CreateUnit(Vector2 pos, std::string playerID, std::string unitID);
-  ~CreateUnit() {};
-  Vector2 GetNewPos() override;
+  AddUnitIN(Rectangle rec);
+  ~AddUnitIN() {};
+  void HandlerEvent(std::shared_ptr<GameScene> gameScene) override;
 
 private:
-  Vector2 pos;
-  std::string playerID;
-  std::string unitID;
+  Rectangle rec;
 };
 
-class UpdateMap : public IEventIN {
+class MoveUnitIN : public IEventIN {
 public:
-  UpdateMap(Vector2 pos, std::string playerID, std::string unitID);
-  ~UpdateMap() {};
-  Vector2 GetNewPos() override;
+  MoveUnitIN(Vector2 old_p, Vector2 new_p, std::string playerID,
+             std::string unitID);
+  ~MoveUnitIN() {};
+  void HandlerEvent(std::shared_ptr<GameScene> gameScene) override;
 
 private:
-  Vector2 pos;
+  Vector2 old_pos;
+  Vector2 new_pos;
   std::string playerID;
   std::string unitID;
 };
@@ -41,16 +42,26 @@ class IEventOut {
 public:
   ~IEventOut() {};
   virtual Event::Event CreateProtoEvent() = 0;
-  virtual Vector2 GetNewPos() = 0;
 };
 
-class MoveUnitPost : public IEventOut {
+class GameResquest : public IEventOut {
 public:
-  MoveUnitPost(Vector2 old_p, Vector2 new_p, std::string playerID,
-               std::string unitID);
-  ~MoveUnitPost() {};
+  GameResquest(std::string playerID, std::string gameID);
+  ~GameResquest() {};
   Event::Event CreateProtoEvent() override;
-  Vector2 GetNewPos() override;
+
+private:
+  std::string playerID;
+  std::string gameID;
+};
+
+class MoveUnitOut : public IEventOut {
+public:
+  MoveUnitOut(Vector2 old_p, Vector2 new_p, std::string playerID,
+              std::string unitID);
+  ~MoveUnitOut() {};
+  Event::Event CreateProtoEvent() override;
+  Vector2 GetNewPos();
 
 private:
   Vector2 old_pos;
@@ -67,13 +78,13 @@ public:
   void Send(std::shared_ptr<IEventOut> ev);
   void PushEvent(std::shared_ptr<IEventOut> ev);
   void PopAndSendEvent();
-  size_t GetQueueSize();
+  size_t GetQueueOutSize();
   void SendEvent(std::string eventString);
   void OnMessage(websocketpp::connection_hdl hdl, client::message_ptr msg);
   client *GetClient() { return &this->c; };
 
   websocketpp::connection_hdl *GetHDL() { return &this->hdl; };
-  std::queue<std::shared_ptr<IEventOut>> queue_in;
+  std::queue<std::shared_ptr<IEventIN>> queue_in;
   std::queue<std::shared_ptr<IEventOut>> queue_out;
 
   client c;

@@ -77,14 +77,29 @@ func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
 
 func (s *WebsocketManager) SyncGameStateHandler(ws *websocket.Conn, event *Event_SyncGameState) {}
 func (s *WebsocketManager) GameRequestHandler(ws *websocket.Conn, event *Event_GameRequest) {
+	s.log.Printf("NEW GAME REQUEST HANDLER INCOMMING FROM: %s", ws.RemoteAddr())
 	var newPlayer *game.Player
 	var playerID string
 	var gameID string = "Game1"
+	var unit *game.Unit = game.NewUnit(game.Vector2{
+		X: 300,
+		Y: 300,
+	}, game.Vector2{
+		X: 10,
+		Y: 10,
+	})
 
 	playerID = fmt.Sprintf("Player%d", len(s.clients))
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
+	newPlayer.AddElement(unit)
+
 	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
 	gameMap := s.gameManager.GetGame(game.GameID(gameID))
+	err := gameMap.AddElement(unit)
+
+	if err != nil {
+		s.log.Println(err)
+	}
 
 	var eventRespond Event
 	var mapGrid SyncGameState

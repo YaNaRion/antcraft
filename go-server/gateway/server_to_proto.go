@@ -1,6 +1,8 @@
 package gateway
 
-import "main/service/game"
+import (
+	"main/service/game"
+)
 
 type Worker struct{ pos Vector2 }
 
@@ -10,18 +12,22 @@ func (w *Worker) SetPost(v Vector2) { w.pos = v }
 
 func MapGridToProto(grid *game.MapGrid, state GameState) *SyncGameState {
 	rows := make([]*Row, len(grid.Grid))
+	var element []*Element
 
 	for y, row := range grid.Grid {
 		values := make([]*Element, len(row))
 		for x, elem := range row {
 			values[x] = iElementToProto(elem)
+			if values[x] != nil {
+				element = append(element, values[x])
+			}
 		}
 		rows[y] = &Row{Values: values}
 	}
-
 	return &SyncGameState{
 		GameState: state,
 		Rows:      rows,
+		Elements:  element,
 	}
 }
 

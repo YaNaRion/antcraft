@@ -18,9 +18,13 @@ public:
 class GameScene : public IScene {
 public:
   std::vector<std::shared_ptr<Player>> players;
+  std::vector<std::shared_ptr<IScreenElement>> elements;
+
+  GameScene();
   GameScene(std::vector<std::shared_ptr<Player>> players);
   ~GameScene();
   void Draw() override;
+  void AddElement(std::shared_ptr<IScreenElement> elem);
 };
 
 class SceneManager {

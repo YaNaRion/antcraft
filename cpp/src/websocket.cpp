@@ -1,7 +1,6 @@
 #include "websocket.h"
 #include "event_name.pb.h"
 #include "raylib.h"
-#include "unit.h"
 #include <iostream>
 
 using websocketpp::lib::bind;
@@ -31,7 +30,7 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
         const auto &units = event.move_element();
         std::cout << "NEW POS: X:" << units.pos().xpos()
                   << ", Y:" << units.pos().ypos() << std::endl;
-        MoveUnitPost unitEvent = MoveUnitPost(
+        MoveUnitIN unitEvent = MoveUnitIN(
             Vector2{
                 .x = (float)units.pos().xpos(),
                 .y = (float)units.pos().ypos(),
@@ -41,8 +40,8 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
                 .y = (float)units.old_pos().ypos(),
             },
             units.player_id(), units.unit_id());
-        std::shared_ptr<MoveUnitPost> shared_unit =
-            std::make_shared<MoveUnitPost>(unitEvent);
+        std::shared_ptr<MoveUnitIN> shared_unit =
+            std::make_shared<MoveUnitIN>(unitEvent);
 
         this->queue_in.push(shared_unit);
       }
@@ -52,12 +51,24 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
       if (event.has_game_respond() && event.game_respond().has_map()) {
         const auto &game = event.game_respond();
         std::cout << "GAME_ID: X:" << game.game_id() << std::endl;
+        std::cout << game.map().elements_size() << std::endl;
+        auto element = game.map().elements()[0];
+        Rectangle rec = Rectangle{
+            .x = (float)element.element().pos().xpos(),
+            .y = (float)element.element().pos().ypos(),
+            .width = (float)element.element().size().xpos(),
+            .height = (float)element.element().size().ypos(),
+        };
 
-        CreateUnit unit = CreateUnit(game);
+        std::cout << rec.x << "\t" << rec.y << std::endl;
+        std::cout << "CREATE UNIT\n";
+        AddUnitIN unit = AddUnitIN(rec);
+        std::shared_ptr<AddUnitIN> shared_unit =
+            std::make_shared<AddUnitIN>(unit);
+        std::cout << "CREATE UNIT ENDED\n";
 
-        // this->queue_in.push(shared_unit);
+        this->queue_in.push(shared_unit);
       }
-      // handle player data
       break;
 
     default:
@@ -102,6 +113,7 @@ Gateway::Gateway() {
     // Start the ASIO io_service run loop
     // this will cause a single connection to be made to the server. c.run()
     // will exit when this connection is closed.
+
     std::thread([this]() { c.run(); }).detach();
 
   } catch (websocketpp::exception const &e) {
@@ -116,7 +128,7 @@ void Gateway::PushEvent(std::shared_ptr<IEventOut> ev) {
   this->queue_out.push(ev);
 };
 
-size_t Gateway::GetQueueSize() { return this->queue_out.size(); }
+size_t Gateway::GetQueueOutSize() { return this->queue_out.size(); }
 
 void Gateway::PopAndSendEvent() {
   auto event = this->queue_out.front();
@@ -135,15 +147,15 @@ void Gateway::SendEvent(std::string eventString) {
   }
 }
 
-MoveUnitPost::MoveUnitPost(Vector2 old_p, Vector2 new_p, std::string player_ID,
-                           std::string unit_ID) {
+MoveUnitOut::MoveUnitOut(Vector2 old_p, Vector2 new_p, std::string player_ID,
+                         std::string unit_ID) {
   old_pos = old_p;
   new_pos = new_p;
   playerID = player_ID;
   unitID = unit_ID;
 };
 
-Event::Event MoveUnitPost::CreateProtoEvent() {
+Event::Event MoveUnitOut::CreateProtoEvent() {
   websocketpp::lib::error_code ec;
   Event::Event event = Event::Event();
 
@@ -162,12 +174,44 @@ Event::Event MoveUnitPost::CreateProtoEvent() {
   return event;
 }
 
-Vector2 MoveUnitPost::GetNewPos() { return this->new_pos; }
+Vector2 MoveUnitOut::GetNewPos() { return this->new_pos; }
 
-CreateUnit::CreateUnit(Vector2 pos, std::string playerID, std::string unitID) {
-  this->pos = pos;
-  this->playerID = playerID;
-  this->unitID = unitID;
+void MoveUnitIN::HandlerEvent(std::shared_ptr<GameScene> gameScene) {
+  std::shared_ptr<IScreenElement> unit =
+      gameScene->players.front()->GetUnit().front();
+  unit->SetPos(this->new_pos);
+  std::cout << "NOUVELLE POSITION RECU DU SERVER ET RECUP DANS CLEAN EVENT "
+               "IN QUEUE \t X: "
+            << unit->GetPos().x << "Y: " << unit->GetPos().y << std::endl;
+  gameScene->AddElement(unit);
 }
 
-Vector2 CreateUnit::GetNewPos() { return this->pos; }
+MoveUnitIN::MoveUnitIN(Vector2 old_p, Vector2 new_p, std::string player_ID,
+                       std::string unit_ID) {
+  old_pos = old_p;
+  new_pos = new_p;
+  playerID = player_ID;
+  unitID = unit_ID;
+};
+
+AddUnitIN::AddUnitIN(Rectangle rec) { this->rec = rec; };
+
+void AddUnitIN::HandlerEvent(std::shared_ptr<GameScene> gameScene) {
+  Unit u = Unit(this->rec);
+  std::shared_ptr<Unit> unit_share = std::make_shared<Unit>(u);
+  gameScene->AddElement(unit_share);
+}
+
+GameResquest::GameResquest(std::string playerID, std::string gameID) {
+  this->gameID = gameID;
+  this->playerID = playerID;
+}
+
+Event::Event GameResquest::CreateProtoEvent() {
+  Event::Event eventWrapper;
+  Event::ConnectToGameRequest *event = eventWrapper.mutable_game_request();
+  event->set_game_id(this->gameID);
+  event->set_player_id(this->playerID);
+
+  return eventWrapper;
+}

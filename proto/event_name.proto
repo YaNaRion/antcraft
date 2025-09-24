@@ -19,8 +19,8 @@ message Vector2 {
 message Player {
   enum ColorTeam {
     UNKNOW = 0;
-    RED = 1;
-    BLUE = 2;
+    RED_PROTO = 1;
+    BLUE_PROTO = 2;
   }
   string unique_id = 1;
   ColorTeam color = 2;
