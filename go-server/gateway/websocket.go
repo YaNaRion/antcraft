@@ -89,13 +89,25 @@ func (s *WebsocketManager) GameRequestHandler(ws *websocket.Conn, event *Event_G
 		Y: 10,
 	})
 
+	var unit2 *game.Unit = game.NewUnit(game.Vector2{
+		X: 350,
+		Y: 350,
+	}, game.Vector2{
+		X: 10,
+		Y: 10,
+	})
+
 	playerID = fmt.Sprintf("Player%d", len(s.clients))
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
+
 	newPlayer.AddElement(unit)
+	newPlayer.AddElement(unit2)
 
 	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
+
 	gameMap := s.gameManager.GetGame(game.GameID(gameID))
 	err := gameMap.AddElement(unit)
+	err = gameMap.AddElement(unit2)
 
 	if err != nil {
 		s.log.Println(err)

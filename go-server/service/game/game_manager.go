@@ -1,8 +1,6 @@
 package game
 
 import (
-	"log"
-
 	"github.com/google/uuid"
 	"golang.org/x/net/websocket"
 )
@@ -52,6 +50,7 @@ type ElementID string
 
 type IElement interface {
 	GetPost() Vector2
+	GetSize() Vector2
 	SetPost(Vector2)
 	GetID() ElementID
 }
@@ -73,6 +72,7 @@ func NewUnit(pos, size Vector2) *Unit {
 func (u *Unit) GetPost() Vector2  { return u.pos }
 func (u *Unit) SetPost(v Vector2) { u.pos = v }
 func (u *Unit) GetID() ElementID  { return u.unitID }
+func (u *Unit) GetSize() Vector2  { return u.size }
 
 type MapGrid struct {
 	Grid     [][]IElement
@@ -140,10 +140,8 @@ func (g *Game) MoveElement(
 
 func (g *Game) AddElement(el IElement) error {
 	if g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] == nil {
-		log.Println("DANS ADD ELEMENT APRES NIL")
 		g.gameElements[el.GetID()] = el
 		g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] = el
-		return nil
 	}
 	return nil
 }
@@ -182,13 +180,6 @@ func (g *GameManager) MoveElement(
 }
 
 func (g *GameManager) AddPlayerToGame(gameID GameID, player *Player) {
-	player.elements = append(player.elements, NewUnit(Vector2{
-		X: 100,
-		Y: 100,
-	}, Vector2{
-		X: 10,
-		Y: 10,
-	}))
 	g.games[gameID].players = append(g.games[gameID].players, player)
 }
 

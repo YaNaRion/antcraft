@@ -14,8 +14,6 @@ GameScene::GameScene(std::vector<std::shared_ptr<Player>> players) {
 GameScene::~GameScene() {};
 
 void GameScene::Draw() {
-  if (this->elements.size() > 0)
-    std::cout << this->elements[0]->GetPos().x << std::endl;
   for (auto &element : elements) {
     element->Draw(RED);
   }

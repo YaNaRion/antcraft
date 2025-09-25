@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"log"
 	"main/service/game"
 )
 
@@ -19,6 +20,7 @@ func MapGridToProto(grid *game.MapGrid, state GameState) *SyncGameState {
 		for x, elem := range row {
 			values[x] = iElementToProto(elem)
 			if values[x] != nil {
+				log.Println(values[x].GetElement().Size.YPos)
 				element = append(element, values[x])
 			}
 		}
@@ -37,14 +39,17 @@ func iElementToProto(elem game.IElement) *Element {
 	}
 
 	pos := elem.GetPost()
-	var et Element_ElementType
-	et = Element_WORKER
+	et := Element_WORKER
 
 	return &Element{
 		Element: &MoveElement{
 			Pos: &Vector2{
 				XPos: int32(pos.X),
 				YPos: int32(pos.Y),
+			},
+			Size: &Vector2{
+				XPos: int32(elem.GetSize().X),
+				YPos: int32(elem.GetSize().Y),
 			},
 		},
 		ElementType: et,

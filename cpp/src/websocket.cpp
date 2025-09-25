@@ -50,24 +50,20 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
     case Event::Event::kGameRespond:
       if (event.has_game_respond() && event.game_respond().has_map()) {
         const auto &game = event.game_respond();
-        std::cout << "GAME_ID: X:" << game.game_id() << std::endl;
-        std::cout << game.map().elements_size() << std::endl;
-        auto element = game.map().elements()[0];
-        Rectangle rec = Rectangle{
-            .x = (float)element.element().pos().xpos(),
-            .y = (float)element.element().pos().ypos(),
-            .width = (float)element.element().size().xpos(),
-            .height = (float)element.element().size().ypos(),
-        };
+        for (auto element : game.map().elements()) {
 
-        std::cout << rec.x << "\t" << rec.y << std::endl;
-        std::cout << "CREATE UNIT\n";
-        AddUnitIN unit = AddUnitIN(rec);
-        std::shared_ptr<AddUnitIN> shared_unit =
-            std::make_shared<AddUnitIN>(unit);
-        std::cout << "CREATE UNIT ENDED\n";
+          Rectangle rec = Rectangle{
+              .x = (float)element.element().pos().xpos(),
+              .y = (float)element.element().pos().ypos(),
+              .width = (float)element.element().size().xpos(),
+              .height = (float)element.element().size().ypos(),
+          };
 
-        this->queue_in.push(shared_unit);
+          AddUnitIN unit = AddUnitIN(rec);
+          std::shared_ptr<AddUnitIN> shared_unit =
+              std::make_shared<AddUnitIN>(unit);
+          this->queue_in.push(shared_unit);
+        }
       }
       break;
 
@@ -81,44 +77,27 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
 
 Gateway::Gateway() {
   try {
-    // Set logging to be pretty verbose (everything except message payloads)
     c.set_access_channels(websocketpp::log::alevel::all);
     c.clear_access_channels(websocketpp::log::alevel::frame_payload);
-
     c.init_asio();
     c.set_open_handler([this](websocketpp::connection_hdl hdl) {
       this->hdl = hdl;
       std::cout << "Connected to server!" << std::endl;
     });
-    //
-    // Register our message handler
     c.set_message_handler(bind(&Gateway::OnMessage, this, ::_1, ::_2));
-
     websocketpp::lib::error_code ec;
     client::connection_ptr con =
         c.get_connection("http://localhost:3000/ws", ec);
-
     std::cout << "APRES CONNECTION\n";
     con->replace_header("Origin", "http://localhost:3000");
-
     if (ec) {
       std::cout << "could not create connection because: " << ec.message()
                 << std::endl;
     }
-
-    // Note that connect here only requests a connection. No network messages
-    // are exchanged until the event loop starts running in the next line.
     c.connect(con);
-
-    // Start the ASIO io_service run loop
-    // this will cause a single connection to be made to the server. c.run()
-    // will exit when this connection is closed.
-
     std::thread([this]() { c.run(); }).detach();
-
   } catch (websocketpp::exception const &e) {
     std::cout << e.what() << std::endl;
-    std::cout << "DANS EXECEP INIT SOCKET\n";
   }
 };
 
