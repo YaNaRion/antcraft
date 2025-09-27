@@ -1,4 +1,6 @@
+#include "event_name.pb.h"
 #include "player.h"
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -17,14 +19,23 @@ public:
 
 class GameScene : public IScene {
 public:
-  std::vector<std::shared_ptr<Player>> players;
-  std::vector<std::shared_ptr<IScreenElement>> elements;
-
   GameScene();
-  GameScene(std::vector<std::shared_ptr<Player>> players);
+  // GameScene(std::vector<std::shared_ptr<Player>> players);
   ~GameScene();
+  void AddElement(std::shared_ptr<IScreenElement>, std::string player_id);
+  void PlayerElement(std::shared_ptr<Player>);
+  void GetElementByID(std::string elementID);
   void Draw() override;
-  void AddElement(std::shared_ptr<IScreenElement> elem);
+  void Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
+              Event::GameState state);
+
+  std::map<std::string, std::shared_ptr<IScreenElement>> GetElements();
+
+private:
+  // Key is ElementID, UnitID
+  std::map<std::string, std::shared_ptr<IScreenElement>> elements;
+  std::map<std::string, std::shared_ptr<Player>> players;
+  Event::GameState state;
 };
 
 class SceneManager {

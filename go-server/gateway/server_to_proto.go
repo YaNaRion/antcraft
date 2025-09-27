@@ -11,7 +11,7 @@ type Worker struct{ pos Vector2 }
 func (w *Worker) GetPost() Vector2  { return w.pos }
 func (w *Worker) SetPost(v Vector2) { w.pos = v }
 
-func MapGridToProto(grid *game.MapGrid, state GameState) *SyncGameState {
+func NewMapGridToSyncGameState(grid *game.MapGrid, state GameState) *SyncGameState {
 	rows := make([]*Row, len(grid.Grid))
 	var element []*Element
 
@@ -30,6 +30,12 @@ func MapGridToProto(grid *game.MapGrid, state GameState) *SyncGameState {
 		GameState: state,
 		Rows:      rows,
 		Elements:  element,
+	}
+}
+
+func NewEventSyncGameState(grid *game.MapGrid, state GameState) *Event_SyncGameState {
+	return &Event_SyncGameState{
+		SyncGameState: NewMapGridToSyncGameState(grid, state),
 	}
 }
 

@@ -4,9 +4,11 @@
 #include <memory>
 #include <vector>
 
-void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr,
-                  Gateway *gate) {
-  for (std::shared_ptr<IScreenElement> element : element_ptr) {
+void InputHandler(
+    std::map<std::string, std::shared_ptr<IScreenElement>> element_map,
+    Gateway *gate) {
+  for (auto &pair_element : element_map) {
+    std::shared_ptr<IScreenElement> element = pair_element.second;
     Vector2 mouse_position = GetMousePosition();
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
       element->SetSelected(false);
@@ -21,6 +23,7 @@ void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr,
       element->SetSelected(true);
     }
   }
+
   if (IsKeyPressed(KEY_P)) {
     std::cout << "JOINING GAME\n";
     std::shared_ptr<GameResquest> joinGameRequest =
@@ -46,7 +49,7 @@ void CleanEvenOutQueue(Gateway *gate) {
 
 void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
   while (gate->queue_in.size() > 0) {
-    std::cout << "CLEAN IN\n";
+    std::cout << "CLEAN IN2\n";
     auto event = gate->queue_in.front();
     event->HandlerEvent(game_scene);
     gate->queue_in.pop();
@@ -73,17 +76,12 @@ int main() {
   SceneManager scene_manager = SceneManager(vectorScene);
   std::cout << "Initialisation done" << std::endl;
 
-  // Event::Event protoEvent = joinGameRequest->CreateProtoEvent();
-  // std::string eventString = protoEvent.SerializeAsString();
-  // c.send(hdl, eventString, websocketpp::frame::opcode::BINARY, ec);
-  // std::cout << "APRES SEND GAME EVENT\n";
-
   while (!window.ShouldWindowClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
     scene_manager.Draw();
 
-    InputHandler(units_ptr, gate);
+    InputHandler(game_shared->GetElements(), gate);
     CleanEvenOutQueue(gate);
     CleanEvenInQueue(gate, game_shared);
 
@@ -92,21 +90,3 @@ int main() {
   window.CloseWin();
   return 0;
 }
-
-//
-// Rectangle rec = {
-//     .x = 400,
-//     .y = 400,
-//     .width = 10,
-//     .height = 10,
-// };
-//
-// Unit unit = Unit(rec); // Create 1st player
-// std::shared_ptr<Unit> posPtr = std::make_shared<Unit>(unit);
-// std::vector<std::shared_ptr<IScreenElement>> units_ptr;
-// units_ptr.push_back(posPtr);
-//
-// Player player = Player(RED, units_ptr);
-// std::shared_ptr<Player> player_ptr = std::make_shared<Player>(player);
-// std::vector<std::shared_ptr<Player>> players;
-// players.push_back(player_ptr);

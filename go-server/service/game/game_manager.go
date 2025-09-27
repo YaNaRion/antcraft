@@ -103,7 +103,7 @@ const (
 type Game struct {
 	MapGrid      *MapGrid
 	players      []*Player
-	GameStat     Enum_Game_State
+	GameState    Enum_Game_State
 	gameElements map[ElementID]IElement
 }
 
@@ -111,7 +111,7 @@ func NewGame(grid *MapGrid) *Game {
 	return &Game{
 		MapGrid:      grid,
 		players:      make([]*Player, 0),
-		GameStat:     GAME_STATE_IN_GAME,
+		GameState:    GAME_STATE_IN_GAME,
 		gameElements: map[ElementID]IElement{},
 	}
 }
@@ -189,6 +189,10 @@ func (g *GameManager) GetPlayerInAGame(gameID GameID) []*Player {
 
 func (g *GameManager) GetMap(gameID GameID) *MapGrid {
 	return g.games[gameID].MapGrid
+}
+
+func (g *GameManager) StartGame(gameID GameID) {
+	g.games[gameID].GameState = GAME_STATE_IN_GAME
 }
 
 func NewGameManager() *GameManager {
