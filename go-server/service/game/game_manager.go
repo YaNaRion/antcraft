@@ -51,14 +51,16 @@ type ElementID string
 type IElement interface {
 	GetPost() Vector2
 	GetSize() Vector2
+	GetPlayerID() PlayerID
 	SetPost(Vector2)
 	GetID() ElementID
 }
 
 type Unit struct {
-	pos    Vector2
-	size   Vector2
-	unitID ElementID
+	pos      Vector2
+	size     Vector2
+	playerID PlayerID
+	unitID   ElementID
 }
 
 func NewUnit(pos, size Vector2) *Unit {
@@ -69,10 +71,11 @@ func NewUnit(pos, size Vector2) *Unit {
 	}
 }
 
-func (u *Unit) GetPost() Vector2  { return u.pos }
-func (u *Unit) SetPost(v Vector2) { u.pos = v }
-func (u *Unit) GetID() ElementID  { return u.unitID }
-func (u *Unit) GetSize() Vector2  { return u.size }
+func (u *Unit) GetPost() Vector2      { return u.pos }
+func (u *Unit) SetPost(v Vector2)     { u.pos = v }
+func (u *Unit) GetID() ElementID      { return u.unitID }
+func (u *Unit) GetSize() Vector2      { return u.size }
+func (u *Unit) GetPlayerID() PlayerID { return u.playerID }
 
 type MapGrid struct {
 	Grid     [][]IElement
@@ -102,7 +105,7 @@ const (
 
 type Game struct {
 	MapGrid      *MapGrid
-	players      []*Player
+	players      map[PlayerID]*Player
 	GameState    Enum_Game_State
 	gameElements map[ElementID]IElement
 }
@@ -110,7 +113,7 @@ type Game struct {
 func NewGame(grid *MapGrid) *Game {
 	return &Game{
 		MapGrid:      grid,
-		players:      make([]*Player, 0),
+		players:      make(map[PlayerID]*Player, 0),
 		GameState:    GAME_STATE_IN_GAME,
 		gameElements: map[ElementID]IElement{},
 	}
@@ -142,11 +145,17 @@ func (g *Game) AddElement(el IElement) error {
 	if g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] == nil {
 		g.gameElements[el.GetID()] = el
 		g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] = el
+
 	}
 	return nil
 }
+
 func (g *Game) GetElements() map[ElementID]IElement {
 	return g.gameElements
+}
+
+func (g *Game) AddPlayer(player *Player) {
+	g.players[player.playerID] = player
 }
 
 type GameID string
@@ -180,10 +189,10 @@ func (g *GameManager) MoveElement(
 }
 
 func (g *GameManager) AddPlayerToGame(gameID GameID, player *Player) {
-	g.games[gameID].players = append(g.games[gameID].players, player)
+	g.games[gameID].AddPlayer(player)
 }
 
-func (g *GameManager) GetPlayerInAGame(gameID GameID) []*Player {
+func (g *GameManager) GetPlayerInAGame(gameID GameID) map[PlayerID]*Player {
 	return g.games[gameID].players
 }
 

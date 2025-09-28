@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"log"
 	"main/service/game"
 )
 
@@ -12,23 +11,17 @@ func (w *Worker) GetPost() Vector2  { return w.pos }
 func (w *Worker) SetPost(v Vector2) { w.pos = v }
 
 func NewMapGridToSyncGameState(grid *game.MapGrid, state GameState) *SyncGameState {
-	rows := make([]*Row, len(grid.Grid))
 	var element []*Element
 
-	for y, row := range grid.Grid {
-		values := make([]*Element, len(row))
-		for x, elem := range row {
-			values[x] = iElementToProto(elem)
-			if values[x] != nil {
-				log.Println(values[x].GetElement().Size.YPos)
-				element = append(element, values[x])
+	for _, row := range grid.Grid {
+		for _, elem := range row {
+			if elem != nil {
+				element = append(element, iElementToProto(elem))
 			}
 		}
-		rows[y] = &Row{Values: values}
 	}
 	return &SyncGameState{
 		GameState: state,
-		Rows:      rows,
 		Elements:  element,
 	}
 }
@@ -45,19 +38,19 @@ func iElementToProto(elem game.IElement) *Element {
 	}
 
 	pos := elem.GetPost()
-	et := Element_WORKER
+	et := ElementType_WORKER
 
 	return &Element{
-		Element: &MoveElement{
-			Pos: &Vector2{
-				XPos: int32(pos.X),
-				YPos: int32(pos.Y),
-			},
-			Size: &Vector2{
-				XPos: int32(elem.GetSize().X),
-				YPos: int32(elem.GetSize().Y),
-			},
+		Pos: &Vector2{
+			X: int32(pos.X),
+			Y: int32(pos.Y),
 		},
+		Size: &Vector2{
+			X: int32(elem.GetSize().X),
+			Y: int32(elem.GetSize().Y),
+		},
+		PlayerId:    string(elem.GetPlayerID()),
+		UnitId:      string(elem.GetID()),
 		ElementType: et,
 	}
 }
