@@ -4,17 +4,17 @@
 #include <memory>
 #include <vector>
 
-void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr,
-                  Gateway *gate) {
-  for (std::shared_ptr<IScreenElement> element : element_ptr) {
+void InputHandler(
+    std::map<std::string, std::shared_ptr<IScreenElement>> element_map,
+    Gateway *gate) {
+  for (auto &pair_element : element_map) {
+    std::shared_ptr<IScreenElement> element = pair_element.second;
     Vector2 mouse_position = GetMousePosition();
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
       element->SetSelected(false);
       element->SetPos(mouse_position);
-      std::shared_ptr<MoveUnitPost> move_unit =
-          std::make_shared<MoveUnitPost>(MoveUnitPost(
-              element->GetPos(), mouse_position, "playerID", "unitID"));
-
+      std::shared_ptr<MoveUnitOut> move_unit = std::make_shared<MoveUnitOut>(
+          MoveUnitOut(element->GetPos(), mouse_position, "playerID", "unitID"));
       gate->PushEvent(move_unit);
     }
 
@@ -23,32 +23,36 @@ void InputHandler(std::vector<std::shared_ptr<IScreenElement>> element_ptr,
       element->SetSelected(true);
     }
   }
+
+  if (IsKeyPressed(KEY_P)) {
+    std::cout << "JOINING GAME\n";
+    std::shared_ptr<GameResquest> joinGameRequest =
+        std::make_shared<GameResquest>(GameResquest("", "Game1"));
+    gate->PushEvent(joinGameRequest);
+  }
 }
 
 void threadGate() { std::cout << "DANS THREAD\n"; }
 
+// TODO:
 // IMPORTANT POUR LES EVENT QUEUE IL VA FALLOIR FAIRE DES WRAPPERS AVEC DES
 // MUTUX OU AU MOINS UN TYPE DE CONTROLE DACCES A LA MEMOIRE/VOIR SI CEST
-// NECESSAIRE
+// NECESSAIRE FAIRE MIEUX QUELE POP_AND_SEND_EVENT
 void CleanEvenOutQueue(Gateway *gate) {
-  size_t queue_size = gate->GetQueueSize();
+  size_t queue_size = gate->GetQueueOutSize();
   while (queue_size > 0) {
     std::cout << "CLEAN OUT\n";
-    gate->PopEvent();
-    queue_size = gate->GetQueueSize();
+    gate->PopAndSendEvent();
+    queue_size = gate->GetQueueOutSize();
   }
 }
 
-void CleanEvenInQueue(Gateway *gate, GameScene *game_scene) {
+void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
+  std::cout << "CLEAN IN\n";
   while (gate->queue_in.size() > 0) {
     std::cout << "CLEAN IN\n";
     auto event = gate->queue_in.front();
-    std::shared_ptr<IScreenElement> unit =
-        game_scene->players.front()->GetUnit().front();
-    unit->SetPos(event->GetNewPos());
-    std::cout << "NOUVELLE POSITION RECU DU SERVER ET RECUP DANS CLEAN EVENT "
-                 "IN QUEUE \t X: "
-              << unit->GetPos().x << "Y: " << unit->GetPos().y << std::endl;
+    event->HandlerEvent(game_scene);
     gate->queue_in.pop();
   }
 }
@@ -56,27 +60,10 @@ void CleanEvenInQueue(Gateway *gate, GameScene *game_scene) {
 int main() {
   Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
 
-  Gateway *gate = new Gateway();
-
-  Rectangle rec = {
-      .x = 400,
-      .y = 400,
-      .width = 10,
-      .height = 10,
-  };
-
-  Unit unit = Unit(rec); // Create 1st player
-  std::shared_ptr<Unit> posPtr = std::make_shared<Unit>(unit);
   std::vector<std::shared_ptr<IScreenElement>> units_ptr;
-  units_ptr.push_back(posPtr);
-
-  Player player = Player(RED, units_ptr);
-  std::shared_ptr<Player> player_ptr = std::make_shared<Player>(player);
-  std::vector<std::shared_ptr<Player>> players;
-  players.push_back(player_ptr);
-
+  Gateway *gate = new Gateway();
   // Init scene
-  GameScene game_scene = GameScene(players);
+  GameScene game_scene = GameScene();
   // Create MenuScene
   MenuScene menu = MenuScene();
 
@@ -88,21 +75,19 @@ int main() {
   vectorScene.push_back(menu_shared);
   vectorScene.push_back(game_shared);
   SceneManager scene_manager = SceneManager(vectorScene);
-
   std::cout << "Initialisation done" << std::endl;
+
   while (!window.ShouldWindowClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
     scene_manager.Draw();
 
-    InputHandler(units_ptr, gate);
+    InputHandler(game_shared->GetElements(), gate);
     CleanEvenOutQueue(gate);
-    CleanEvenInQueue(gate, &game_scene);
+    CleanEvenInQueue(gate, game_shared);
 
     EndDrawing();
   }
-
   window.CloseWin();
-
   return 0;
 }

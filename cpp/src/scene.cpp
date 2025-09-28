@@ -16,6 +16,7 @@ MenuScene::~MenuScene() {};
 
 SceneManager::SceneManager(std::vector<std::shared_ptr<IScene>> scenes) {
   this->scenes = scenes;
+
   // TODO Faire meilleur facon de faire le choix de scene
   if (this->scenes.size() > 1) {
     this->current_scene = scenes[1];
