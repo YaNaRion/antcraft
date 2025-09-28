@@ -59,11 +59,13 @@ func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
 	s.readLoop(ws)
 }
 
-func (s *WebsocketManager) GameRequestHandler(ws *websocket.Conn, event *Event_GameRequest) {
-	s.log.Printf("NEW GAME REQUEST HANDLER INCOMMING FROM: %s", ws.RemoteAddr())
+func (s *WebsocketManager) JoinGameHandler(ws *websocket.Conn, event *Event_GameRequest) {
+	s.log.Println("JOIN GAME EVENT")
+
 	var newPlayer *game.Player
 	var playerID string
 	var gameID string = "Game1"
+
 	var unit *game.Unit = game.NewUnit(game.Vector2{
 		X: 300,
 		Y: 300,
@@ -103,67 +105,62 @@ func (s *WebsocketManager) GameRequestHandler(ws *websocket.Conn, event *Event_G
 }
 
 func (s *WebsocketManager) StartGame(ws *websocket.Conn, event *Event_StartGame) {
-	s.log.Println("DANS START GAME")
-
+	s.log.Println("StartGame Event")
 	// gameID := event.StartGame.GameId
 	gameID := "Game1"
-
-	go func(c *websocket.Conn) {
-		s.log.Println("DANS GO FUNC DUPDATE")
-		var err error
-		gameMap := s.gameManager.GetGame(game.GameID(gameID))
-		if gameMap.GameState != game.GAME_STATE_IN_GAME {
-			return
-		}
-		var eventRespond Event
-		var players []*Player
-		for _, player := range s.gameManager.GetPlayerInAGame(game.GameID(gameID)) {
-			players = append(players, &Player{
-				UniqueId: player.GetPlayerIDString(),
-			})
-		}
-
-		mapGrid := NewEventSyncGameState(
-			s.gameManager.GetMap(game.GameID(gameID)),
-			GameState(gameMap.GameState),
-		)
-
-		// METTRE MUTEX OU DE QUOI
-		eventRespond.Data_Event = mapGrid
-
-		marshalData, err := proto.Marshal(&eventRespond)
-		if err != nil {
-			s.log.Println("send error:", err)
-		}
-
-		for _, client := range s.clients {
-			err = websocket.Message.Send(client.Conn, marshalData)
-			if err != nil {
-				s.log.Println("send error:", err)
-			}
-		}
-
-		if err != nil {
-			s.log.Println("send error:", err)
-		}
-	}(ws)
-	// ENVOYER GAME ENDED A TOUS LES CLIENT CONSERNE
-	// for _, client := range s.clients {
-	// 	err = websocket.Message.Send(client.Conn, marshalData)
-	// 	if err != nil {
-	// 		s.log.Println("send error:", err)
-	// 	}
-	// }
+	go s.GameLoop(gameID)
 }
 
-func (s *WebsocketManager) GameRespondHandler(ws *websocket.Conn, event *Event_GameRespond) {}
-func (s *WebsocketManager) PlayerDataHandler(ws *websocket.Conn, event *Event_PlayerData)   {}
+func (s *WebsocketManager) GameLoop(gameID string) {
+	s.log.Println("DANS GO FUNC DUPDATE")
+	var err error
+	gameMap := s.gameManager.GetGame(game.GameID(gameID))
+
+	if gameMap.GameState != game.GAME_STATE_IN_GAME {
+		return
+	}
+
+	var eventRespond Event
+	var players []*Player
+	for _, player := range s.gameManager.GetPlayerInAGame(game.GameID(gameID)) {
+		players = append(players, &Player{
+			UniqueId: player.GetPlayerIDString(),
+		})
+	}
+
+	mapGrid := NewEventSyncGameState(
+		s.gameManager.GetMap(game.GameID(gameID)),
+		GameState(gameMap.GameState),
+	)
+
+	s.log.Println(mapGrid.SyncGameState.Elements)
+
+	// METTRE MUTEX OU DE QUOI
+	eventRespond.Data_Event = mapGrid
+
+	marshalData, err := proto.Marshal(&eventRespond)
+	if err != nil {
+		s.log.Println("send error:", err)
+	}
+
+	for _, client := range s.clients {
+		err = websocket.Message.Send(client.Conn, marshalData)
+		if err != nil {
+			s.log.Println("send error:", err)
+		}
+	}
+
+	if err != nil {
+		s.log.Println("send error:", err)
+	}
+}
 
 func (s *WebsocketManager) MoveElementHandler(
 	ws *websocket.Conn,
 	unit *Event_MoveElement,
 	gameID, playerID *string,
 ) {
+	s.log.Println("MoveElement Event")
 	elementNewPos := game.Vector2{
 		X: int(unit.MoveElement.GetPos().XPos),
 		Y: int(unit.MoveElement.GetPos().YPos),
@@ -207,7 +204,7 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 		case *Event_PlayerData:
 			s.log.Println(x.PlayerData.UniqueId)
 		case *Event_GameRequest:
-			s.GameRequestHandler(ws, x)
+			s.JoinGameHandler(ws, x)
 		case *Event_GameRespond:
 		case *Event_MoveElement:
 			s.MoveElementHandler(ws, x, event.GameID, event.PlayerID)

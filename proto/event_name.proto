@@ -35,7 +35,6 @@ message ConnectToGameRespond {
   string player_id = 1;
   string game_id = 2;
   repeated Player player_in_room = 3;
-  SyncGameState Map = 4;
 }
 
 message MoveElement {
@@ -56,7 +55,11 @@ message Element {
     SUPPLY = 5;
     MINERAL = 6;
   }
-  MoveElement element = 1;
+  string player_id = 1;
+  string unit_id = 2;
+  optional Vector2 old_pos = 3;
+  Vector2 pos = 4;
+  Vector2 size = 5;
   ElementType element_type = 2;
   optional Player player = 3;
 }
@@ -71,12 +74,17 @@ message SyncGameState {
   repeated Element elements = 3;
 }
 
+message StartGame { string game_id = 1; }
+
 message Event {
+  optional string gameID = 7;
+  optional string playerID = 8;
   oneof Data_Event {
     Player player_data = 1;
     ConnectToGameRequest game_request = 2;
     ConnectToGameRespond game_respond = 3;
     MoveElement move_element = 4;
     SyncGameState sync_game_state = 5;
+    StartGame start_game = 6;
   }
 }

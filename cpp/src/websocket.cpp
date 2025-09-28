@@ -28,14 +28,23 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
     if (event.has_sync_game_state()) {
       const auto &game_sync = event.sync_game_state();
       std::vector<std::shared_ptr<IScreenElement>> vector;
-      for (auto &elem : game_sync.elements()) {
+      std::cout << "DANS SYNC\n";
+      game_sync.elements();
+
+      for (const Event::Element &elem : game_sync.elements()) {
+        std::cout << "DANS SYNC FOR\n";
+        const auto element = elem.element();
+        std::cout << element.unit_id() << std::endl;
+        std::cout << "DANS SYNC FOR\n";
         Vector2 pos = Vector2{
-            .x = (float)elem.element().pos().xpos(),
-            .y = (float)elem.element().pos().ypos(),
+            .x = (float)element.pos().xpos(),
+            .y = (float)element.pos().ypos(),
         };
+
         Unit unit = Unit(pos, elem.element().unit_id());
         vector.push_back(std::make_shared<Unit>(unit));
       }
+      std::cout << "DANS SYNC\n";
       UpdateMapStateEvent update_map_event =
           UpdateMapStateEvent(vector, game_sync.game_state());
       std::shared_ptr<UpdateMapStateEvent> share_update =

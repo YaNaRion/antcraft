@@ -48,8 +48,9 @@ void CleanEvenOutQueue(Gateway *gate) {
 }
 
 void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
+  std::cout << "CLEAN IN\n";
   while (gate->queue_in.size() > 0) {
-    std::cout << "CLEAN IN2\n";
+    std::cout << "CLEAN IN\n";
     auto event = gate->queue_in.front();
     event->HandlerEvent(game_scene);
     gate->queue_in.pop();

@@ -49,5 +49,7 @@ UpdateMapStateEvent::UpdateMapStateEvent(
 }
 
 void UpdateMapStateEvent::HandlerEvent(std::shared_ptr<GameScene> game_scene) {
+  std::cout << "DANS HANDLER UPDATE EVENT" << std::endl;
   game_scene->Update(this->elements, this->state);
+  std::cout << "DANS HANDLER UPDATE EVENT" << std::endl;
 }
