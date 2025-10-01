@@ -3,6 +3,16 @@ syntax = "proto3";
 package Event;
 option go_package = "/gateway";
 
+enum ElementType {
+  UNKNOWN_ELEMENT = 0; // Always start with 0 as a default
+  WORKER = 1;
+  MARINE = 2;
+  BASE = 3;
+  BARRACK = 4;
+  SUPPLY = 5;
+  MINERAL = 6;
+}
+
 enum GameState {
   STATE_UNKNOWN = 0;
   GAME_IN_LOBBY = 1;
@@ -11,80 +21,62 @@ enum GameState {
   END_GAME = 4;
 }
 
+enum ColorTeam {
+  UNKNOW = 0;
+  RED_PROTO = 1;
+  BLUE_PROTO = 2;
+}
+
 message Vector2 {
-  int32 XPos = 1;
-  int32 YPos = 2;
+  int32 x = 1;
+  int32 y = 2;
 }
 
 message Player {
-  enum ColorTeam {
-    UNKNOW = 0;
-    RED_PROTO = 1;
-    BLUE_PROTO = 2;
-  }
-  string unique_id = 1;
-  ColorTeam color = 2;
-}
-
-message ConnectToGameRequest {
   string player_id = 1;
-  string game_id = 2;
-}
-
-message ConnectToGameRespond {
-  string player_id = 1;
-  string game_id = 2;
-  repeated Player player_in_room = 3;
+  optional ColorTeam color = 2;
 }
 
 message MoveElement {
   string player_id = 1;
   string unit_id = 2;
-  optional Vector2 old_pos = 3;
-  Vector2 pos = 4;
-  Vector2 size = 5;
+  Vector2 old_pos = 3;
+  Vector2 new_pos = 4;
 }
 
 message Element {
-  enum ElementType {
-    UNKNOWN_ELEMENT = 0; // Always start with 0 as a default
-    WORKER = 1;
-    MARINE = 2;
-    BASE = 3;
-    BARRACK = 4;
-    SUPPLY = 5;
-    MINERAL = 6;
-  }
   string player_id = 1;
   string unit_id = 2;
-  optional Vector2 old_pos = 3;
+
   Vector2 pos = 4;
   Vector2 size = 5;
-  ElementType element_type = 2;
-  optional Player player = 3;
+
+  ElementType element_type = 6;
 }
 
-message Row {
-  repeated Element values = 1; // one row
-}
+// message Row {
+//   optional repeated Element values = 1; // one row
+// }
 
 message SyncGameState {
   GameState game_state = 1;
-  repeated Row rows = 2; // multiple rows → forms a 2D array
-  repeated Element elements = 3;
+  repeated Element elements = 2;
+  // optional repeated Row rows = 2; // multiple rows → forms a 2D array
 }
 
 message StartGame { string game_id = 1; }
+message EndGame { string game_id = 1; }
+
+message JoinGame {}
 
 message Event {
-  optional string gameID = 7;
-  optional string playerID = 8;
-  oneof Data_Event {
-    Player player_data = 1;
-    ConnectToGameRequest game_request = 2;
-    ConnectToGameRespond game_respond = 3;
-    MoveElement move_element = 4;
-    SyncGameState sync_game_state = 5;
+  string game_id = 1;
+  Player player_info = 2;
+  oneof data_event {
+    MoveElement move_element = 3;
+    SyncGameState sync_game_state = 4;
+    EndGame end_game = 5;
     StartGame start_game = 6;
+    JoinGame join_game = 7;
   }
 }

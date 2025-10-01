@@ -53,56 +53,57 @@ func (s *WebsocketManager) JoinGameHandler(ws *websocket.Conn, event *Event_Join
 	}
 
 	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
-	s.StartGame(ws, nil)
+	s.StartGame(ws, game.GameID(gameID))
 }
 
-func (s *WebsocketManager) StartGame(ws *websocket.Conn, event *Event_StartGame) {
+func (s *WebsocketManager) StartGame(ws *websocket.Conn, gameID game.GameID) {
 	s.log.Println("StartGame Event")
-	gameID := event.StartGame.GameId
 	s.gameManager.StartGame(game.GameID(gameID))
 	go s.GameLoop(gameID)
 }
 
-func (s *WebsocketManager) GameLoop(gameID string) {
+func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 	s.log.Println("GAME LOOP")
 
-	var err error
-	gameMap := s.gameManager.GetGame(game.GameID(gameID))
+	gameMap := s.gameManager.GetGame(gameID)
+	for {
+		var err error
+		s.log.Println("DANS FOR LOOP")
+		if gameMap.GameState != game.GAME_STATE_IN_GAME {
+			return
+		}
 
-	if gameMap.GameState != game.GAME_STATE_IN_GAME {
-		return
-	}
+		var eventRespond Event
 
-	var eventRespond Event
+		mapGrid := NewEventSyncGameState(
+			s.gameManager.GetMap(gameID),
+			GameState(gameMap.GameState),
+		)
 
-	mapGrid := NewEventSyncGameState(
-		s.gameManager.GetMap(game.GameID(gameID)),
-		GameState(gameMap.GameState),
-	)
+		s.log.Println(mapGrid.SyncGameState.Elements)
 
-	s.log.Println(mapGrid.SyncGameState.Elements)
+		// METTRE MUTEX OU DE QUOI
+		eventRespond.DataEvent = mapGrid
 
-	// METTRE MUTEX OU DE QUOI
-	eventRespond.DataEvent = mapGrid
-
-	marshalData, err := proto.Marshal(&eventRespond)
-	if err != nil {
-		s.log.Println("send error:", err)
-	}
-
-	for _, client := range s.clients {
-		err = websocket.Message.Send(client.Conn, marshalData)
+		marshalData, err := proto.Marshal(&eventRespond)
 		if err != nil {
 			s.log.Println("send error:", err)
 		}
-	}
 
-	if err != nil {
-		s.log.Println("send error:", err)
-	}
+		for _, client := range s.clients {
+			err = websocket.Message.Send(client.Conn, marshalData)
+			if err != nil {
+				s.log.Println("send error:", err)
+			}
+		}
 
-	// Mise a jours a 60 HZ
-	time.Sleep(16 * time.Millisecond)
+		if err != nil {
+			s.log.Println("send error:", err)
+		}
+
+		// Mise a jours a 60 HZ
+		time.Sleep(16 * time.Millisecond)
+	}
 }
 
 func (s *WebsocketManager) MoveElementHandler(
@@ -126,6 +127,7 @@ func (s *WebsocketManager) MoveElementHandler(
 		elementNewPos,
 		elementOldPos,
 	)
+
 	if err != nil {
 		s.log.Println(err)
 	}

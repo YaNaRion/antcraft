@@ -38,6 +38,6 @@ private:
   std::string id;
   Vector2 current_pos;
   Rectangle rectangle;
-  Vector2 *current_objective;
+  // Vector2 *current_objective;
   bool is_selected;
 };

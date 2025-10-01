@@ -12,10 +12,11 @@ void InputHandler(
     Vector2 mouse_position = GetMousePosition();
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
       element->SetSelected(false);
-      element->SetPos(mouse_position);
       std::shared_ptr<MoveUnitOut> move_unit = std::make_shared<MoveUnitOut>(
           MoveUnitOut(element->GetPos(), mouse_position, "playerID", "unitID"));
       gate->PushEvent(move_unit);
+      std::cout << move_unit->GetNewPos().x;
+      std::cout << move_unit->GetNewPos().y;
     }
 
     if (CheckCollisionPointRec(mouse_position, element->GetRec()) &&
@@ -25,6 +26,7 @@ void InputHandler(
   }
 
   if (IsKeyPressed(KEY_P)) {
+
     std::cout << "JOINING GAME\n";
     std::shared_ptr<GameResquest> joinGameRequest =
         std::make_shared<GameResquest>(GameResquest("", "Game1"));
@@ -48,9 +50,8 @@ void CleanEvenOutQueue(Gateway *gate) {
 }
 
 void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
-  std::cout << "CLEAN IN\n";
   while (gate->queue_in.size() > 0) {
-    std::cout << "CLEAN IN\n";
+    std::cout << "CLEAN IN DANS WHILE\n";
     auto event = gate->queue_in.front();
     event->HandlerEvent(game_scene);
     gate->queue_in.pop();

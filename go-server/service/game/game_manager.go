@@ -1,6 +1,8 @@
 package game
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 	"golang.org/x/net/websocket"
 )
@@ -129,15 +131,23 @@ func (g *Game) MoveElement(
 	newPos Vector2,
 	oldPos Vector2,
 ) error {
+	log.Println(newPos.X)
+	log.Println(newPos.Y)
+
+	log.Println(g.gameElements)
+
+	log.Println(oldPos.X)
+	log.Println(oldPos.Y)
+
 	element := g.MapGrid.Grid[oldPos.X][oldPos.Y]
 	if element == nil {
-		// Faire une erreur
+		log.Println("ELEMENT N'A PAS ETE MODIFIE")
 		return nil
 	}
+
 	element.SetPost(newPos)
 	g.MapGrid.Grid[oldPos.X][oldPos.Y] = nil
-	g.MapGrid.Grid[newPos.X][newPos.X] = element
-
+	g.MapGrid.Grid[newPos.X][newPos.Y] = element
 	return nil
 }
 
@@ -145,7 +155,6 @@ func (g *Game) AddElement(el IElement) error {
 	if g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] == nil {
 		g.gameElements[el.GetID()] = el
 		g.MapGrid.Grid[el.GetPost().X][el.GetPost().Y] = el
-
 	}
 	return nil
 }
@@ -182,6 +191,7 @@ func (g *GameManager) MoveElement(
 ) error {
 	err := g.games[gameID].MoveElement(elementID, playerID, newPos, oldPos)
 	if err != nil {
+		log.Panicln("TROUVE PAS LELEMENT A DEPLACER")
 		// Mettre une erreur
 		return nil
 	}

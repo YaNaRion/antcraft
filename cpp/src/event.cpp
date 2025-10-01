@@ -16,12 +16,18 @@ Event::Event MoveUnitOut::CreateProtoEvent() {
   unit->set_player_id(this->playerID);
 
   Event::Vector2 *old_pos = unit->mutable_old_pos();
-  old_pos->set_xpos(this->old_pos.x);
-  old_pos->set_ypos(this->old_pos.y);
+  old_pos->set_x(this->old_pos.x);
+  old_pos->set_y(this->old_pos.y);
 
-  Event::Vector2 *new_pos = unit->mutable_pos();
-  new_pos->set_xpos(this->new_pos.x);
-  new_pos->set_ypos(this->new_pos.y);
+  Event::Vector2 *new_pos = unit->mutable_new_pos();
+  new_pos->set_x(this->new_pos.x);
+  new_pos->set_y(this->new_pos.y);
+
+  std::string gameID = "Game1";
+  event.set_game_id(gameID);
+
+  Event::Player *player_info = event.mutable_player_info();
+  player_info->set_player_id(this->playerID);
 
   return event;
 }
@@ -35,12 +41,15 @@ GameResquest::GameResquest(std::string playerID, std::string gameID) {
 
 Event::Event GameResquest::CreateProtoEvent() {
   Event::Event eventWrapper;
-  Event::ConnectToGameRequest *event = eventWrapper.mutable_game_request();
-  event->set_game_id(this->gameID);
-  event->set_player_id(this->playerID);
+  Event::JoinGame *event = eventWrapper.mutable_join_game();
+  eventWrapper.set_game_id(this->gameID);
+  Event::Player *player_info = eventWrapper.mutable_player_info();
+  player_info->set_player_id(this->playerID);
+  // player_info->set_color(Event::RED_PROTO);
 
   return eventWrapper;
 }
+
 UpdateMapStateEvent::UpdateMapStateEvent(
     std::vector<std::shared_ptr<IScreenElement>> elements,
     Event::GameState state) {
@@ -49,7 +58,5 @@ UpdateMapStateEvent::UpdateMapStateEvent(
 }
 
 void UpdateMapStateEvent::HandlerEvent(std::shared_ptr<GameScene> game_scene) {
-  std::cout << "DANS HANDLER UPDATE EVENT" << std::endl;
   game_scene->Update(this->elements, this->state);
-  std::cout << "DANS HANDLER UPDATE EVENT" << std::endl;
 }
