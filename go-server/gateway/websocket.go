@@ -1,12 +1,13 @@
 package gateway
 
 import (
-	"github.com/google/uuid"
-	"golang.org/x/net/websocket"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"log"
 	"main/service/game"
+
+	"github.com/google/uuid"
+	"golang.org/x/net/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 type WebsocketManager struct {

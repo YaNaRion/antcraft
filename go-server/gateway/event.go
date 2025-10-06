@@ -2,7 +2,10 @@ package gateway
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"main/service/game"
+	"net"
 	"time"
 
 	"golang.org/x/net/websocket"
@@ -90,6 +93,8 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			s.log.Println("send error:", err)
 		}
 
+		log.Printf("Nombre client: %d", len(s.clients))
+		countNilClient := 0
 		for _, client := range s.clients {
 			err = websocket.Message.Send(client.Conn, marshalData)
 			if err != nil {
@@ -97,8 +102,9 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			}
 		}
 
-		if err != nil {
-			s.log.Println("send error:", err)
+		if len(s.clients) == countNilClient {
+
+			return
 		}
 
 		// Mise a jours a 60 HZ
