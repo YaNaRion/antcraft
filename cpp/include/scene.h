@@ -30,10 +30,12 @@ public:
               Event::GameState state);
 
   std::map<std::string, std::shared_ptr<IScreenElement>> GetElements();
+  // std::vector<std::shared_ptr<IScreenElement>> GetElements();
 
 private:
   // Key is ElementID, UnitID
   std::map<std::string, std::shared_ptr<IScreenElement>> elements;
+  // std::vector<std::shared_ptr<IScreenElement>> elements;
   std::map<std::string, std::shared_ptr<Player>> players;
   Event::GameState state;
 };

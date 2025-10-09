@@ -7,7 +7,6 @@ using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 
-// SET URL FOR THE SERVER
 const std::string url = "http://localhost:3000/ws";
 
 void Gateway::OnMessage(websocketpp::connection_hdl hdl,
@@ -23,30 +22,34 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
     return;
   }
 
-  switch (event.Data_Event_case()) {
+  switch (event.data_event_case()) {
   case Event::Event::kSyncGameState:
     if (event.has_sync_game_state()) {
       const auto &game_sync = event.sync_game_state();
       std::vector<std::shared_ptr<IScreenElement>> vector;
-      std::cout << "DANS SYNC\n";
-      game_sync.elements();
 
-      for (const Event::Element &elem : game_sync.elements()) {
-        std::cout << "DANS SYNC FOR\n";
-        const auto element = elem.element();
-        std::cout << element.unit_id() << std::endl;
-        std::cout << "DANS SYNC FOR\n";
+      for (const Event::Element &element : game_sync.elements()) {
+        float x = (float)element.pos().x();
+        float y = (float)element.pos().y();
+
         Vector2 pos = Vector2{
-            .x = (float)element.pos().xpos(),
-            .y = (float)element.pos().ypos(),
+            .x = x,
+            .y = y,
         };
 
-        Unit unit = Unit(pos, elem.element().unit_id());
-        vector.push_back(std::make_shared<Unit>(unit));
+        Vector2 currentObjectif = Vector2{
+            .x = (float)element.currentobjective().x(),
+            .y = (float)element.currentobjective().y(),
+        };
+
+        Unit unit = Unit(pos, currentObjectif, element.unit_id());
+        std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
+        vector.push_back(unit_shared);
       }
-      std::cout << "DANS SYNC\n";
+
       UpdateMapStateEvent update_map_event =
           UpdateMapStateEvent(vector, game_sync.game_state());
+
       std::shared_ptr<UpdateMapStateEvent> share_update =
           std::make_shared<UpdateMapStateEvent>(update_map_event);
       this->queue_in.push(share_update);
@@ -68,7 +71,6 @@ Gateway::Gateway() {
     websocketpp::lib::error_code ec;
     client::connection_ptr con =
         c.get_connection("http://localhost:3000/ws", ec);
-    std::cout << "APRES CONNECTION\n";
     con->replace_header("Origin", "http://localhost:3000");
     if (ec) {
       std::cout << "could not create connection because: " << ec.message()

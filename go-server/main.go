@@ -67,7 +67,7 @@ func Setup(logger *log.Logger) *Server {
 func main() {
 	logger := log.New(os.Stdout, "LOG: ", log.LstdFlags)
 	server := Setup(logger)
-	logger.Println("SERVER STARTED")
+	log.Println("SERVER STARTED")
 	server.Conf.Router.Mux.Handle("/ws", websocket.Handler(server.Conf.Websock.HandleWS))
 	err := http.ListenAndServe(httpPort, server.Conf.Router.Mux)
 	if err != nil {

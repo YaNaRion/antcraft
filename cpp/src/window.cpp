@@ -6,6 +6,7 @@ Window::Window(int width, int height, const char *title) {
   this->height = height;
   this->title = title;
 
+  SetTargetFPS(144);
   InitWindow(width, height, title);
 }
 
