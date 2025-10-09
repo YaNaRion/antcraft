@@ -10,6 +10,7 @@ void InputHandler(
   for (auto &pair_element : element_map) {
     std::shared_ptr<IScreenElement> element = pair_element.second;
     Vector2 mouse_position = GetMousePosition();
+    // TODO:
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
       element->SetSelected(false);
       std::shared_ptr<MoveUnitOut> move_unit =
