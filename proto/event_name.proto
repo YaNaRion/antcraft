@@ -47,11 +47,10 @@ message MoveElement {
 message Element {
   string player_id = 1;
   string unit_id = 2;
-
   Vector2 pos = 4;
   Vector2 size = 5;
-
   ElementType element_type = 6;
+  optional Vector2 currentObjective = 7;
 }
 
 // message Row {

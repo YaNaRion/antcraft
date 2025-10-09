@@ -11,18 +11,9 @@ GameScene::~GameScene() {};
 
 void GameScene::Draw() {
   for (auto &element : this->elements) {
-    // std::cout << element.second->GetID() << std::endl;
-    // std::cout << element.second->GetRec().x << std::endl;
-    // std::cout << element.second->GetRec().y << std::endl;
-    // std::cout << element.second->GetRec().height << std::endl;
     element.second->Draw(RED);
   }
 }
-
-// std::map<std::string, std::shared_ptr<IScreenElement>>
-// GameScene::GetElements() {
-//   return this->elements;
-// }
 
 std::map<std::string, std::shared_ptr<IScreenElement>>
 GameScene::GetElements() {
@@ -44,14 +35,20 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
 
   // TODO: ATTENTION DE PREND PAS EN COMPTE LE CAS OU DES UNITS ONT ETE
   // ENLEVER!!!
+
+  // TODO: FAIRE EN SORTE QU'A CHAQUE UPDATE DE SERVER, L'ELEMENT SE DEPLACE
+  // PLUSIEURS FOIS DANS LE SENS DU VECTEUR DIRECTEUR FAIRE LE MEME CALCULE A
+  // CHAQUE FRAME DU COTE CLIENT QUE DU COTE SERVER
+  //
   for (std::shared_ptr<IScreenElement> unit : vectorIN) {
     auto foundElement = this->elements.find(unit->GetID());
     if (foundElement == this->elements.end()) {
       this->elements[unit->GetID()] = unit;
     } else {
-      std::cout << foundElement->second->GetRec().x << std::endl;
-      std::cout << unit->GetPos().x << std::endl;
-      foundElement->second->SetPos(unit->GetPos());
+      if (unit->GetCurrentObjective().get() != nullptr) {
+        foundElement->second->SetCurrentObjective(unit->GetCurrentObjective());
+        foundElement->second->SetDirectionVector();
+      }
     }
   }
 }

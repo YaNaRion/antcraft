@@ -2,40 +2,40 @@ package gateway
 
 import (
 	"fmt"
-	"io"
-	"log"
-	"main/service/game"
-	"net"
-	"time"
-
 	"golang.org/x/net/websocket"
 	"google.golang.org/protobuf/proto"
+	"main/service/game"
+	"main/service/math"
+	"math/rand"
+	"time"
 )
 
-func (s *WebsocketManager) JoinGameHandler(ws *websocket.Conn, event *Event_JoinGame) {
+func (s *WebsocketManager) JoinGameHandler(
+	ws *websocket.Conn,
+	event *Event_JoinGame,
+	gameID string,
+) {
 	s.log.Println("JOIN GAME EVENT")
 
 	var newPlayer *game.Player
 	var playerID string
 
 	// Faire un join game custom pour join la game voulu
-	var gameID string = "Game1"
-
 	playerID = fmt.Sprintf("Player%d", len(s.clients))
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
 
-	var unit *game.Unit = game.NewUnit(game.Vector2{
-		X: 300,
-		Y: 300,
-	}, game.Vector2{
+	var unit *game.Unit = game.NewUnit(math.Vector2{
+		X: float64(rand.Int() % 500),
+		Y: float64(rand.Int() % 500),
+	}, math.Vector2{
 		X: 10,
 		Y: 10,
 	})
 
-	var unit2 *game.Unit = game.NewUnit(game.Vector2{
-		X: 350,
-		Y: 350,
-	}, game.Vector2{
+	var unit2 *game.Unit = game.NewUnit(math.Vector2{
+		X: float64(rand.Int() % 500),
+		Y: float64(rand.Int() % 500),
+	}, math.Vector2{
 		X: 10,
 		Y: 10,
 	})
@@ -67,24 +67,21 @@ func (s *WebsocketManager) StartGame(ws *websocket.Conn, gameID game.GameID) {
 
 func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 	s.log.Println("GAME LOOP")
-
 	gameMap := s.gameManager.GetGame(gameID)
 	for {
 		var err error
-		s.log.Println("DANS FOR LOOP")
 		if gameMap.GameState != game.GAME_STATE_IN_GAME {
 			return
 		}
+		gameMap.UpdateGameState()
 
 		var eventRespond Event
-
 		mapGrid := NewEventSyncGameState(
 			s.gameManager.GetMap(gameID),
 			GameState(gameMap.GameState),
 		)
 
-		s.log.Println(mapGrid.SyncGameState.Elements)
-
+		// s.log.Println(mapGrid.SyncGameState.Elements)
 		// METTRE MUTEX OU DE QUOI
 		eventRespond.DataEvent = mapGrid
 
@@ -93,21 +90,22 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			s.log.Println("send error:", err)
 		}
 
-		log.Printf("Nombre client: %d", len(s.clients))
+		// log.Printf("Nombre client: %d", len(s.clients))
 		countNilClient := 0
 		for _, client := range s.clients {
 			err = websocket.Message.Send(client.Conn, marshalData)
 			if err != nil {
 				s.log.Println("send error:", err)
+				s.gameManager.RemoveGame(gameID)
+				return
 			}
 		}
 
 		if len(s.clients) == countNilClient {
-
 			return
 		}
 
-		// Mise a jours a 60 HZ
+		// Mise a jours a 60 HZ, 16
 		time.Sleep(16 * time.Millisecond)
 	}
 }
@@ -118,15 +116,21 @@ func (s *WebsocketManager) MoveElementHandler(
 	gameID, playerID *string,
 ) {
 	s.log.Println("MoveElement Event")
-	elementNewPos := game.Vector2{
-		X: int(unit.MoveElement.GetNewPos().X),
-		Y: int(unit.MoveElement.GetNewPos().Y),
+	s.log.Printf("MoveElementFrom: %s", ws.RemoteAddr())
+	s.log.Printf("PlayerID: %s", *playerID)
+	s.log.Printf("Moving: %s", unit.MoveElement.GetUnitId())
+
+	elementNewPos := math.Vector2{
+		X: float64(unit.MoveElement.GetNewPos().X),
+		Y: float64(unit.MoveElement.GetNewPos().Y),
 	}
-	elementOldPos := game.Vector2{
-		X: int(unit.MoveElement.GetOldPos().X),
-		Y: int(unit.MoveElement.GetOldPos().Y),
+
+	elementOldPos := math.Vector2{
+		X: float64(unit.MoveElement.GetOldPos().X),
+		Y: float64(unit.MoveElement.GetOldPos().Y),
 	}
-	err := s.gameManager.MoveElement(
+
+	err := s.gameManager.AddTargetToElement(
 		game.ElementID(unit.MoveElement.UnitId),
 		game.PlayerID(unit.MoveElement.PlayerId),
 		game.GameID(*gameID),

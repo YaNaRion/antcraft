@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"log"
 	"main/service/game"
 )
 
@@ -40,6 +41,19 @@ func iElementToProto(elem game.IElement) *Element {
 	pos := elem.GetPost()
 	et := ElementType_WORKER
 
+	currentObjective := &Vector2{
+		X: -1,
+		Y: -1,
+	}
+
+	if elem.GetCurrentObjective() != nil {
+		currentObjective = &Vector2{
+			X: int32(elem.GetCurrentObjective().X),
+			Y: int32(elem.GetCurrentObjective().Y),
+		}
+	}
+
+	log.Println(currentObjective)
 	return &Element{
 		Pos: &Vector2{
 			X: int32(pos.X),
@@ -49,33 +63,10 @@ func iElementToProto(elem game.IElement) *Element {
 			X: int32(elem.GetSize().X),
 			Y: int32(elem.GetSize().Y),
 		},
+		CurrentObjective: currentObjective,
+
 		PlayerId:    string(elem.GetPlayerID()),
 		UnitId:      string(elem.GetID()),
 		ElementType: et,
 	}
 }
-
-// type Marine struct{ pos Vector2 }
-//
-// func (m *Marine) GetPost() Vector2  { return m.pos }
-// func (m *Marine) SetPost(v Vector2) { m.pos = v }
-//
-// type Base struct{ pos Vector2 }
-//
-// func (b *Base) GetPost() Vector2  { return b.pos }
-// func (b *Base) SetPost(v Vector2) { b.pos = v }
-//
-// type Barrack struct{ pos Vector2 }
-//
-// func (br *Barrack) GetPost() Vector2  { return br.pos }
-// func (br *Barrack) SetPost(v Vector2) { br.pos = v }
-//
-// type Supply struct{ pos Vector2 }
-//
-// func (s *Supply) GetPost() Vector2  { return s.pos }
-// func (s *Supply) SetPost(v Vector2) { s.pos = v }
-//
-// type Mineral struct{ pos Vector2 }
-//
-// func (m *Mineral) GetPost() Vector2  { return m.pos }
-// func (m *Mineral) SetPost(v Vector2) { m.pos = v }

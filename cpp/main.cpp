@@ -12,22 +12,23 @@ void InputHandler(
     Vector2 mouse_position = GetMousePosition();
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
       element->SetSelected(false);
-      std::shared_ptr<MoveUnitOut> move_unit = std::make_shared<MoveUnitOut>(
-          MoveUnitOut(element->GetPos(), mouse_position, "playerID", "unitID"));
+      std::shared_ptr<MoveUnitOut> move_unit =
+          std::make_shared<MoveUnitOut>(MoveUnitOut(
+              element->GetPos(), mouse_position, "playerID", element->GetID()));
+
       gate->PushEvent(move_unit);
-      std::cout << move_unit->GetNewPos().x;
-      std::cout << move_unit->GetNewPos().y;
     }
 
     if (CheckCollisionPointRec(mouse_position, element->GetRec()) &&
         IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
       element->SetSelected(true);
+    } else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+      element->SetSelected(false);
     }
   }
 
   if (IsKeyPressed(KEY_P)) {
-
-    std::cout << "JOINING GAME\n";
+    // std::cout << "JOINING GAME\n";
     std::shared_ptr<GameResquest> joinGameRequest =
         std::make_shared<GameResquest>(GameResquest("", "Game1"));
     gate->PushEvent(joinGameRequest);
@@ -43,7 +44,7 @@ void threadGate() { std::cout << "DANS THREAD\n"; }
 void CleanEvenOutQueue(Gateway *gate) {
   size_t queue_size = gate->GetQueueOutSize();
   while (queue_size > 0) {
-    std::cout << "CLEAN OUT\n";
+    // std::cout << "CLEAN OUT\n";
     gate->PopAndSendEvent();
     queue_size = gate->GetQueueOutSize();
   }
@@ -51,7 +52,7 @@ void CleanEvenOutQueue(Gateway *gate) {
 
 void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
   while (gate->queue_in.size() > 0) {
-    std::cout << "CLEAN IN DANS WHILE\n";
+    // std::cout << "CLEAN IN DANS WHILE\n";
     auto event = gate->queue_in.front();
     event->HandlerEvent(game_scene);
     gate->queue_in.pop();
@@ -62,9 +63,12 @@ int main() {
   Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
 
   std::vector<std::shared_ptr<IScreenElement>> units_ptr;
+
   Gateway *gate = new Gateway();
+
   // Init scene
   GameScene game_scene = GameScene();
+
   // Create MenuScene
   MenuScene menu = MenuScene();
 

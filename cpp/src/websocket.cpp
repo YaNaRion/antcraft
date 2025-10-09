@@ -7,7 +7,6 @@ using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 
-// SET URL FOR THE SERVER
 const std::string url = "http://localhost:3000/ws";
 
 void Gateway::OnMessage(websocketpp::connection_hdl hdl,
@@ -38,7 +37,12 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
             .y = y,
         };
 
-        Unit unit = Unit(pos, element.unit_id());
+        Vector2 currentObjectif = Vector2{
+            .x = (float)element.currentobjective().x(),
+            .y = (float)element.currentobjective().y(),
+        };
+
+        Unit unit = Unit(pos, currentObjectif, element.unit_id());
         std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
         vector.push_back(unit_shared);
       }
@@ -67,7 +71,6 @@ Gateway::Gateway() {
     websocketpp::lib::error_code ec;
     client::connection_ptr con =
         c.get_connection("http://localhost:3000/ws", ec);
-    std::cout << "APRES CONNECTION\n";
     con->replace_header("Origin", "http://localhost:3000");
     if (ec) {
       std::cout << "could not create connection because: " << ec.message()

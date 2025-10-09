@@ -61,7 +61,7 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 		switch x := event.DataEvent.(type) {
 		case *Event_JoinGame:
 			s.log.Println("NEW EVENT: JOIN GAME")
-			s.JoinGameHandler(ws, x)
+			s.JoinGameHandler(ws, x, event.GameId)
 		case *Event_MoveElement:
 			s.log.Println("NEW EVENT: MOVE ELEMENT")
 			s.MoveElementHandler(ws, x, &event.GameId, &event.PlayerInfo.PlayerId)
