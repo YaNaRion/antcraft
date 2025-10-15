@@ -20,13 +20,16 @@ public:
   void SendEvent(std::string eventString);
   void OnMessage(websocketpp::connection_hdl hdl, client::message_ptr msg);
   client *GetClient() { return &this->c; };
-
+  void Connect();
+  bool GetIsConnected();
+  void SyncGameEventHandler(const Event::SyncGameState &game_state);
   websocketpp::connection_hdl *GetHDL() { return &this->hdl; };
+
   std::queue<std::shared_ptr<IEventIN>> queue_in;
   std::queue<std::shared_ptr<IEventOut>> queue_out;
 
+private:
   client c;
   websocketpp::connection_hdl hdl;
-
-private:
+  bool IsConnected;
 };

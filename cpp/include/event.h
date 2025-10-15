@@ -7,16 +7,28 @@ public:
   virtual void HandlerEvent(std::shared_ptr<GameScene> game_scene) = 0;
 };
 
-class UpdateMapStateEvent : public IEventIN {
+class UpdateMapStateEventIN : public IEventIN {
 public:
-  UpdateMapStateEvent(std::vector<std::shared_ptr<IScreenElement>> elements,
-                      Event::GameState state);
-  ~UpdateMapStateEvent() {};
+  UpdateMapStateEventIN(std::vector<std::shared_ptr<IScreenElement>> elements,
+                        Event::GameState state);
+  ~UpdateMapStateEventIN() {};
   void HandlerEvent(std::shared_ptr<GameScene> gameScene) override;
 
 private:
   std::vector<std::shared_ptr<IScreenElement>> elements;
   Event::GameState state;
+};
+
+class JoinGameEventIN : public IEventIN {
+public:
+  JoinGameEventIN(std::string game_id, std::string player_id, Color color);
+  ~JoinGameEventIN() {};
+  void HandlerEvent(std::shared_ptr<GameScene> gameScene) override;
+
+private:
+  std::string game_id;
+  std::string player_id;
+  Color color;
 };
 
 class IEventOut {

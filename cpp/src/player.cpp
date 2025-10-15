@@ -8,6 +8,12 @@ Player::Player(Color color, std::vector<std::shared_ptr<IScreenElement>> units,
   this->player_id = player_id;
 };
 
+Player::Player(std::string player_id, Color color) {
+  this->player_id = player_id;
+  this->units = std::vector<std::shared_ptr<IScreenElement>>();
+  this->color = color;
+};
+
 void Player::AddElement(std::shared_ptr<IScreenElement> elem) {
   this->units.push_back(elem);
 }

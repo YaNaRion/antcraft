@@ -56,7 +56,7 @@ func (g *GameManager) AddPlayerToGame(gameID GameID, player *Player) {
 }
 
 func (g *GameManager) GetPlayerInAGame(gameID GameID) map[PlayerID]*Player {
-	return g.games[gameID].players
+	return g.games[gameID].Players
 }
 
 func (g *GameManager) GetMap(gameID GameID) *MapGrid {

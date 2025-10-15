@@ -26,39 +26,30 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
   case Event::Event::kSyncGameState:
     if (event.has_sync_game_state()) {
       const auto &game_sync = event.sync_game_state();
-      std::vector<std::shared_ptr<IScreenElement>> vector;
-
-      for (const Event::Element &element : game_sync.elements()) {
-        float x = (float)element.pos().x();
-        float y = (float)element.pos().y();
-
-        Vector2 pos = Vector2{
-            .x = x,
-            .y = y,
-        };
-
-        Vector2 currentObjectif = Vector2{
-            .x = (float)element.currentobjective().x(),
-            .y = (float)element.currentobjective().y(),
-        };
-
-        Unit unit = Unit(pos, currentObjectif, element.unit_id());
-        std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
-        vector.push_back(unit_shared);
-      }
-
-      UpdateMapStateEvent update_map_event =
-          UpdateMapStateEvent(vector, game_sync.game_state());
-
-      std::shared_ptr<UpdateMapStateEvent> share_update =
-          std::make_shared<UpdateMapStateEvent>(update_map_event);
-      this->queue_in.push(share_update);
+      this->SyncGameEventHandler(game_sync);
     }
+    break;
+  case Event::Event::kJoinGame:
+    const auto &game_sync = event.join_game();
+    Color color;
+    if (event.player_info().color() == 0) {
+      color = RED;
+    } else {
+      color = BLUE;
+    }
+    JoinGameEventIN join_game_event = JoinGameEventIN(
+        game_sync.game_id(), event.player_info().player_id(), color);
     break;
   }
 }
 
-Gateway::Gateway() {
+Gateway::Gateway() {};
+
+Gateway::~Gateway() {};
+
+bool Gateway::GetIsConnected() { return this->IsConnected; }
+
+void Gateway::Connect() {
   try {
     c.set_access_channels(websocketpp::log::alevel::all);
     c.clear_access_channels(websocketpp::log::alevel::frame_payload);
@@ -78,12 +69,11 @@ Gateway::Gateway() {
     }
     c.connect(con);
     std::thread([this]() { c.run(); }).detach();
+    this->IsConnected = true;
   } catch (websocketpp::exception const &e) {
     std::cout << e.what() << std::endl;
   }
-};
-
-Gateway::~Gateway() {};
+}
 
 void Gateway::PushEvent(std::shared_ptr<IEventOut> ev) {
   this->queue_out.push(ev);
@@ -92,6 +82,7 @@ void Gateway::PushEvent(std::shared_ptr<IEventOut> ev) {
 size_t Gateway::GetQueueOutSize() { return this->queue_out.size(); }
 
 void Gateway::PopAndSendEvent() {
+  std::cout << "DANS POP AND SERVER" << std::endl;
   auto event = this->queue_out.front();
   Event::Event protoEvent = event->CreateProtoEvent();
   std::string eventString = protoEvent.SerializeAsString();
@@ -107,3 +98,33 @@ void Gateway::SendEvent(std::string eventString) {
     std::cout << "Send Error: " << ec.message() << std::endl;
   }
 }
+
+void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
+  std::vector<std::shared_ptr<IScreenElement>> vector;
+
+  for (const Event::Element &element : game_state.elements()) {
+    float x = (float)element.pos().x();
+    float y = (float)element.pos().y();
+
+    Vector2 pos = Vector2{
+        .x = x,
+        .y = y,
+    };
+
+    Vector2 currentObjectif = Vector2{
+        .x = (float)element.currentobjective().x(),
+        .y = (float)element.currentobjective().y(),
+    };
+
+    Unit unit = Unit(pos, currentObjectif, element.unit_id());
+    std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
+    vector.push_back(unit_shared);
+  }
+
+  UpdateMapStateEventIN update_map_event =
+      UpdateMapStateEventIN(vector, game_state.game_state());
+
+  std::shared_ptr<UpdateMapStateEventIN> share_update =
+      std::make_shared<UpdateMapStateEventIN>(update_map_event);
+  this->queue_in.push(share_update);
+};

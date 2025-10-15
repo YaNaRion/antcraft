@@ -1,6 +1,5 @@
 #include "event_name.pb.h"
 #include "scene.h"
-#include <iostream>
 
 GameScene::GameScene() {
   this->elements = {};
@@ -13,6 +12,14 @@ void GameScene::Draw() {
   for (auto &element : this->elements) {
     element.second->Draw(RED);
   }
+}
+
+void GameScene::SetCurrentPlayer(std::shared_ptr<Player> player) {
+  this->current_player = player;
+}
+
+std::map<std::string, std::shared_ptr<Player>> GameScene::GetPlayers() {
+  return this->players;
 }
 
 std::map<std::string, std::shared_ptr<IScreenElement>>

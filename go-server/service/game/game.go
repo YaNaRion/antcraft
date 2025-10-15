@@ -33,7 +33,7 @@ const (
 
 type Game struct {
 	MapGrid      *MapGrid
-	players      map[PlayerID]*Player
+	Players      map[PlayerID]*Player
 	GameState    Enum_Game_State
 	gameElements map[ElementID]IElement
 }
@@ -41,7 +41,7 @@ type Game struct {
 func NewGame(grid *MapGrid) *Game {
 	return &Game{
 		MapGrid:      grid,
-		players:      make(map[PlayerID]*Player, 0),
+		Players:      make(map[PlayerID]*Player, 0),
 		GameState:    GAME_STATE_IN_GAME,
 		gameElements: map[ElementID]IElement{},
 	}
@@ -99,7 +99,7 @@ func (g *Game) GetElements() map[ElementID]IElement {
 }
 
 func (g *Game) AddPlayer(player *Player) {
-	g.players[player.playerID] = player
+	g.Players[player.playerID] = player
 }
 
 func (g *Game) UpdateGameState() {

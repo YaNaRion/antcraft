@@ -8,6 +8,7 @@ public:
   void Draw();
   Player(Color color, std::vector<std::shared_ptr<IScreenElement>> units,
          std::string player_id);
+  Player(std::string player_id, Color color);
   ~Player();
   Color GetTeamColor();
   void AddElement(std::shared_ptr<IScreenElement> elem);

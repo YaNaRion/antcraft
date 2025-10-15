@@ -45,18 +45,34 @@ Event::Event GameResquest::CreateProtoEvent() {
   eventWrapper.set_game_id(this->gameID);
   Event::Player *player_info = eventWrapper.mutable_player_info();
   player_info->set_player_id(this->playerID);
-  // player_info->set_color(Event::RED_PROTO);
-
+  player_info->set_color(Event::RED_PROTO);
   return eventWrapper;
 }
 
-UpdateMapStateEvent::UpdateMapStateEvent(
+UpdateMapStateEventIN::UpdateMapStateEventIN(
     std::vector<std::shared_ptr<IScreenElement>> elements,
     Event::GameState state) {
   this->elements = elements;
   this->state = state;
 }
 
-void UpdateMapStateEvent::HandlerEvent(std::shared_ptr<GameScene> game_scene) {
+void UpdateMapStateEventIN::HandlerEvent(
+    std::shared_ptr<GameScene> game_scene) {
   game_scene->Update(this->elements, this->state);
+}
+
+JoinGameEventIN::JoinGameEventIN(std::string game_id, std::string player_id,
+                                 Color color) {
+  this->game_id = game_id;
+  this->player_id = player_id;
+  this->color = color;
+}
+
+void JoinGameEventIN::HandlerEvent(std::shared_ptr<GameScene> gameScene) {
+  std::map<std::string, std::shared_ptr<Player>> players =
+      gameScene->GetPlayers();
+  Player player = Player(this->player_id, this->color);
+  std::shared_ptr<Player> shared_player = std::make_shared<Player>(player);
+  players.insert({player_id, shared_player});
+  gameScene->SetCurrentPlayer(shared_player);
 }

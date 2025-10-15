@@ -18,10 +18,9 @@ func (s *WebsocketManager) JoinGameHandler(
 	s.log.Println("JOIN GAME EVENT")
 
 	var newPlayer *game.Player
-	var playerID string
 
 	// Faire un join game custom pour join la game voulu
-	playerID = fmt.Sprintf("Player%d", len(s.clients))
+	playerID := fmt.Sprintf("Player%d", len(s.clients))
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
 
 	var unit *game.Unit = game.NewUnit(math.Vector2{
@@ -56,6 +55,34 @@ func (s *WebsocketManager) JoinGameHandler(
 	}
 
 	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
+
+	var eventRespond Event
+	eventRespond.GameId = gameID
+	var teamColor ColorTeam
+	if len(gameMap.Players) == 0 {
+		teamColor = ColorTeam_RED_PROTO
+	} else if len(gameMap.Players) == 1 {
+		teamColor = ColorTeam_BLUE_PROTO
+	} else {
+		s.log.Println("MAX 2 PLAYER")
+		return
+	}
+
+	eventRespond.PlayerInfo = &Player{
+		Color:    &teamColor,
+		PlayerId: playerID,
+	}
+	eventRespond.DataEvent = &Event_JoinGame{}
+
+	marshalData, err := proto.Marshal(&eventRespond)
+	if err != nil {
+		s.log.Println("Error occured when marsharl game data")
+	}
+
+	err = websocket.Message.Send(ws, marshalData)
+	if err != nil {
+		s.log.Println("Error occured when sending game info")
+	}
 	s.StartGame(ws, game.GameID(gameID))
 }
 
@@ -81,7 +108,6 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			GameState(gameMap.GameState),
 		)
 
-		// s.log.Println(mapGrid.SyncGameState.Elements)
 		// METTRE MUTEX OU DE QUOI
 		eventRespond.DataEvent = mapGrid
 
@@ -90,7 +116,6 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			s.log.Println("send error:", err)
 		}
 
-		// log.Printf("Nombre client: %d", len(s.clients))
 		countNilClient := 0
 		for _, client := range s.clients {
 			err = websocket.Message.Send(client.Conn, marshalData)
@@ -105,7 +130,7 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			return
 		}
 
-		// Mise a jours a 60 HZ, 16
+		// Mise a jours a 60 HZ, 16, pas vraiment vrai car cest 16ms apres le fin dexecution de la boucle
 		time.Sleep(16 * time.Millisecond)
 	}
 }

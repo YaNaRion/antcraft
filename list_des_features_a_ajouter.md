@@ -1,8 +1,8 @@
 # Feature à améliorer/modifier
 **- Faire une meilleure gestion des websockets et des connexions client du côté server**
 - Modifier le moment de connection du client
-    - Faire en sorte que le client se connect à la partie lorsqu'il fait P non lors de l'initialisation du client
-- Faire en sorte que le client recoit du server suite à sa connection à la partie son ID
+    - [x] Faire en sorte que le client se connect à la partie lorsqu'il fait P non lors de l'initialisation du client
+    - [ ] Faire en sorte que le client recoit du server suite à sa connexion à la partie son ID
     - Ajouter un event de réponse que le server envoie
     - Ajouter un event de réception dans le client qui lui permet de récupérer son ID
 - Déplacement des élements qui fonctionnent sans problème sans obstacle 
@@ -33,6 +33,8 @@
         - Faire HUD de game avec les options en fonction de l'unité selectionnée 
             - Si batiment, les options d'unités à créer
             - Si unité, les options de constructions, movement et effets spéciaux
+- Faire des unités animés
+    - https://zylinski.se/posts/gamedev-for-beginners-using-odin-and-raylib-3/
 
 # Feature à créer optionnelle
 - Ajouter une option de replay la partie
