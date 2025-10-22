@@ -2,6 +2,7 @@
 #include "event_name.pb.h"
 #include "raylib.h"
 #include <iostream>
+#include <memory>
 
 using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
@@ -32,13 +33,20 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
   case Event::Event::kJoinGame:
     const auto &game_sync = event.join_game();
     Color color;
-    if (event.player_info().color() == 0) {
+    std::cout << event.player_info().color() << std::endl;
+
+    // 1 est la valeur pour rouge dans le proto
+    if (event.player_info().color() == 1) {
+      std::cout << "COULEUR ACTUEL EST ROUGE" << std::endl;
       color = RED;
     } else {
+      std::cout << "COULEUR ACTUEL EST BLEU" << std::endl;
       color = BLUE;
     }
     JoinGameEventIN join_game_event = JoinGameEventIN(
-        game_sync.game_id(), event.player_info().player_id(), color);
+        event.game_id(), event.player_info().player_id(), color);
+
+    this->queue_in.push(std::make_shared<JoinGameEventIN>(join_game_event));
     break;
   }
 }

@@ -65,6 +65,9 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 		case *Event_MoveElement:
 			s.log.Println("NEW EVENT: MOVE ELEMENT")
 			s.MoveElementHandler(ws, x, &event.GameId, &event.PlayerInfo.PlayerId)
+		case *Event_StartGame:
+			s.log.Println("NEW EVENT: MOVE START GAME")
+			s.StartGameHandler(ws, x, &event.GameId)
 		}
 	}
 }

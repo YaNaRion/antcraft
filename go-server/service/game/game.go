@@ -102,6 +102,10 @@ func (g *Game) AddPlayer(player *Player) {
 	g.Players[player.playerID] = player
 }
 
+func (g *Game) RemovePlayer(player *Player) {
+	g.Players[player.playerID] = nil
+}
+
 func (g *Game) UpdateGameState() {
 	for _, element := range g.gameElements {
 		element.MoveElement(g.MapGrid.Grid)

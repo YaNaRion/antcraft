@@ -54,8 +54,6 @@ func (s *WebsocketManager) JoinGameHandler(
 		s.log.Println(err)
 	}
 
-	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
-
 	var eventRespond Event
 	eventRespond.GameId = gameID
 	var teamColor ColorTeam
@@ -67,6 +65,8 @@ func (s *WebsocketManager) JoinGameHandler(
 		s.log.Println("MAX 2 PLAYER")
 		return
 	}
+
+	s.gameManager.AddPlayerToGame(game.GameID(gameID), newPlayer)
 
 	eventRespond.PlayerInfo = &Player{
 		Color:    &teamColor,
@@ -83,7 +83,14 @@ func (s *WebsocketManager) JoinGameHandler(
 	if err != nil {
 		s.log.Println("Error occured when sending game info")
 	}
-	s.StartGame(ws, game.GameID(gameID))
+
+	s.log.Println("START GAME")
+	if len(gameMap.Players) == 2 {
+		s.log.Println("START GAME")
+		s.log.Printf("GameID: %s \n", gameID)
+		s.StartGame(ws, game.GameID(gameID))
+		s.log.Printf("GAME STARTED")
+	}
 }
 
 func (s *WebsocketManager) StartGame(ws *websocket.Conn, gameID game.GameID) {
@@ -166,4 +173,11 @@ func (s *WebsocketManager) MoveElementHandler(
 	if err != nil {
 		s.log.Println(err)
 	}
+}
+
+func (s *WebsocketManager) StartGameHandler(
+	ws *websocket.Conn,
+	gameID, playerID string,
+) {
+	s.gameManager.StartGame(game.GameID(gameID))
 }

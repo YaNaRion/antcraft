@@ -1,4 +1,5 @@
 #include "event.h"
+#include "event_name.pb.h"
 
 MoveUnitOut::MoveUnitOut(Vector2 old_p, Vector2 new_p, std::string player_ID,
                          std::string unit_ID) {
@@ -75,4 +76,15 @@ void JoinGameEventIN::HandlerEvent(std::shared_ptr<GameScene> gameScene) {
   std::shared_ptr<Player> shared_player = std::make_shared<Player>(player);
   players.insert({player_id, shared_player});
   gameScene->SetCurrentPlayer(shared_player);
+  return;
 }
+
+StartGameOut::StartGameOut(std::string gameID) { this->game_id = gameID; };
+
+Event::Event StartGameOut::CreateProtoEvent() {
+  Event::Event event = Event::Event();
+
+  Event::StartGame *start_game = event.mutable_start_game();
+  start_game->set_game_id(this->game_id);
+  return event;
+};

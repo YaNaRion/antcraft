@@ -32,8 +32,6 @@ void Unit::Draw(Color color) {
   } else {
     DrawRectangleRec(rectangle, color);
   }
-  // std::printf("UNITID: %s, POSX: %f, POXY: %f\n", this->id.c_str(),
-  //             this->current_pos.x, this->current_pos.y);
 };
 
 Vector2 Unit::GetPos() { return this->current_pos; };

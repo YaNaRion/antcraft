@@ -26,6 +26,8 @@ public:
   void PlayerElement(std::shared_ptr<Player>);
   void GetElementByID(std::string elementID);
   void SetCurrentPlayer(std::shared_ptr<Player> player);
+  std::string GetGameID();
+  void SetGameID(std::string gameID);
   void Draw() override;
   void Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
               Event::GameState state);
@@ -40,6 +42,7 @@ private:
   std::map<std::string, std::shared_ptr<Player>> players;
   Event::GameState state;
   std::shared_ptr<Player> current_player;
+  std::string game_id;
 };
 
 class SceneManager {

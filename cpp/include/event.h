@@ -62,3 +62,13 @@ private:
   std::string playerID;
   std::string unitID;
 };
+
+class StartGameOut : public IEventOut {
+public:
+  StartGameOut(std::string gameID);
+  ~StartGameOut() {};
+  Event::Event CreateProtoEvent() override;
+
+private:
+  std::string game_id;
+};

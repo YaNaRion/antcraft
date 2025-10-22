@@ -28,4 +28,6 @@ std::vector<std::shared_ptr<IScreenElement>> Player::GetUnits() {
   return this->units;
 }
 
+Color Player::GetTeamColor() { return this->color; }
+
 Player::~Player() {};
