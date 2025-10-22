@@ -17,19 +17,23 @@ func (s *WebsocketManager) JoinGameHandler(
 ) {
 	s.log.Println("JOIN GAME EVENT")
 
+	gameMap := s.gameManager.GetGame(game.GameID(gameID))
 	var newPlayer *game.Player
 
 	// Faire un join game custom pour join la game voulu
 	playerID := fmt.Sprintf("Player%d", len(s.clients))
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
 
+	// TEAM 1 est rouge TEAM 2 est bleu
 	var unit *game.Unit = game.NewUnit(math.Vector2{
 		X: float64(rand.Int() % 500),
 		Y: float64(rand.Int() % 500),
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
-	})
+	},
+		len(gameMap.Players)+1,
+	)
 
 	var unit2 *game.Unit = game.NewUnit(math.Vector2{
 		X: float64(rand.Int() % 500),
@@ -37,12 +41,12 @@ func (s *WebsocketManager) JoinGameHandler(
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
-	})
+	},
+		len(gameMap.Players)+1,
+	)
 
 	newPlayer.AddElement(unit)
 	newPlayer.AddElement(unit2)
-
-	gameMap := s.gameManager.GetGame(game.GameID(gameID))
 
 	err := gameMap.AddElement(unit)
 	if err != nil {
@@ -84,13 +88,12 @@ func (s *WebsocketManager) JoinGameHandler(
 		s.log.Println("Error occured when sending game info")
 	}
 
-	s.log.Println("START GAME")
-	if len(gameMap.Players) == 2 {
-		s.log.Println("START GAME")
-		s.log.Printf("GameID: %s \n", gameID)
-		s.StartGame(ws, game.GameID(gameID))
-		s.log.Printf("GAME STARTED")
-	}
+	// if len(gameMap.Players) == 2 {
+	// 	s.log.Println("START GAME")
+	// 	s.log.Printf("GameID: %s \n", gameID)
+	s.StartGame(ws, game.GameID(gameID))
+	// 	s.log.Printf("GAME STARTED")
+	// }
 }
 
 func (s *WebsocketManager) StartGame(ws *websocket.Conn, gameID game.GameID) {

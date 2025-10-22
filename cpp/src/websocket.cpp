@@ -1,6 +1,7 @@
 #include "websocket.h"
 #include "event_name.pb.h"
 #include "raylib.h"
+#include <boost/asio/serial_port_base.hpp>
 #include <iostream>
 #include <memory>
 
@@ -35,16 +36,9 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
     Color color;
     std::cout << event.player_info().color() << std::endl;
 
-    // 1 est la valeur pour rouge dans le proto
-    if (event.player_info().color() == 1) {
-      std::cout << "COULEUR ACTUEL EST ROUGE" << std::endl;
-      color = RED;
-    } else {
-      std::cout << "COULEUR ACTUEL EST BLEU" << std::endl;
-      color = BLUE;
-    }
-    JoinGameEventIN join_game_event = JoinGameEventIN(
-        event.game_id(), event.player_info().player_id(), color);
+    JoinGameEventIN join_game_event =
+        JoinGameEventIN(event.game_id(), event.player_info().player_id(),
+                        event.player_info().color());
 
     this->queue_in.push(std::make_shared<JoinGameEventIN>(join_game_event));
     break;
@@ -111,6 +105,7 @@ void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
   std::vector<std::shared_ptr<IScreenElement>> vector;
 
   for (const Event::Element &element : game_state.elements()) {
+    std::cout << "DANS ELEMENT\n";
     float x = (float)element.pos().x();
     float y = (float)element.pos().y();
 
@@ -124,7 +119,7 @@ void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
         .y = (float)element.currentobjective().y(),
     };
 
-    Unit unit = Unit(pos, currentObjectif, element.unit_id());
+    Unit unit = Unit(pos, currentObjectif, element.unit_id(), element.team());
     std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
     vector.push_back(unit_shared);
   }

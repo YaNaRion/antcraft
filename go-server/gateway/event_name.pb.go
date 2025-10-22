@@ -366,6 +366,7 @@ type Element struct {
 	Size             *Vector2               `protobuf:"bytes,5,opt,name=size,proto3" json:"size,omitempty"`
 	ElementType      ElementType            `protobuf:"varint,6,opt,name=element_type,json=elementType,proto3,enum=Event.ElementType" json:"element_type,omitempty"`
 	CurrentObjective *Vector2               `protobuf:"bytes,7,opt,name=currentObjective,proto3,oneof" json:"currentObjective,omitempty"`
+	Team             ColorTeam              `protobuf:"varint,8,opt,name=team,proto3,enum=Event.ColorTeam" json:"team,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -440,6 +441,13 @@ func (x *Element) GetCurrentObjective() *Vector2 {
 		return x.CurrentObjective
 	}
 	return nil
+}
+
+func (x *Element) GetTeam() ColorTeam {
+	if x != nil {
+		return x.Team
+	}
+	return ColorTeam_UNKNOW
 }
 
 type SyncGameState struct {
@@ -780,14 +788,15 @@ const file_event_name_proto_rawDesc = "" +
 	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x17\n" +
 	"\aunit_id\x18\x02 \x01(\tR\x06unitId\x12'\n" +
 	"\aold_pos\x18\x03 \x01(\v2\x0e.Event.Vector2R\x06oldPos\x12'\n" +
-	"\anew_pos\x18\x04 \x01(\v2\x0e.Event.Vector2R\x06newPos\"\x92\x02\n" +
+	"\anew_pos\x18\x04 \x01(\v2\x0e.Event.Vector2R\x06newPos\"\xb8\x02\n" +
 	"\aElement\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x17\n" +
 	"\aunit_id\x18\x02 \x01(\tR\x06unitId\x12 \n" +
 	"\x03pos\x18\x04 \x01(\v2\x0e.Event.Vector2R\x03pos\x12\"\n" +
 	"\x04size\x18\x05 \x01(\v2\x0e.Event.Vector2R\x04size\x125\n" +
 	"\felement_type\x18\x06 \x01(\x0e2\x12.Event.ElementTypeR\velementType\x12?\n" +
-	"\x10currentObjective\x18\a \x01(\v2\x0e.Event.Vector2H\x00R\x10currentObjective\x88\x01\x01B\x13\n" +
+	"\x10currentObjective\x18\a \x01(\v2\x0e.Event.Vector2H\x00R\x10currentObjective\x88\x01\x01\x12$\n" +
+	"\x04team\x18\b \x01(\x0e2\x10.Event.ColorTeamR\x04teamB\x13\n" +
 	"\x11_currentObjective\"l\n" +
 	"\rSyncGameState\x12/\n" +
 	"\n" +
@@ -872,19 +881,20 @@ var file_event_name_proto_depIdxs = []int32{
 	3,  // 4: Event.Element.size:type_name -> Event.Vector2
 	0,  // 5: Event.Element.element_type:type_name -> Event.ElementType
 	3,  // 6: Event.Element.currentObjective:type_name -> Event.Vector2
-	1,  // 7: Event.SyncGameState.game_state:type_name -> Event.GameState
-	6,  // 8: Event.SyncGameState.elements:type_name -> Event.Element
-	4,  // 9: Event.Event.player_info:type_name -> Event.Player
-	5,  // 10: Event.Event.move_element:type_name -> Event.MoveElement
-	7,  // 11: Event.Event.sync_game_state:type_name -> Event.SyncGameState
-	9,  // 12: Event.Event.end_game:type_name -> Event.EndGame
-	8,  // 13: Event.Event.start_game:type_name -> Event.StartGame
-	10, // 14: Event.Event.join_game:type_name -> Event.JoinGame
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	2,  // 7: Event.Element.team:type_name -> Event.ColorTeam
+	1,  // 8: Event.SyncGameState.game_state:type_name -> Event.GameState
+	6,  // 9: Event.SyncGameState.elements:type_name -> Event.Element
+	4,  // 10: Event.Event.player_info:type_name -> Event.Player
+	5,  // 11: Event.Event.move_element:type_name -> Event.MoveElement
+	7,  // 12: Event.Event.sync_game_state:type_name -> Event.SyncGameState
+	9,  // 13: Event.Event.end_game:type_name -> Event.EndGame
+	8,  // 14: Event.Event.start_game:type_name -> Event.StartGame
+	10, // 15: Event.Event.join_game:type_name -> Event.JoinGame
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_event_name_proto_init() }

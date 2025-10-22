@@ -26,6 +26,7 @@ public:
   void PlayerElement(std::shared_ptr<Player>);
   void GetElementByID(std::string elementID);
   void SetCurrentPlayer(std::shared_ptr<Player> player);
+  std::shared_ptr<Player> GetCurrentPlayer();
   std::string GetGameID();
   void SetGameID(std::string gameID);
   void Draw() override;

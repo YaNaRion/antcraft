@@ -8,27 +8,15 @@ GameScene::GameScene() {
 
 GameScene::~GameScene() {};
 
-// TODO : AJOUER PARTOUT LA TEAM DE UNIT DANS SES DONNÉES A LUI POUR SIMPLIFIER
-// LA CHOSE
 void GameScene::Draw() {
-  // for (auto &element : this->elements) {
-  //   element.second->Draw(this->current_player->GetTeamColor());
-  // }
-
-  for (auto &player : this->players) {
-    for (auto &element : this->elements) {
-      element.second->Draw(player.second->GetTeamColor());
-    }
+  for (auto &element : this->elements) {
+    element.second->Draw();
   }
 }
 
 void GameScene::SetCurrentPlayer(std::shared_ptr<Player> player) {
   this->current_player = player;
 }
-
-void GameScene::SetGameID(std::string gameID) { this->game_id = gameID; }
-
-std::string GameScene::GetGameID() { return this->game_id; }
 
 std::map<std::string, std::shared_ptr<Player>> GameScene::GetPlayers() {
   return this->players;
@@ -52,6 +40,8 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
                        Event::GameState state) {
   this->state = state;
 
+  std::cout << vectorIN.size();
+
   // TODO: ATTENTION DE PREND PAS EN COMPTE LE CAS OU DES UNITS ONT ETE
   // ENLEVER!!!
 
@@ -69,4 +59,10 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
       }
     }
   }
+
+  std::cout << this->elements.size();
+}
+
+std::shared_ptr<Player> GameScene::GetCurrentPlayer() {
+  return this->current_player;
 }

@@ -9,7 +9,7 @@ Unit::Unit(Rectangle rec) {
   this->is_selected = false;
 };
 
-Unit::Unit(Vector2 pos, Vector2 currentObj, std::string id) {
+Unit::Unit(Vector2 pos, Vector2 currentObj, std::string id, int team) {
   this->current_objective = std::make_shared<Vector2>(currentObj);
   this->current_pos = pos;
   this->rectangle = Rectangle{
@@ -20,17 +20,18 @@ Unit::Unit(Vector2 pos, Vector2 currentObj, std::string id) {
   };
   this->id = id;
   this->is_selected = false;
+  this->team = team;
+  this->color = COLOR_TO_TEAM_ID.find(team)->second;
 };
 
 Unit::~Unit() {}
 
-void Unit::Draw(Color color) {
+void Unit::Draw() {
   this->MoveUnitPerFrame();
-
   if (this->is_selected) {
     DrawRectangleRec(rectangle, GREEN);
   } else {
-    DrawRectangleRec(rectangle, color);
+    DrawRectangleRec(rectangle, this->color);
   }
 };
 
@@ -39,6 +40,8 @@ Vector2 Unit::GetPos() { return this->current_pos; };
 Rectangle Unit::GetRec() { return this->rectangle; };
 
 bool Unit::IsSelected() { return this->is_selected; };
+
+int Unit::GetTeam() { return this->team; };
 
 void Unit::SetSelected(bool is_selected) { this->is_selected = is_selected; };
 

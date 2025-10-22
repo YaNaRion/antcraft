@@ -21,14 +21,14 @@ private:
 
 class JoinGameEventIN : public IEventIN {
 public:
-  JoinGameEventIN(std::string game_id, std::string player_id, Color color);
+  JoinGameEventIN(std::string game_id, std::string player_id, int team);
   ~JoinGameEventIN() {};
   void HandlerEvent(std::shared_ptr<GameScene> gameScene) override;
 
 private:
   std::string game_id;
   std::string player_id;
-  Color color;
+  int team;
 };
 
 class IEventOut {

@@ -16,6 +16,7 @@ type IElement interface {
 	SetNewTarget(math.Vector2)
 	MoveElement(mapGrid [][]IElement)
 	GetCurrentObjective() *math.Vector2
+	GetTeam() int
 }
 
 type Unit struct {
@@ -25,14 +26,16 @@ type Unit struct {
 	unitID          ElementID
 	currentTarget   *math.Vector2
 	directionVector *math.Vector2
+	team            int
 }
 
-func NewUnit(pos, size math.Vector2) *Unit {
+func NewUnit(pos, size math.Vector2, team int) *Unit {
 	return &Unit{
 		pos:           pos,
 		size:          size,
 		unitID:        ElementID(uuid.New().String()),
 		currentTarget: nil,
+		team:          team,
 	}
 }
 
@@ -43,6 +46,9 @@ func (u *Unit) GetSize() math.Vector2  { return u.size }
 func (u *Unit) GetPlayerID() PlayerID  { return u.playerID }
 func (u *Unit) GetCurrentObjective() *math.Vector2 {
 	return u.currentTarget
+}
+func (u *Unit) GetTeam() int {
+	return u.team
 }
 
 func (u *Unit) SetNewTarget(newTarget math.Vector2) {

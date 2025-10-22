@@ -51,6 +51,7 @@ message Element {
   Vector2 size = 5;
   ElementType element_type = 6;
   optional Vector2 currentObjective = 7;
+  ColorTeam team = 8;
 }
 
 message SyncGameState {

@@ -7,6 +7,8 @@
 
 // TODO: Trouver pourquoi GetElements est un vecteur vide
 void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
+
+  std::shared_ptr<Player> current_player = game_scene->GetCurrentPlayer();
   Vector2 mouse_position = GetMousePosition();
   // if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
   //   std::cout << "MOUSE PRESS" << mouse_position.x << " " << mouse_position.y
@@ -27,7 +29,8 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
     // TODO: la déselection ne fonctionne pas vraiment lorsqu'on veut
     // sélectionner un élément en mouvement
     if (CheckCollisionPointRec(mouse_position, element->GetRec()) &&
-        IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+        IsMouseButtonDown(MOUSE_LEFT_BUTTON) &&
+        element->GetTeam() == current_player->GetTeam()) {
       element->SetSelected(true);
     }
     // else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
@@ -47,11 +50,11 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
     }
   }
 
-  if (IsKeyPressed(KEY_Q)) {
-    std::shared_ptr<StartGameOut> start_game =
-        std::make_shared<StartGameOut>(StartGameOut(game_scene->GetGameID()));
-    gate->PushEvent(start_game);
-  }
+  // if (IsKeyPressed(KEY_Q)) {
+  //   std::shared_ptr<StartGameOut> start_game =
+  //       std::make_shared<StartGameOut>(StartGameOut(game_scene->GetGameID()));
+  //   gate->PushEvent(start_game);
+  // }
 }
 
 // TODO:
@@ -114,6 +117,7 @@ int main() {
 
     EndDrawing();
   }
+
   window.CloseWin();
   return 0;
 }

@@ -63,16 +63,16 @@ void UpdateMapStateEventIN::HandlerEvent(
 }
 
 JoinGameEventIN::JoinGameEventIN(std::string game_id, std::string player_id,
-                                 Color color) {
+                                 int team) {
   this->game_id = game_id;
   this->player_id = player_id;
-  this->color = color;
+  this->team = team;
 }
 
 void JoinGameEventIN::HandlerEvent(std::shared_ptr<GameScene> gameScene) {
   std::map<std::string, std::shared_ptr<Player>> players =
       gameScene->GetPlayers();
-  Player player = Player(this->player_id, this->color);
+  Player player = Player(this->player_id, this->team);
   std::shared_ptr<Player> shared_player = std::make_shared<Player>(player);
   players.insert({player_id, shared_player});
   gameScene->SetCurrentPlayer(shared_player);

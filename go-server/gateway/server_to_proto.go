@@ -68,5 +68,6 @@ func iElementToProto(elem game.IElement) *Element {
 		PlayerId:    string(elem.GetPlayerID()),
 		UnitId:      string(elem.GetID()),
 		ElementType: et,
+		Team:        ColorTeam(elem.GetTeam()),
 	}
 }
