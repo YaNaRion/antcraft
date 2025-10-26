@@ -2,12 +2,13 @@ package gateway
 
 import (
 	"fmt"
-	"golang.org/x/net/websocket"
-	"google.golang.org/protobuf/proto"
 	"main/service/game"
 	"main/service/math"
 	"math/rand"
 	"time"
+
+	"golang.org/x/net/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 func (s *WebsocketManager) JoinGameHandler(
@@ -18,6 +19,10 @@ func (s *WebsocketManager) JoinGameHandler(
 	s.log.Println("JOIN GAME EVENT")
 
 	gameMap := s.gameManager.GetGame(game.GameID(gameID))
+	if gameMap == nil {
+		s.gameManager.PopulateWithDefaultGame()
+		gameMap = s.gameManager.GetGame(game.GameID(gameID))
+	}
 	var newPlayer *game.Player
 
 	// Faire un join game custom pour join la game voulu
@@ -132,6 +137,7 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			if err != nil {
 				s.log.Println("send error:", err)
 				s.gameManager.RemoveGame(gameID)
+				s.CleanClient()
 				return
 			}
 		}
@@ -180,7 +186,7 @@ func (s *WebsocketManager) MoveElementHandler(
 
 func (s *WebsocketManager) StartGameHandler(
 	ws *websocket.Conn,
-	gameID, playerID string,
+	gameID game.GameID,
 ) {
 	s.gameManager.StartGame(game.GameID(gameID))
 }

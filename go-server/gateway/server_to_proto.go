@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"log"
 	"main/service/game"
 )
 
@@ -53,7 +52,6 @@ func iElementToProto(elem game.IElement) *Element {
 		}
 	}
 
-	log.Println(currentObjective)
 	return &Element{
 		Pos: &Vector2{
 			X: int32(pos.X),

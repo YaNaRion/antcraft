@@ -26,6 +26,10 @@ func NewWebsocketManager(log *log.Logger) *WebsocketManager {
 	}
 }
 
+func (s *WebsocketManager) CleanClient() {
+	s.clients = make(map[ClientID]*Client)
+}
+
 // ON CONNECT FONCTION
 func (s *WebsocketManager) HandleWS(ws *websocket.Conn) {
 	s.log.Println("New incoming connection from client:", ws.RemoteAddr())
@@ -67,7 +71,7 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 			s.MoveElementHandler(ws, x, &event.GameId, &event.PlayerInfo.PlayerId)
 		case *Event_StartGame:
 			s.log.Println("NEW EVENT: MOVE START GAME")
-			// s.StartGameHandler(ws, x, &event.GameId)
+			s.StartGameHandler(ws, game.GameID(event.GameId))
 		}
 	}
 }

@@ -85,9 +85,7 @@ void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
 
 int main() {
   Window window = Window(900, 900, "WINDOW FROM SCENE_MANAGER");
-
   std::vector<std::shared_ptr<IScreenElement>> units_ptr;
-
   Gateway gate = Gateway();
 
   // Init scene

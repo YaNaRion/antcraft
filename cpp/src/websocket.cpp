@@ -33,9 +33,6 @@ void Gateway::OnMessage(websocketpp::connection_hdl hdl,
     break;
   case Event::Event::kJoinGame:
     const auto &game_sync = event.join_game();
-    Color color;
-    std::cout << event.player_info().color() << std::endl;
-
     JoinGameEventIN join_game_event =
         JoinGameEventIN(event.game_id(), event.player_info().player_id(),
                         event.player_info().color());
@@ -60,6 +57,7 @@ void Gateway::Connect() {
       this->hdl = hdl;
       std::cout << "Connected to server!" << std::endl;
     });
+
     c.set_message_handler(bind(&Gateway::OnMessage, this, ::_1, ::_2));
     websocketpp::lib::error_code ec;
     client::connection_ptr con =
@@ -84,7 +82,7 @@ void Gateway::PushEvent(std::shared_ptr<IEventOut> ev) {
 size_t Gateway::GetQueueOutSize() { return this->queue_out.size(); }
 
 void Gateway::PopAndSendEvent() {
-  std::cout << "DANS POP AND SERVER" << std::endl;
+  // std::cout << "DANS POP AND SERVER" << std::endl;
   auto event = this->queue_out.front();
   Event::Event protoEvent = event->CreateProtoEvent();
   std::string eventString = protoEvent.SerializeAsString();
@@ -105,7 +103,6 @@ void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
   std::vector<std::shared_ptr<IScreenElement>> vector;
 
   for (const Event::Element &element : game_state.elements()) {
-    std::cout << "DANS ELEMENT\n";
     float x = (float)element.pos().x();
     float y = (float)element.pos().y();
 

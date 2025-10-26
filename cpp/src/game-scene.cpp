@@ -40,8 +40,6 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
                        Event::GameState state) {
   this->state = state;
 
-  std::cout << vectorIN.size();
-
   // TODO: ATTENTION DE PREND PAS EN COMPTE LE CAS OU DES UNITS ONT ETE
   // ENLEVER!!!
 
@@ -59,8 +57,6 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
       }
     }
   }
-
-  std::cout << this->elements.size();
 }
 
 std::shared_ptr<Player> GameScene::GetCurrentPlayer() {

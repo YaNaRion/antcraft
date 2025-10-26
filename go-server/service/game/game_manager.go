@@ -78,10 +78,12 @@ func NewGameManager() *GameManager {
 	}
 
 	// Game de setup pour accelerer le dev
-	var defaultGameID GameID = "Game1"
-	gameManager.gamesID = append(gameManager.gamesID, defaultGameID)
-	var mapGrid *MapGrid = NewMapGrid(10000, 10000)
-	gameManager.games[defaultGameID] = NewGame(mapGrid)
-
 	return gameManager
+}
+
+func (g *GameManager) PopulateWithDefaultGame() {
+	var defaultGameID GameID = "Game1"
+	g.gamesID = append(g.gamesID, defaultGameID)
+	var mapGrid *MapGrid = NewMapGrid(10000, 10000)
+	g.games[defaultGameID] = NewGame(mapGrid)
 }
