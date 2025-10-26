@@ -14,7 +14,7 @@ type IElement interface {
 	SetPost(math.Vector2)
 	GetID() ElementID
 	SetNewTarget(math.Vector2)
-	MoveElement(mapGrid [][]Tile)
+	MoveElement(mapGrid [][]Tile) error
 	GetCurrentObjective() *math.Vector2
 	GetTeam() int
 }
@@ -61,6 +61,8 @@ func (u *Unit) SetNewTarget(newTarget math.Vector2) {
 }
 
 // TODO Mettre collision d'unite
+// Il u a une approximation de la position lors du cast de float a int, ne devrait pas etre grave avec des tres petites tiles comme ici
+// Note pour potentiel future bug
 func (u *Unit) UpdatePos(grid [][]Tile, x, y float64) {
 	grid[int(u.pos.X)][int(u.pos.Y)].Element = nil
 	u.pos.X += x
@@ -68,9 +70,21 @@ func (u *Unit) UpdatePos(grid [][]Tile, x, y float64) {
 	grid[int(u.pos.X)][int(u.pos.Y)].Element = u
 }
 
-func (u *Unit) MoveElement(mapGrid [][]Tile) {
+// fonction que regarde si l'unit peut se deplacer a sa prochaine destination
+func (u *Unit) canUnitMove(mapGrid [][]Tile) bool {
+	return true
+}
+
+// Avec des murs, il va falloir mettre en place du pathing pour que l'unité arrive à se rendre à sa destination
+func (u *Unit) MoveElement(mapGrid [][]Tile) error {
 	if u.currentTarget == nil {
-		return
+		return nil
+	}
+
+	if !u.canUnitMove(mapGrid) {
+		u.directionVector.X = 0
+		u.directionVector.Y = 0
+		return nil
 	}
 
 	const speed = 1.0
@@ -88,4 +102,5 @@ func (u *Unit) MoveElement(mapGrid [][]Tile) {
 	}
 
 	u.UpdatePos(mapGrid, moveX, moveY)
+	return nil
 }

@@ -35,6 +35,7 @@ func (g *GameManager) AddTargetToElement(
 	return nil
 }
 
+// FONCTION NEST PAS ACTUELLEMENT UTILISE
 func (g *GameManager) MoveElement(
 	elementID ElementID,
 	playerID PlayerID,

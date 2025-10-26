@@ -12,3 +12,10 @@ type Tile struct {
 	Element  IElement
 	TileType TileType
 }
+
+func NewTile() Tile {
+	return Tile{
+		Element:  nil,
+		TileType: GROUND,
+	}
+}

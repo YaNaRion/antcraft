@@ -12,8 +12,11 @@ type MapGrid struct {
 
 func NewMapGrid(width, height int) *MapGrid {
 	grid := make([][]Tile, height)
-	for i := range grid {
+	for i, row := range grid {
 		grid[i] = make([]Tile, width)
+		for j := range row {
+			row[j] = NewTile()
+		}
 	}
 	return &MapGrid{
 		Grid:     grid,
@@ -68,6 +71,7 @@ func (g *Game) AddTargetToElement(
 	return nil
 }
 
+// LA FONCTION EST UNIQUEMENT UTILISE DANS UNE FONCTION QUI N'EST PAS UTILISE
 func (g *Game) MoveElement(
 	elementID ElementID,
 	playerID PlayerID,
@@ -77,6 +81,7 @@ func (g *Game) MoveElement(
 	element := g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element
 	if element == nil {
 		log.Println("ELEMENT N'A PAS ETE MODIFIE")
+		// TODO: Mettre une vraie erreur avec un system de gestion d'erreur plus avance
 		return nil
 	}
 
