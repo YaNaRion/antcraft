@@ -15,7 +15,7 @@ func NewMapGridToSyncGameState(grid *game.MapGrid, state GameState) *SyncGameSta
 
 	for _, row := range grid.Grid {
 		for _, elem := range row {
-			if elem != nil {
+			if elem.Element != nil {
 				element = append(element, iElementToProto(elem))
 			}
 		}
@@ -32,12 +32,12 @@ func NewEventSyncGameState(grid *game.MapGrid, state GameState) *Event_SyncGameS
 	}
 }
 
-func iElementToProto(elem game.IElement) *Element {
-	if elem == nil {
+func iElementToProto(tile game.Tile) *Element {
+	if tile.Element == nil {
 		return nil
 	}
 
-	pos := elem.GetPost()
+	pos := tile.Element.GetPost()
 	et := ElementType_WORKER
 
 	currentObjective := &Vector2{
@@ -45,10 +45,10 @@ func iElementToProto(elem game.IElement) *Element {
 		Y: -1,
 	}
 
-	if elem.GetCurrentObjective() != nil {
+	if tile.Element.GetCurrentObjective() != nil {
 		currentObjective = &Vector2{
-			X: int32(elem.GetCurrentObjective().X),
-			Y: int32(elem.GetCurrentObjective().Y),
+			X: int32(tile.Element.GetCurrentObjective().X),
+			Y: int32(tile.Element.GetCurrentObjective().Y),
 		}
 	}
 
@@ -58,14 +58,14 @@ func iElementToProto(elem game.IElement) *Element {
 			Y: int32(pos.Y),
 		},
 		Size: &Vector2{
-			X: int32(elem.GetSize().X),
-			Y: int32(elem.GetSize().Y),
+			X: int32(tile.Element.GetSize().X),
+			Y: int32(tile.Element.GetSize().Y),
 		},
 		CurrentObjective: currentObjective,
 
-		PlayerId:    string(elem.GetPlayerID()),
-		UnitId:      string(elem.GetID()),
+		PlayerId:    string(tile.Element.GetPlayerID()),
+		UnitId:      string(tile.Element.GetID()),
 		ElementType: et,
-		Team:        ColorTeam(elem.GetTeam()),
+		Team:        ColorTeam(tile.Element.GetTeam()),
 	}
 }

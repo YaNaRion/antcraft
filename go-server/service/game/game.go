@@ -6,14 +6,14 @@ import (
 )
 
 type MapGrid struct {
-	Grid     [][]IElement
+	Grid     [][]Tile
 	GridSpec math.Vector2
 }
 
 func NewMapGrid(width, height int) *MapGrid {
-	grid := make([][]IElement, height)
+	grid := make([][]Tile, height)
 	for i := range grid {
-		grid[i] = make([]IElement, width)
+		grid[i] = make([]Tile, width)
 	}
 	return &MapGrid{
 		Grid:     grid,
@@ -47,7 +47,7 @@ func NewGame(grid *MapGrid) *Game {
 	}
 }
 
-func (g *Game) GetIElementAt(vec *math.Vector2) IElement {
+func (g *Game) GetIElementAt(vec *math.Vector2) Tile {
 	return g.MapGrid.Grid[int(vec.X)][int(vec.Y)]
 }
 
@@ -74,22 +74,22 @@ func (g *Game) MoveElement(
 	newPos math.Vector2,
 	oldPos math.Vector2,
 ) error {
-	element := g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)]
+	element := g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element
 	if element == nil {
 		log.Println("ELEMENT N'A PAS ETE MODIFIE")
 		return nil
 	}
 
 	element.SetPost(newPos)
-	g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)] = nil
-	g.MapGrid.Grid[int(newPos.X)][int(newPos.Y)] = element
+	g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element = nil
+	g.MapGrid.Grid[int(newPos.X)][int(newPos.Y)].Element = element
 	return nil
 }
 
 func (g *Game) AddElement(el IElement) error {
-	if g.MapGrid.Grid[int(el.GetPost().X)][int(el.GetPost().Y)] == nil {
+	if g.MapGrid.Grid[int(el.GetPost().X)][int(el.GetPost().Y)].Element == nil {
 		g.gameElements[el.GetID()] = el
-		g.MapGrid.Grid[int(el.GetPost().X)][int(el.GetPost().Y)] = el
+		g.MapGrid.Grid[int(el.GetPost().X)][int(el.GetPost().Y)].Element = el
 	}
 	return nil
 }

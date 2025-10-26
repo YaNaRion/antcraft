@@ -14,7 +14,7 @@ type IElement interface {
 	SetPost(math.Vector2)
 	GetID() ElementID
 	SetNewTarget(math.Vector2)
-	MoveElement(mapGrid [][]IElement)
+	MoveElement(mapGrid [][]Tile)
 	GetCurrentObjective() *math.Vector2
 	GetTeam() int
 }
@@ -61,14 +61,14 @@ func (u *Unit) SetNewTarget(newTarget math.Vector2) {
 }
 
 // TODO Mettre collision d'unite
-func (u *Unit) UpdatePos(grid [][]IElement, x, y float64) {
-	grid[int(u.pos.X)][int(u.pos.Y)] = nil
+func (u *Unit) UpdatePos(grid [][]Tile, x, y float64) {
+	grid[int(u.pos.X)][int(u.pos.Y)].Element = nil
 	u.pos.X += x
 	u.pos.Y += y
-	grid[int(u.pos.X)][int(u.pos.Y)] = u
+	grid[int(u.pos.X)][int(u.pos.Y)].Element = u
 }
 
-func (u *Unit) MoveElement(mapGrid [][]IElement) {
+func (u *Unit) MoveElement(mapGrid [][]Tile) {
 	if u.currentTarget == nil {
 		return
 	}
