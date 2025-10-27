@@ -31,11 +31,6 @@ func NewTownCenter(pos math.Vector2, team int) *TownCenter {
 	}
 }
 
-type Building interface {
-	CreateUnitFactory() *Unit
-	SetNewTargetForUnitOut()
-}
-
 func (u *TownCenter) GetPost() math.Vector2  { return u.pos }
 func (u *TownCenter) SetPost(v math.Vector2) { u.pos = v }
 func (u *TownCenter) GetID() ElementID       { return u.unitID }
