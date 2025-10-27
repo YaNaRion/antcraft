@@ -35,10 +35,11 @@ const (
 )
 
 type Game struct {
-	MapGrid      *MapGrid
-	Players      map[PlayerID]*Player
-	GameState    Enum_Game_State
-	gameElements map[ElementID]IElement
+	MapGrid       *MapGrid
+	Players       map[PlayerID]*Player
+	GameState     Enum_Game_State
+	gameElements  map[ElementID]IElement
+	gameBuildings []Building
 }
 
 func NewGame(grid *MapGrid) *Game {
@@ -48,6 +49,9 @@ func NewGame(grid *MapGrid) *Game {
 		GameState:    GAME_STATE_IN_GAME,
 		gameElements: map[ElementID]IElement{},
 	}
+}
+func (g *Game) StartGame() {
+
 }
 
 func (g *Game) GetIElementAt(vec *math.Vector2) Tile {
@@ -88,6 +92,11 @@ func (g *Game) MoveElement(
 	element.SetPost(newPos)
 	g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element = nil
 	g.MapGrid.Grid[int(newPos.X)][int(newPos.Y)].Element = element
+	return nil
+}
+
+func (g *Game) AddBuilding(el Building) error {
+	g.gameBuildings = append(g.gameBuildings, el)
 	return nil
 }
 

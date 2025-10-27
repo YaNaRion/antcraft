@@ -65,7 +65,7 @@ func (g *GameManager) GetMap(gameID GameID) *MapGrid {
 }
 
 func (g *GameManager) StartGame(gameID GameID) {
-	g.games[gameID].GameState = GAME_STATE_IN_GAME
+	g.games[gameID].StartGame()
 }
 
 func (g *GameManager) RemoveGame(gameID GameID) {

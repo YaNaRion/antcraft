@@ -30,7 +30,7 @@ func (s *WebsocketManager) JoinGameHandler(
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
 
 	// TEAM 1 est rouge TEAM 2 est bleu
-	var unit *game.Unit = game.NewUnit(math.Vector2{
+	unit := game.NewUnit(math.Vector2{
 		X: float64(rand.Int() % 500),
 		Y: float64(rand.Int() % 500),
 	}, math.Vector2{
@@ -40,12 +40,19 @@ func (s *WebsocketManager) JoinGameHandler(
 		len(gameMap.Players)+1,
 	)
 
-	var unit2 *game.Unit = game.NewUnit(math.Vector2{
+	unit2 := game.NewUnit(math.Vector2{
 		X: float64(rand.Int() % 500),
 		Y: float64(rand.Int() % 500),
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
+	},
+		len(gameMap.Players)+1,
+	)
+
+	cc := game.NewTownCenter(math.Vector2{
+		X: float64(rand.Int() % 500),
+		Y: float64(rand.Int() % 500),
 	},
 		len(gameMap.Players)+1,
 	)
@@ -53,12 +60,19 @@ func (s *WebsocketManager) JoinGameHandler(
 	newPlayer.AddElement(unit)
 	newPlayer.AddElement(unit2)
 
+	newPlayer.AddBuilding(cc)
+
 	err := gameMap.AddElement(unit)
 	if err != nil {
 		s.log.Println(err)
 	}
 
 	err = gameMap.AddElement(unit2)
+	if err != nil {
+		s.log.Println(err)
+	}
+
+	err = gameMap.AddBuilding(cc)
 	if err != nil {
 		s.log.Println(err)
 	}
@@ -95,7 +109,6 @@ func (s *WebsocketManager) JoinGameHandler(
 
 	// if len(gameMap.Players) == 2 {
 	// 	s.log.Println("START GAME")
-	// 	s.log.Printf("GameID: %s \n", gameID)
 	s.StartGame(ws, game.GameID(gameID))
 	// 	s.log.Printf("GAME STARTED")
 	// }
@@ -108,7 +121,7 @@ func (s *WebsocketManager) StartGame(ws *websocket.Conn, gameID game.GameID) {
 }
 
 func (s *WebsocketManager) GameLoop(gameID game.GameID) {
-	s.log.Println("GAME LOOP")
+	s.log.Printf("GAME LOOP FOR GAME: %s", gameID)
 	gameMap := s.gameManager.GetGame(gameID)
 	for {
 		var err error
@@ -146,7 +159,7 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 			return
 		}
 
-		// Mise a jours a 60 HZ, 16, pas vraiment vrai car cest 16ms apres le fin dexecution de la boucle
+		// Mise a jours a 60 HZ, 16, pas vraiment vrai car cest 16ms apres le fin dexecution de la boucle INF3610 style
 		time.Sleep(16 * time.Millisecond)
 	}
 }
@@ -157,9 +170,9 @@ func (s *WebsocketManager) MoveElementHandler(
 	gameID, playerID *string,
 ) {
 	s.log.Println("MoveElement Event")
-	s.log.Printf("MoveElementFrom: %s", ws.RemoteAddr())
-	s.log.Printf("PlayerID: %s", *playerID)
-	s.log.Printf("Moving: %s", unit.MoveElement.GetUnitId())
+	// s.log.Printf("MoveElementFrom: %s", ws.RemoteAddr())
+	// s.log.Printf("PlayerID: %s", *playerID)
+	// s.log.Printf("Moving: %s", unit.MoveElement.GetUnitId())
 
 	elementNewPos := math.Vector2{
 		X: float64(unit.MoveElement.GetNewPos().X),

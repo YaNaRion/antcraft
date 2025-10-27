@@ -15,6 +15,7 @@ type PlayerID string
 type Player struct {
 	playerID PlayerID
 	elements []IElement
+	building []Building
 	conn     *PlayerConn
 }
 
@@ -28,6 +29,10 @@ func NewPlayer(conn *PlayerConn, playerID PlayerID) *Player {
 
 func (p *Player) AddElement(el IElement) {
 	p.elements = append(p.elements, el)
+}
+
+func (p *Player) AddBuilding(el Building) {
+	p.building = append(p.building, el)
 }
 
 func (p *Player) GetPlayerIDString() string {
