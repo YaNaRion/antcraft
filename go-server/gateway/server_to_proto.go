@@ -20,6 +20,7 @@ func NewMapGridToSyncGameState(grid *game.MapGrid, state GameState) *SyncGameSta
 			}
 		}
 	}
+
 	return &SyncGameState{
 		GameState: state,
 		Elements:  element,
@@ -38,7 +39,14 @@ func iElementToProto(tile game.Tile) *Element {
 	}
 
 	pos := tile.Element.GetPost()
-	et := ElementType_WORKER
+	var et ElementType
+
+	switch tile.Element.(type) {
+	case *game.Unit:
+		et = ElementType_WORKER
+	case *game.TownCenter:
+		et = ElementType_BASE
+	}
 
 	currentObjective := &Vector2{
 		X: -1,

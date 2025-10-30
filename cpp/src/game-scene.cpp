@@ -32,7 +32,7 @@ void GameScene::AddElement(std::shared_ptr<IScreenElement> elem,
 
   this->players[player_id]->AddElement(elem);
   // this->elements.push_back(elem);
-  this->elements[elem->GetID()] = elem;
+  this->elements[elem->GetElementData()->GetID()] = elem;
   // this->elements[elem->GetID()] = elem;
 }
 
@@ -47,13 +47,14 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
   // PLUSIEURS FOIS DANS LE SENS DU VECTEUR DIRECTEUR FAIRE LE MEME CALCULE A
   // CHAQUE FRAME DU COTE CLIENT QUE DU COTE SERVER
   for (std::shared_ptr<IScreenElement> unit : vectorIN) {
-    auto foundElement = this->elements.find(unit->GetID());
+    auto foundElement = this->elements.find(unit->GetElementData()->GetID());
     if (foundElement == this->elements.end()) {
-      this->elements[unit->GetID()] = unit;
+      this->elements[unit->GetElementData()->GetID()] = unit;
     } else {
-      if (unit->GetCurrentObjective().get() != nullptr) {
-        foundElement->second->SetCurrentObjective(unit->GetCurrentObjective());
-        foundElement->second->SetDirectionVector();
+      if (unit->GetElementData()->GetCurrentObjective().get() != nullptr) {
+        foundElement->second->GetElementData()->SetCurrentObjective(
+            unit->GetElementData()->GetCurrentObjective());
+        foundElement->second->GetElementData()->SetDirectionVector();
       }
     }
   }

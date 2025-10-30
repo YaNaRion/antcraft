@@ -18,20 +18,22 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
   for (auto &pair_element : game_scene->GetElements()) {
     std::shared_ptr<IScreenElement> element = pair_element.second;
 
-    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && element->IsSelected()) {
-      element->SetSelected(false);
-      std::shared_ptr<MoveUnitOut> move_unit =
-          std::make_shared<MoveUnitOut>(MoveUnitOut(
-              element->GetPos(), mouse_position, "playerID", element->GetID()));
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) &&
+        element->GetElementData()->IsSelected()) {
+      element->GetElementData()->SetSelected(false);
+      std::shared_ptr<MoveUnitOut> move_unit = std::make_shared<MoveUnitOut>(
+          MoveUnitOut(element->GetElementData()->GetPos(), mouse_position,
+                      "playerID", element->GetElementData()->GetID()));
       gate->PushEvent(move_unit);
     }
 
     // TODO: la déselection ne fonctionne pas vraiment lorsqu'on veut
     // sélectionner un élément en mouvement
-    if (CheckCollisionPointRec(mouse_position, element->GetRec()) &&
+    if (CheckCollisionPointRec(mouse_position,
+                               element->GetElementData()->GetRec()) &&
         IsMouseButtonDown(MOUSE_LEFT_BUTTON) &&
-        element->GetTeam() == current_player->GetTeam()) {
-      element->SetSelected(true);
+        element->GetElementData()->GetTeam() == current_player->GetTeam()) {
+      element->GetElementData()->SetSelected(true);
     }
     // else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
     //   element->SetSelected(false);

@@ -6,21 +6,11 @@ import (
 	"github.com/google/uuid"
 )
 
-type Unit struct {
-	pos             math.Vector2
-	size            math.Vector2
-	playerID        PlayerID
-	unitID          ElementID
-	currentTarget   *math.Vector2
-	directionVector *math.Vector2
-	team            int
-}
-
 func NewUnit(pos, size math.Vector2, team int) *Unit {
 	return &Unit{
 		pos:           pos,
 		size:          size,
-		unitID:        ElementID(uuid.New().String()),
+		id:            ElementID(uuid.New().String()),
 		currentTarget: nil,
 		team:          team,
 	}
@@ -28,20 +18,27 @@ func NewUnit(pos, size math.Vector2, team int) *Unit {
 
 func (u *Unit) GetPost() math.Vector2  { return u.pos }
 func (u *Unit) SetPost(v math.Vector2) { u.pos = v }
-func (u *Unit) GetID() ElementID       { return u.unitID }
+func (u *Unit) GetID() ElementID       { return u.id }
 func (u *Unit) GetSize() math.Vector2  { return u.size }
 func (u *Unit) GetPlayerID() PlayerID  { return u.playerID }
 func (u *Unit) GetCurrentObjective() *math.Vector2 {
 	return u.currentTarget
 }
+func (u *Unit) GetDirectionVector() *math.Vector2 {
+	return u.directionVector
+}
 func (u *Unit) GetTeam() int {
 	return u.team
 }
 
-func (u *Unit) SetNewTarget(newTarget math.Vector2) {
-	u.currentTarget = &newTarget
+func (u *Unit) SetNewTarget(newTarget *math.Vector2) {
+	u.currentTarget = newTarget
 
-	directionVector := math.SubVec2(newTarget, u.pos)
+	if newTarget == nil {
+		u.directionVector = nil
+		return
+	}
+	directionVector := math.SubVec2(*newTarget, u.pos)
 
 	directionVector.NormalizeVec()
 	u.directionVector = &directionVector
@@ -68,11 +65,11 @@ func (u *Unit) MoveElement(mapGrid [][]Tile) error {
 		return nil
 	}
 
-	if !u.canUnitMove(mapGrid) {
-		u.directionVector.X = 0
-		u.directionVector.Y = 0
-		return nil
-	}
+	// if !u.canUnitMove(mapGrid) {
+	// 	u.directionVector.X = 0
+	// 	u.directionVector.Y = 0
+	// 	return nil
+	// }
 
 	const speed = 1.0
 	moveX := u.directionVector.X * speed

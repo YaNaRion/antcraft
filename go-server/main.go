@@ -44,7 +44,7 @@ func NewServer(config *Config) *Server {
 }
 
 func Setup(logger *log.Logger) *Server {
-	// log.Println("Setup DB connection")
+	// logger.Println("Setup DB connection")
 	var db *infra.DB
 
 	// Setup des routes de l'API

@@ -9,13 +9,15 @@ const (
 )
 
 type Tile struct {
-	Element  IElement
-	TileType TileType
+	Element    IElement
+	TileType   TileType
+	IsWalkable bool
 }
 
 func NewTile() Tile {
 	return Tile{
-		Element:  nil,
-		TileType: GROUND,
+		Element:    nil,
+		TileType:   GROUND,
+		IsWalkable: true,
 	}
 }

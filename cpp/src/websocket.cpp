@@ -103,12 +103,18 @@ void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
   std::vector<std::shared_ptr<IScreenElement>> vector;
 
   for (const Event::Element &element : game_state.elements()) {
-    float x = (float)element.pos().x();
-    float y = (float)element.pos().y();
-
+    float x_pos = (float)element.pos().x();
+    float y_pos = (float)element.pos().y();
     Vector2 pos = Vector2{
-        .x = x,
-        .y = y,
+        .x = x_pos,
+        .y = y_pos,
+    };
+
+    float x_size = (float)element.size().x();
+    float y_size = (float)element.size().y();
+    Vector2 size = Vector2{
+        .x = x_size,
+        .y = y_size,
     };
 
     Vector2 currentObjectif = Vector2{
@@ -116,9 +122,20 @@ void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
         .y = (float)element.currentobjective().y(),
     };
 
-    Unit unit = Unit(pos, currentObjectif, element.unit_id(), element.team());
-    std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
-    vector.push_back(unit_shared);
+    if (element.element_type() == Event::ElementType::WORKER) {
+      Unit unit =
+          Unit(pos, currentObjectif, size, element.unit_id(), element.team());
+      std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
+      vector.push_back(unit_shared);
+    }
+
+    if (element.element_type() == Event::ElementType::BASE) {
+      Building building = Building(pos, currentObjectif, size,
+                                   element.unit_id(), element.team());
+      std::shared_ptr<Building> building_shared =
+          std::make_shared<Building>(building);
+      vector.push_back(building_shared);
+    }
   }
 
   UpdateMapStateEventIN update_map_event =

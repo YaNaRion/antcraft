@@ -60,7 +60,7 @@ func (s *WebsocketManager) JoinGameHandler(
 	newPlayer.AddElement(unit)
 	newPlayer.AddElement(unit2)
 
-	newPlayer.AddBuilding(cc)
+	newPlayer.AddElement(cc)
 
 	err := gameMap.AddElement(unit)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *WebsocketManager) JoinGameHandler(
 		s.log.Println(err)
 	}
 
-	err = gameMap.AddBuilding(cc)
+	err = gameMap.AddElement(cc)
 	if err != nil {
 		s.log.Println(err)
 	}
