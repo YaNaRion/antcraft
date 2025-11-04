@@ -1,7 +1,6 @@
 package game
 
 import (
-	"log"
 	"main/service/math"
 )
 
@@ -29,28 +28,27 @@ func (g *GameManager) AddTargetToElement(
 ) error {
 	err := g.games[gameID].AddTargetToElement(elementID, playerID, newTarget, currentPos)
 	if err != nil {
-		log.Panicln("TROUVE PAS LELEMENT A AJOUTER UNE NOUVELLE TARGET")
-		return nil
+		return ErrNotUnitFound
 	}
 	return nil
 }
 
 // FONCTION NEST PAS ACTUELLEMENT UTILISE
-func (g *GameManager) MoveElement(
-	elementID ElementID,
-	playerID PlayerID,
-	gameID GameID,
-	newPos math.Vector2,
-	oldPos math.Vector2,
-) error {
-	err := g.games[gameID].MoveElement(elementID, playerID, newPos, oldPos)
-	if err != nil {
-		log.Panicln("TROUVE PAS LELEMENT A DEPLACER")
-		// Mettre une erreur
-		return nil
-	}
-	return nil
-}
+// func (g *GameManager) MoveElement(
+// 	elementID ElementID,
+// 	playerID PlayerID,
+// 	gameID GameID,
+// 	newPos math.Vector2,
+// 	oldPos math.Vector2,
+// ) error {
+// 	err := g.games[gameID].MoveElement(elementID, playerID, newPos, oldPos)
+// 	if err != nil {
+// 		log.Panicln("TROUVE PAS LELEMENT A DEPLACER")
+// 		// Mettre une erreur
+// 		return nil
+// 	}
+// 	return nil
+// }
 
 func (g *GameManager) AddPlayerToGame(gameID GameID, player *Player) {
 	g.games[gameID].AddPlayer(player)

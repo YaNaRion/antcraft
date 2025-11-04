@@ -27,7 +27,7 @@ func (u *TownCenter) GetID() ElementID       { return u.id }
 func (u *TownCenter) GetSize() math.Vector2  { return u.size }
 func (u *TownCenter) GetPlayerID() PlayerID  { return u.playerID }
 
-func (u *TownCenter) UpdatePos(grid [][]Tile, x, y float64) {
+func (u *TownCenter) UpdatePos(grid [][]Tile, x, y int) {
 	grid[int(u.pos.X)][int(u.pos.Y)].Element = nil
 	u.pos.X += x
 	u.pos.Y += y

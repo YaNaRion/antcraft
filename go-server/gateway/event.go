@@ -31,8 +31,8 @@ func (s *WebsocketManager) JoinGameHandler(
 
 	// TEAM 1 est rouge TEAM 2 est bleu
 	unit := game.NewUnit(math.Vector2{
-		X: float64(rand.Int() % 500),
-		Y: float64(rand.Int() % 500),
+		X: rand.Int() % 500,
+		Y: rand.Int() % 500,
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
@@ -41,8 +41,8 @@ func (s *WebsocketManager) JoinGameHandler(
 	)
 
 	unit2 := game.NewUnit(math.Vector2{
-		X: float64(rand.Int() % 500),
-		Y: float64(rand.Int() % 500),
+		X: rand.Int() % 500,
+		Y: rand.Int() % 500,
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
@@ -51,8 +51,8 @@ func (s *WebsocketManager) JoinGameHandler(
 	)
 
 	cc := game.NewTownCenter(math.Vector2{
-		X: float64(rand.Int() % 500),
-		Y: float64(rand.Int() % 500),
+		X: rand.Int() % 500,
+		Y: rand.Int() % 500,
 	},
 		len(gameMap.Players)+1,
 	)
@@ -171,17 +171,17 @@ func (s *WebsocketManager) MoveElementHandler(
 ) {
 	s.log.Println("MoveElement Event")
 	// s.log.Printf("MoveElementFrom: %s", ws.RemoteAddr())
-	// s.log.Printf("PlayerID: %s", *playerID)
-	// s.log.Printf("Moving: %s", unit.MoveElement.GetUnitId())
+	s.log.Printf("PlayerID: %s", *playerID)
+	s.log.Printf("Moving: %s", unit.MoveElement.GetUnitId())
 
 	elementNewPos := math.Vector2{
-		X: float64(unit.MoveElement.GetNewPos().X),
-		Y: float64(unit.MoveElement.GetNewPos().Y),
+		X: int(unit.MoveElement.GetNewPos().X),
+		Y: int(unit.MoveElement.GetNewPos().Y),
 	}
 
 	elementOldPos := math.Vector2{
-		X: float64(unit.MoveElement.GetOldPos().X),
-		Y: float64(unit.MoveElement.GetOldPos().Y),
+		X: int(unit.MoveElement.GetOldPos().X),
+		Y: int(unit.MoveElement.GetOldPos().Y),
 	}
 
 	err := s.gameManager.AddTargetToElement(
@@ -194,7 +194,11 @@ func (s *WebsocketManager) MoveElementHandler(
 
 	if err != nil {
 		s.log.Println(err)
+		return
 	}
+
+	s.log.Println("OLD POS {}", elementOldPos)
+	s.log.Println("NEW POS {}", elementNewPos)
 }
 
 func (s *WebsocketManager) StartGameHandler(

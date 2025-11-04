@@ -12,23 +12,23 @@ type MapGrid struct {
 
 func NewMapGrid(width, height int) *MapGrid {
 	grid := make([][]Tile, width)
-	for i := range width {
-		grid = append(grid, []Tile{})
-		for range height {
-			grid[i] = append(grid[i], NewTile())
+	for x := range width {
+		grid[x] = make([]Tile, height)
+		for y := range height {
+			grid[x][y] = NewTile()
 		}
 	}
 
 	return &MapGrid{
 		Grid:     grid,
-		GridSpec: math.NewVector2(float64(width), float64(height)),
+		GridSpec: math.NewVector2(width, height),
 	}
 }
 
 func (m *MapGrid) ToggleCollisionTiles(el IElement, IsWalkable bool) {
-	for i := int(el.GetPost().X); i < int(el.GetPost().X+el.GetSize().X); i++ {
-		for j := int(el.GetPost().Y); j < int(el.GetPost().Y+el.GetSize().Y); j++ {
-			m.Grid[i][j].IsWalkable = IsWalkable
+	for i := el.GetPost().X; i < el.GetPost().X+el.GetSize().X; i++ {
+		for j := el.GetPost().Y; j < el.GetPost().Y+el.GetSize().Y; j++ {
+			m.Grid[j][i].IsWalkable = IsWalkable
 		}
 	}
 }
@@ -83,34 +83,34 @@ func (g *Game) AddTargetToElement(
 	element := g.gameElements[elementID]
 	if element == nil {
 		log.Println("ELEMENT NEST PAS TROUVE")
-		return nil
+		return ErrNotUnitFound
 	}
-	_, ok := element.(IUnit)
-	if ok {
-		element.SetNewTarget(&newTarget)
-		g.MoveUnit(element)
-	}
+
+	// _, ok := element.(IUnit)
+	// if ok {
+	// log.Println("DANS SET NEW TARGET FOR UNIT")
+	element.SetNewTarget(&newTarget)
+	// }
 	return nil
 }
 
-func (g *Game) MoveElement(
-	elementID ElementID,
-	playerID PlayerID,
-	newPos math.Vector2,
-	oldPos math.Vector2,
-) error {
-	element := g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element
-	if element == nil {
-		log.Println("ELEMENT N'A PAS ETE MODIFIE")
-		// TODO: Mettre une vraie erreur avec un system de gestion d'erreur plus avance
-		return nil
-	}
-
-	element.SetPost(newPos)
-	g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element = nil
-	g.MapGrid.Grid[int(newPos.X)][int(newPos.Y)].Element = element
-	return nil
-}
+// func (g *Game) MoveElement(
+// 	elementID ElementID,
+// 	playerID PlayerID,
+// 	newPos math.Vector2,
+// 	oldPos math.Vector2,
+// ) error {
+// 	element := g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element
+// 	if element == nil {
+// 		// TODO: Mettre une vraie erreur avec un system de gestion d'erreur plus avance
+// 		return ErrNotUnitFound
+// 	}
+//
+// 	element.SetPost(newPos)
+// 	g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element = nil
+// 	g.MapGrid.Grid[int(newPos.X)][int(newPos.Y)].Element = element
+// 	return nil
+// }
 
 // TODO: RETOUR DERREUR
 func (g *Game) AddElement(el IElement) error {
@@ -137,20 +137,23 @@ func (g *Game) RemovePlayer(player *Player) {
 
 func (g *Game) UpdateGameState() {
 	for _, element := range g.gameElements {
-		if _, ok := element.(IUnit); ok {
-			g.MoveUnit(element)
+		// if _, ok := element.(IUnit); ok {
+		err := g.MoveUnit(element)
+		if err == ErrCannotMoveUnitFurder {
+			log.Println(err)
 		}
+		// }
 	}
 }
 
-func (m *MapGrid) CheckNextPosition(el IElement, moveX, moveY float64) bool {
-	return m.Grid[int(el.GetPost().X+moveX)][int(el.GetPost().Y+moveY)].IsWalkable
+func (m *MapGrid) IsNextPostionwalkable(el IElement, moveX, moveY float64) bool {
+	return m.Grid[int(float64(el.GetPost().X)+moveX)][int(float64(el.GetPost().Y)+moveY)].IsWalkable
 }
 
 // Plus utilisé logique tranférer à la struct Game, garde pour trace
 func (g *Game) MoveUnit(el IElement) error {
 	if el.GetCurrentObjective() == nil {
-		return nil
+		return ErrUnitHasNoObjective
 	}
 
 	// if !el.canUnitMove(mapGrid) {
@@ -160,27 +163,30 @@ func (g *Game) MoveUnit(el IElement) error {
 	// }
 
 	const speed = 1.0
-	moveX := el.GetDirectionVector().X * speed
-	moveY := el.GetDirectionVector().Y * speed
+	moveX := float64(el.GetDirectionVector().X) * speed
+	moveY := float64(el.GetDirectionVector().Y) * speed
 
-	toTarget := math.Vector2{
-		X: el.GetCurrentObjective().X - el.GetPost().X,
-		Y: el.GetCurrentObjective().Y - el.GetPost().Y,
+	toTargetX := float64(el.GetCurrentObjective().X - el.GetPost().X)
+	toTargetY := float64(el.GetCurrentObjective().Y - el.GetPost().Y)
+
+	if (moveX*toTargetX + moveY*toTargetY) <= 0 {
+		moveX = toTargetX
+		moveY = toTargetY
 	}
 
-	if (moveX*toTarget.X + moveY*toTarget.Y) <= 0 {
-		moveX = toTarget.X
-		moveY = toTarget.Y
-	}
-
-	if g.MapGrid.CheckNextPosition(el, moveX, moveY) {
+	if g.MapGrid.IsNextPostionwalkable(el, moveX, moveY) {
+		log.Println("DANS IF WALK")
 		g.MapGrid.ToggleCollisionTiles(el, true)
-		el.UpdatePos(g.MapGrid.Grid, moveX, moveY)
+		el.UpdatePos(g.MapGrid.Grid, int(moveX), int(moveY))
 		g.MapGrid.ToggleCollisionTiles(el, false)
 		return nil
 	}
 
 	el.SetNewTarget(nil)
 	// return error collision mettre direction vector nil et currentobjective nil
-	return nil
+
+	log.Println(el.GetPost().X + int(moveX))
+	log.Println(el.GetPost().Y + int(moveY))
+	log.Println(g.MapGrid.Grid[el.GetPost().X+int(moveX)][el.GetPost().Y+int(moveY)])
+	return ErrCannotMoveUnitFurder
 }
