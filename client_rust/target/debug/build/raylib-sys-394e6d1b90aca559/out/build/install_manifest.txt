@@ -1,0 +1,7 @@
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/lib/libraylib.a
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/include/raylib.h
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/include/rlgl.h
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/include/raymath.h
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/lib/pkgconfig/raylib.pc
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/lib/cmake/raylib/raylib-config-version.cmake
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/lib/cmake/raylib/raylib-config.cmake

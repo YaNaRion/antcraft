@@ -1,7 +1,0 @@
-[package]
-name = "my_raylib_game"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-    raylib = "5.0.2" # Or the latest version available on crates.io
