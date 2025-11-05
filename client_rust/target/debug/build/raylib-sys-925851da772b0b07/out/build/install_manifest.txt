@@ -1,0 +1,17 @@
+<<<<<<< HEAD
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/lib/libraylib.a
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/include/raylib.h
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/include/rlgl.h
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/include/raymath.h
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/lib/pkgconfig/raylib.pc
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/lib/cmake/raylib/raylib-config-version.cmake
+/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/lib/cmake/raylib/raylib-config.cmake
+=======
+/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-925851da772b0b07/out/lib/libraylib.a
+/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-925851da772b0b07/out/include/raylib.h
+/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-925851da772b0b07/out/include/rlgl.h
+/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-925851da772b0b07/out/include/raymath.h
+/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-925851da772b0b07/out/lib/pkgconfig/raylib.pc
+/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-925851da772b0b07/out/lib/cmake/raylib/raylib-config-version.cmake
+/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-925851da772b0b07/out/lib/cmake/raylib/raylib-config.cmake
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730

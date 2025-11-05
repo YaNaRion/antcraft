@@ -1,0 +1,17 @@
+<<<<<<< HEAD
+prefix=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out
+=======
+prefix=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: raylib
+Description: A simple and easy-to-use library to enjoy videogames programming
+URL: https://github.com/raysan5/raylib
+Version: 5.5.0
+Libs: -L"${libdir}" -lraylib 
+Libs.private: 
+Requires.private: 
+Cflags: -I"${includedir}"
