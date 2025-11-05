@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 prefix=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out
+=======
+prefix=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

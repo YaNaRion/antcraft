@@ -1,7 +1,7 @@
 #include "unit.h"
 #include "raylib.h"
 #include <cmath>
-// #include <iostream>
+#include <iostream>
 // #include <print>
 
 Building::Building(Vector2 pos, Vector2 currentObj, Vector2 size,
@@ -11,6 +11,9 @@ Building::Building(Vector2 pos, Vector2 currentObj, Vector2 size,
 }
 
 void Building::Draw() {
+  std::cout << "UNIT POS X: " << this->data->GetPos().x;
+  std::cout << "UNIT POS Y: " << this->data->GetPos().y << std::endl;
+
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {

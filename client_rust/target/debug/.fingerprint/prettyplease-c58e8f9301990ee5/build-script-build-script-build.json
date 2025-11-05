@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"rustc":17921773896214356806,"features":"[\"verbatim\"]","declared_features":"[\"verbatim\"]","target":5408242616063297496,"profile":2225463790103693989,"path":851817449739566743,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"debug/.fingerprint/prettyplease-c58e8f9301990ee5/dep-build-script-build-script-build","checksum":false}}],"rustflags":[],"config":2069994364910194474,"compile_kind":0}
+=======
+{"rustc":17921773896214356806,"features":"[\"verbatim\"]","declared_features":"[\"verbatim\"]","target":5408242616063297496,"profile":2225463790103693989,"path":18004323570080937151,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"debug/.fingerprint/prettyplease-c58e8f9301990ee5/dep-build-script-build-script-build","checksum":false}}],"rustflags":[],"config":2069994364910194474,"compile_kind":0}
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730

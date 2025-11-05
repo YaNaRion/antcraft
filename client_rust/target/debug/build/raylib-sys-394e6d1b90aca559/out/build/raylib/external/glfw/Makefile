@@ -60,7 +60,11 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib
 
 # The top-level build directory on which CMake was run.
+<<<<<<< HEAD
 CMAKE_BINARY_DIR = /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build
+=======
+CMAKE_BINARY_DIR = /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -68,7 +72,11 @@ CMAKE_BINARY_DIR = /home/yann/projet/antcraft/client_rust/target/debug/build/ray
 # Special rule for the target package
 package: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool..."
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && /usr/bin/cpack --config ./CPackConfig.cmake
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && /usr/bin/cpack --config ./CPackConfig.cmake
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : package
 
 # Special rule for the target package
@@ -78,7 +86,11 @@ package/fast: package
 # Special rule for the target package_source
 package_source:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool for source..."
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CPackSourceConfig.cmake
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CPackSourceConfig.cmake
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : package_source
 
 # Special rule for the target package_source
@@ -162,14 +174,24 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CMakeFiles /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw//CMakeFiles/progress.marks
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CMakeFiles 0
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CMakeFiles /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/raylib/external/glfw//CMakeFiles/progress.marks
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CMakeFiles 0
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : all
 
 # The main clean target
 clean:
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/clean
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/clean
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : clean
 
 # The main clean target
@@ -178,17 +200,29 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/preinstall
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/preinstall
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/preinstall
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 raylib/external/glfw/preinstall
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : depend
 
 # Help Target
@@ -217,6 +251,10 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : cmake_check_build_system
 

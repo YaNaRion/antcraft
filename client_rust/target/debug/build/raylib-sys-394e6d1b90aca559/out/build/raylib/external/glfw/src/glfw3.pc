@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 prefix=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out
 exec_prefix=${prefix}
 includedir=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/include
 libdir=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/lib
+=======
+prefix=/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-394e6d1b90aca559/out
+exec_prefix=${prefix}
+includedir=/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-394e6d1b90aca559/out/include
+libdir=/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-394e6d1b90aca559/out/lib
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 
 Name: GLFW
 Description: A multi-platform library for OpenGL, window and input

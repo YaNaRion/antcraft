@@ -60,7 +60,11 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib
 
 # The top-level build directory on which CMake was run.
+<<<<<<< HEAD
 CMAKE_BINARY_DIR = /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build
+=======
+CMAKE_BINARY_DIR = /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -78,7 +82,11 @@ package/fast: package
 # Special rule for the target package_source
 package_source:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool for source..."
+<<<<<<< HEAD
 	/usr/bin/cpack --config ./CPackSourceConfig.cmake /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CPackSourceConfig.cmake
+=======
+	/usr/bin/cpack --config ./CPackSourceConfig.cmake /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CPackSourceConfig.cmake
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : package_source
 
 # Special rule for the target package_source
@@ -162,9 +170,15 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
+<<<<<<< HEAD
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CMakeFiles /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CMakeFiles 0
+=======
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CMakeFiles /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build//CMakeFiles/progress.marks
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CMakeFiles 0
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : all
 
 # The main clean target

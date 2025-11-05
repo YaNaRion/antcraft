@@ -108,9 +108,17 @@ int main() {
 
   std::cout << "Initialisation done" << std::endl;
   while (!window.ShouldWindowClose()) {
+    Vector2 mouse_position = GetMousePosition();
     BeginDrawing();
     ClearBackground(BLACK);
     scene_manager.Draw();
+
+    std::string mouse_pos_string =
+        "MOUSE POSITION X: " + std::to_string(mouse_position.x) +
+        "MOUSE POSITION Y: " + std::to_string(mouse_position.y);
+
+    DrawText(mouse_pos_string.c_str(), mouse_position.x, mouse_position.y, 12,
+             WHITE);
 
     InputHandler(game_shared, &gate);
     CleanEvenOutQueue(&gate);

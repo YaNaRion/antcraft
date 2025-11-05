@@ -10,7 +10,11 @@
 # usually begin with CPACK_<GENNAME>_xxxx.
 
 
+<<<<<<< HEAD
 set(CPACK_BUILD_SOURCE_DIRS "/home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib;/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build")
+=======
+set(CPACK_BUILD_SOURCE_DIRS "/home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib;/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build")
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 set(CPACK_CMAKE_GENERATOR "Unix Makefiles")
 set(CPACK_COMPONENT_UNSPECIFIED_HIDDEN "TRUE")
 set(CPACK_COMPONENT_UNSPECIFIED_REQUIRED "TRUE")
@@ -22,8 +26,13 @@ set(CPACK_DEFAULT_PACKAGE_DESCRIPTION_SUMMARY "raylib built using CMake")
 set(CPACK_DMG_SLA_USE_RESOURCE_FILE_LICENSE "ON")
 set(CPACK_GENERATOR "ZIP;TGZ;DEB;RPM")
 set(CPACK_INNOSETUP_ARCHITECTURE "x64")
+<<<<<<< HEAD
 set(CPACK_INSTALL_CMAKE_PROJECTS "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build;raylib;ALL;/")
 set(CPACK_INSTALL_PREFIX "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out")
+=======
+set(CPACK_INSTALL_CMAKE_PROJECTS "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build;raylib;ALL;/")
+set(CPACK_INSTALL_PREFIX "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out")
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 set(CPACK_MODULE_PATH "/home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib/cmake")
 set(CPACK_NSIS_DISPLAY_NAME "raylib 5.5.0")
 set(CPACK_NSIS_INSTALLER_ICON_CODE "")
@@ -33,7 +42,11 @@ set(CPACK_NSIS_PACKAGE_NAME "raylib 5.5.0")
 set(CPACK_NSIS_UNINSTALL_NAME "Uninstall")
 set(CPACK_OBJCOPY_EXECUTABLE "/usr/bin/objcopy")
 set(CPACK_OBJDUMP_EXECUTABLE "/usr/bin/objdump")
+<<<<<<< HEAD
 set(CPACK_OUTPUT_CONFIG_FILE "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CPackConfig.cmake")
+=======
+set(CPACK_OUTPUT_CONFIG_FILE "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CPackConfig.cmake")
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 set(CPACK_PACKAGE_CONTACT "raysan5")
 set(CPACK_PACKAGE_DEFAULT_LOCATION "/")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "/home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib/src/../README.md")
@@ -55,7 +68,11 @@ set(CPACK_RESOURCE_FILE_WELCOME "/home/yann/.cargo/registry/src/index.crates.io-
 set(CPACK_RPM_PACKAGE_NAME "libraylib-devel")
 set(CPACK_SET_DESTDIR "OFF")
 set(CPACK_SOURCE_GENERATOR "TBZ2;TGZ;TXZ;TZ")
+<<<<<<< HEAD
 set(CPACK_SOURCE_OUTPUT_CONFIG_FILE "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CPackSourceConfig.cmake")
+=======
+set(CPACK_SOURCE_OUTPUT_CONFIG_FILE "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CPackSourceConfig.cmake")
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 set(CPACK_SOURCE_RPM "OFF")
 set(CPACK_SOURCE_TBZ2 "ON")
 set(CPACK_SOURCE_TGZ "ON")
@@ -68,7 +85,11 @@ set(CPACK_TOPLEVEL_TAG "Linux")
 set(CPACK_WIX_SIZEOF_VOID_P "8")
 
 if(NOT CPACK_PROPERTIES_FILE)
+<<<<<<< HEAD
   set(CPACK_PROPERTIES_FILE "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CPackProperties.cmake")
+=======
+  set(CPACK_PROPERTIES_FILE "/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CPackProperties.cmake")
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 endif()
 
 if(EXISTS ${CPACK_PROPERTIES_FILE})

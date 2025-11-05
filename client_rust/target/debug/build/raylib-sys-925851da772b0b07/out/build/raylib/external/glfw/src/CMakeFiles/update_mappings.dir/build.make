@@ -56,7 +56,11 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib
 
 # The top-level build directory on which CMake was run.
+<<<<<<< HEAD
 CMAKE_BINARY_DIR = /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build
+=======
+CMAKE_BINARY_DIR = /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 
 # Utility rule file for update_mappings.
 
@@ -67,7 +71,11 @@ include raylib/external/glfw/src/CMakeFiles/update_mappings.dir/compiler_depend.
 include raylib/external/glfw/src/CMakeFiles/update_mappings.dir/progress.make
 
 raylib/external/glfw/src/CMakeFiles/update_mappings:
+<<<<<<< HEAD
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Updating gamepad mappings from upstream repository"
+=======
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Updating gamepad mappings from upstream repository"
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 	cd /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib/src/external/glfw/src && /usr/bin/cmake -P /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib/src/external/glfw/CMake/GenerateMappings.cmake mappings.h.in mappings.h
 
 raylib/external/glfw/src/CMakeFiles/update_mappings.dir/codegen:
@@ -82,10 +90,18 @@ raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build: update_mappings
 .PHONY : raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
 
 raylib/external/glfw/src/CMakeFiles/update_mappings.dir/clean:
+<<<<<<< HEAD
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/raylib/external/glfw/src && $(CMAKE_COMMAND) -P CMakeFiles/update_mappings.dir/cmake_clean.cmake
 .PHONY : raylib/external/glfw/src/CMakeFiles/update_mappings.dir/clean
 
 raylib/external/glfw/src/CMakeFiles/update_mappings.dir/depend:
 	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib/src/external/glfw/src /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/raylib/external/glfw/src /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-925851da772b0b07/out/build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/DependInfo.cmake "--color=$(COLOR)"
+=======
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw/src && $(CMAKE_COMMAND) -P CMakeFiles/update_mappings.dir/cmake_clean.cmake
+.PHONY : raylib/external/glfw/src/CMakeFiles/update_mappings.dir/clean
+
+raylib/external/glfw/src/CMakeFiles/update_mappings.dir/depend:
+	cd /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib /home/yann/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/raylib/src/external/glfw/src /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw/src /home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/DependInfo.cmake "--color=$(COLOR)"
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 .PHONY : raylib/external/glfw/src/CMakeFiles/update_mappings.dir/depend
 

@@ -17,7 +17,7 @@ type IElement interface {
 	GetTeam() int
 
 	GetDirectionVector() *math.Vector2
-	UpdatePos(grid [][]Tile, x, y float64)
+	UpdatePos(grid [][]Tile, x, y int)
 }
 
 type IUnit interface {

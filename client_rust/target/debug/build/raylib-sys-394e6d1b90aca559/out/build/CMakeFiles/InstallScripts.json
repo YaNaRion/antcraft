@@ -1,10 +1,17 @@
 {
 	"InstallScripts" : 
 	[
+<<<<<<< HEAD
 		"/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/cmake_install.cmake",
 		"/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/cmake_install.cmake",
 		"/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw/cmake_install.cmake",
 		"/home/yann/projet/antcraft/client_rust/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw/src/cmake_install.cmake"
+=======
+		"/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/cmake_install.cmake",
+		"/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/cmake_install.cmake",
+		"/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw/cmake_install.cmake",
+		"/home/yanarion/ProjetPerso/antcraft/my_raylib_game/target/debug/build/raylib-sys-394e6d1b90aca559/out/build/raylib/external/glfw/src/cmake_install.cmake"
+>>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730
 	],
 	"Parallel" : false
 }
