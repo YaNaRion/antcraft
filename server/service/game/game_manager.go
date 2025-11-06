@@ -58,10 +58,6 @@ func (g *GameManager) GetPlayerInAGame(gameID GameID) map[PlayerID]*Player {
 	return g.games[gameID].Players
 }
 
-func (g *GameManager) GetMap(gameID GameID) *MapGrid {
-	return g.games[gameID].MapGrid
-}
-
 func (g *GameManager) StartGame(gameID GameID) {
 	g.games[gameID].StartGame()
 }
@@ -83,6 +79,5 @@ func NewGameManager() *GameManager {
 func (g *GameManager) PopulateWithDefaultGame() {
 	var defaultGameID GameID = "Game1"
 	g.gamesID = append(g.gamesID, defaultGameID)
-	var mapGrid *MapGrid = NewMapGrid(10000, 10000)
-	g.games[defaultGameID] = NewGame(mapGrid)
+	g.games[defaultGameID] = NewGame()
 }
