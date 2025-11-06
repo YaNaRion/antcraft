@@ -53,25 +53,6 @@ func (g *Game) AddTargetToElement(
 	return nil
 }
 
-// func (g *Game) MoveElement(
-// 	elementID ElementID,
-// 	playerID PlayerID,
-// 	newPos math.Vector2,
-// 	oldPos math.Vector2,
-// ) error {
-// 	element := g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element
-// 	if element == nil {
-// 		// TODO: Mettre une vraie erreur avec un system de gestion d'erreur plus avance
-// 		return ErrNotUnitFound
-// 	}
-//
-// 	element.SetPost(newPos)
-// 	g.MapGrid.Grid[int(oldPos.X)][int(oldPos.Y)].Element = nil
-// 	g.MapGrid.Grid[int(newPos.X)][int(newPos.Y)].Element = element
-// 	return nil
-// }
-
-// TODO: RETOUR DERREUR
 func (g *Game) AddElement(el IElement) error {
 	g.gameElements[el.GetData().GetID()] = el
 	return nil
@@ -115,22 +96,12 @@ func (g *Game) IsNextPositionWalkable(el *ElementData, moveX, moveY float64) boo
 	newY := el.GetPost().Y + moveY
 	elSize := el.GetSize()
 
-	// Define new bounding box
 	elLeft := newX
 	elRight := newX + elSize.X
 	elTop := newY
 	elBottom := newY + elSize.Y
 
-	log.Printf(
-		"EL LEFT: %d, EL RIGHT: %d, EL TOP: %d, EL BOT: %d\n",
-		int(elLeft),
-		int(elRight),
-		int(elTop),
-		int(elBottom),
-	)
-
 	for _, other := range g.gameElements {
-		// Skip self
 		if other.GetData().GetID() == el.GetID() {
 			continue
 		}
@@ -138,36 +109,17 @@ func (g *Game) IsNextPositionWalkable(el *ElementData, moveX, moveY float64) boo
 		otherPos := other.GetData().GetPost()
 		otherSize := other.GetData().GetSize()
 
-		// Define other bounding box
 		otherLeft := otherPos.X
 		otherRight := otherPos.X + otherSize.X
 		otherTop := otherPos.Y
 		otherBottom := otherPos.Y + otherSize.Y
 
-		log.Printf(
-			"other LEFT: %d, other RIGHT: %d, other TOP: %d, other BOT: %d\n",
-			int(otherLeft),
-			int(otherRight),
-			int(otherTop),
-			int(otherBottom),
-		)
-
-		// if elLeft < otherRight && elRight > elLeft && elTop > otherBottom && elBottom < otherTop {
-		// 	return false
-		// }
-
-		isX := (elLeft > otherLeft && elLeft < otherRight) ||
-			(elRight < otherRight && elRight > otherLeft)
-
-		isY := (elTop > otherTop && elTop < otherBottom) ||
-			(elBottom < otherBottom && elBottom > otherTop)
-
-		if isX && isY {
-			return false
+		if elRight > otherLeft && elLeft < otherRight &&
+			elBottom > otherTop && elTop < otherBottom {
+			return false // collision
 		}
 
 	}
-
 	return true // no collision
 }
 
@@ -177,13 +129,7 @@ func (g *Game) MoveUnit(el IUnit) error {
 		return ErrUnitHasNoObjective
 	}
 
-	// if !el.canUnitMove(mapGrid) {
-	// 	el.directionVector.X = 0
-	// 	el.directionVector.Y = 0
-	// 	return nil
-	// }
-
-	const speed = 1.0
+	const speed = 2.0
 	moveX := el.GetData().directionVector.X * speed
 	moveY := el.GetData().directionVector.Y * speed
 
@@ -205,17 +151,6 @@ func (g *Game) MoveUnit(el IUnit) error {
 		el.GetData().UpdatePos(moveX, moveY)
 		return nil
 	}
-
-	if el.GetData().GetPost().X != el.GetData().GetCurrentObjective().X {
-		el.GetData().UpdatePos(moveX, 0)
-		return nil
-	}
-
-	if el.GetData().GetPost().Y != el.GetData().GetCurrentObjective().Y {
-		el.GetData().UpdatePos(0, moveY)
-		return nil
-	}
-	log.Println("DANS NEXT POSTION NOT WALKABLE")
 
 	el.GetData().SetNewTarget(nil)
 	// return error collision mettre direction vector nil et currentobjective nil

@@ -18,6 +18,10 @@ void Building::Draw() {
   } else {
     DrawRectangleRec(this->data->GetRec(), this->data->color);
   }
+  std::string str = "X: " + std::to_string(this->data->GetPos().x) +
+                    " Y: " + std::to_string(this->data->GetPos().y);
+  DrawText(str.c_str(), this->data->GetPos().x, this->data->GetPos().y, 10,
+           WHITE);
 };
 
 ScreenElementType Building::GetType() { return ScreenElementType::Base; }
@@ -28,10 +32,10 @@ Unit::Unit(Vector2 pos, Vector2 size, std::string id, int team) {
 }
 
 void Unit::Draw() {
-  if (this->GetElementData()->GetCurrentObjective() != nullptr) {
-    std::cout << "MoveUnitPerframe\n";
-    this->MoveUnitPerFrame();
-  }
+  // if (this->GetElementData()->GetCurrentObjective()->x != -1 &&
+  //     this->GetElementData()->GetCurrentObjective()->y != -1) {
+  this->MoveUnitPerFrame();
+  // }
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {
@@ -55,6 +59,7 @@ void Unit::MoveUnitPerFrame() {
          this->data->current_objective->y < 0)) {
       return;
     }
+
     const float speed = 1.0;
     float moveX = this->data->direction_vector_normalize->x * speed;
     float moveY = this->data->direction_vector_normalize->y * speed;
@@ -132,6 +137,7 @@ void ElementData::SetCurrentObjective(Vector2 vec2) {
 
 void ElementData::SetCurrentObjective(std::shared_ptr<Vector2> vec2) {
   this->current_objective = vec2;
+  this->SetDirectionVector();
 };
 
 std::string ElementData::GetID() { return this->id; }
@@ -141,7 +147,7 @@ std::shared_ptr<Vector2> ElementData::GetCurrentObjective() {
 }
 
 void ElementData::SetDirectionVector() {
-  if (this->current_objective.get() == nullptr) {
+  if (this->current_objective == nullptr) {
     return;
   }
   Vector2 direction_vector =

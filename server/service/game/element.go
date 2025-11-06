@@ -78,10 +78,7 @@ func (u *ElementData) SetNewTarget(newTarget *math.Vector2) {
 // Il u a une approximation de la position lors du cast de float a int, ne devrait pas etre grave avec des tres petites tiles comme ici
 // Note pour potentiel future bug
 func (u *ElementData) UpdatePos(x, y float64) {
-
-	// grid[u.pos.X][u.pos.Y].Element = nil
 	u.pos.X += x
 	u.pos.Y += y
 	u.SetNewTarget(u.currentTarget)
-	// grid[u.pos.X][u.pos.Y].Element = u
 }

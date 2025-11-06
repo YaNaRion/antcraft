@@ -36,9 +36,9 @@ func iElementToProto(el game.IElement) *Element {
 
 	switch el.(type) {
 	case *game.Worker:
-		et = ElementType_WORKER
+		et = ElementType_UNIT
 	case *game.TownCenter:
-		et = ElementType_BASE
+		et = ElementType_BUILDING
 	}
 
 	var currentObjective *Vector2 = nil
