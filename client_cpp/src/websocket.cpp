@@ -117,23 +117,30 @@ void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
         .y = y_size,
     };
 
-    Vector2 currentObjectif = Vector2{
-        .x = (float)element.currentobjective().x(),
-        .y = (float)element.currentobjective().y(),
-    };
+    Vector2 *currentObjectif;
+    if (element.has_currentobjective()) {
+      currentObjectif = new Vector2{
+          .x = (float)element.currentobjective().x(),
+          .y = (float)element.currentobjective().y(),
+      };
+    } else {
+      std::cout << "CURRENT OBJECTIF IS NIL\n";
+    }
 
     if (element.element_type() == Event::ElementType::WORKER) {
-      Unit unit =
-          Unit(pos, currentObjectif, size, element.unit_id(), element.team());
+      Unit unit = Unit(pos, size, element.unit_id(), element.team());
       std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
+      unit_shared->GetElementData()->SetCurrentObjective(*currentObjectif);
       vector.push_back(unit_shared);
     }
 
     if (element.element_type() == Event::ElementType::BASE) {
-      Building building = Building(pos, currentObjectif, size,
-                                   element.unit_id(), element.team());
+      Building building =
+          Building(pos, size, element.unit_id(), element.team());
+
       std::shared_ptr<Building> building_shared =
           std::make_shared<Building>(building);
+      building_shared->GetElementData()->SetCurrentObjective(*currentObjectif);
       vector.push_back(building_shared);
     }
   }

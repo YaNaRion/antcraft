@@ -14,8 +14,7 @@ enum class ScreenElementType {
 class ElementData {
 public:
   ElementData(Rectangle rec);
-  ElementData(Vector2 pos, Vector2 currentObj, Vector2 size, std::string id,
-              int team);
+  ElementData(Vector2 pos, Vector2 size, std::string id, int team);
   ~ElementData();
 
   Vector2 GetPos();
@@ -24,6 +23,7 @@ public:
   void SetSelected(bool is_selected);
   std::string GetID();
   Rectangle GetRec();
+  void SetPosition();
   void SetDirectionVector();
   void SetCurrentObjective(Vector2 vec2);
   void SetCurrentObjective(std::shared_ptr<Vector2> vec2);
@@ -67,7 +67,7 @@ public:
 
 class Unit : public IScreenElement {
 public:
-  Unit(Vector2 pos, Vector2 currentObj, Vector2 size, std::string id, int team);
+  Unit(Vector2 pos, Vector2 size, std::string id, int team);
   ~Unit() {};
   void Draw() override;
   std::shared_ptr<ElementData> GetElementData() override;
@@ -80,8 +80,7 @@ private:
 
 class Building : public IScreenElement {
 public:
-  Building(Vector2 pos, Vector2 currentObj, Vector2 size, std::string id,
-           int team);
+  Building(Vector2 pos, Vector2 size, std::string id, int team);
   ~Building() {};
   void Draw() override;
   ScreenElementType GetType() override;

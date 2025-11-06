@@ -31,7 +31,7 @@ func (s *WebsocketManager) JoinGameHandler(
 
 	// TEAM 1 est rouge TEAM 2 est bleu
 	unit := game.NewWorker(math.Vector2{
-		X: float64(100),
+		X: float64(50),
 		Y: float64(10),
 	}, math.Vector2{
 		X: 10,
@@ -57,7 +57,7 @@ func (s *WebsocketManager) JoinGameHandler(
 		len(gameMap.Players)+1,
 	)
 
-	err := gameMap.AddElement(unit)
+	err := gameMap.AddUnit(unit, unit)
 	if err != nil {
 		s.log.Println(err)
 	}
@@ -68,7 +68,7 @@ func (s *WebsocketManager) JoinGameHandler(
 	// }
 	//
 
-	err = gameMap.AddElement(cc)
+	err = gameMap.AddBuilding(cc, cc)
 	if err != nil {
 		s.log.Println(err)
 	}

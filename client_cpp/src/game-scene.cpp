@@ -52,6 +52,8 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
       this->elements[unit->GetElementData()->GetID()] = unit;
     } else {
       if (unit->GetElementData()->GetCurrentObjective().get() != nullptr) {
+        foundElement->second->GetElementData()->SetPos(
+            unit->GetElementData()->GetPos());
         foundElement->second->GetElementData()->SetCurrentObjective(
             unit->GetElementData()->GetCurrentObjective());
         foundElement->second->GetElementData()->SetDirectionVector();

@@ -41,10 +41,7 @@ func iElementToProto(el game.IElement) *Element {
 		et = ElementType_BASE
 	}
 
-	currentObjective := &Vector2{
-		X: -1,
-		Y: -1,
-	}
+	var currentObjective *Vector2 = nil
 
 	if el.GetData().GetCurrentObjective() != nil {
 		currentObjective = &Vector2{

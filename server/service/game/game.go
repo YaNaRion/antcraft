@@ -77,6 +77,18 @@ func (g *Game) AddElement(el IElement) error {
 	return nil
 }
 
+func (g *Game) AddUnit(el IElement, u IUnit) error {
+	g.gameUnits[el.GetData().GetID()] = u
+	g.gameElements[el.GetData().GetID()] = el
+	return nil
+}
+
+func (g *Game) AddBuilding(el IElement, b IBuilding) error {
+	g.gameBuildings[el.GetData().GetID()] = b
+	g.gameElements[el.GetData().GetID()] = el
+	return nil
+}
+
 func (g *Game) GetElements() map[ElementID]IElement {
 	return g.gameElements
 }
@@ -90,13 +102,11 @@ func (g *Game) RemovePlayer(player *Player) {
 }
 
 func (g *Game) UpdateGameState() {
-	for _, element := range g.gameElements {
-		// if _, ok := element.(IUnit); ok {
-		err := g.MoveUnit(element)
+	for _, unit := range g.gameUnits {
+		err := g.MoveUnit(unit)
 		if err == ErrCannotMoveUnitFurder {
 			log.Println(err)
 		}
-		// }
 	}
 }
 
@@ -142,24 +152,27 @@ func (g *Game) IsNextPositionWalkable(el *ElementData, moveX, moveY float64) boo
 			int(otherBottom),
 		)
 
-		if elLeft < otherRight && elLeft > otherLeft {
-			log.Println()
+		// if elLeft < otherRight && elRight > elLeft && elTop > otherBottom && elBottom < otherTop {
+		// 	return false
+		// }
+
+		isX := (elLeft > otherLeft && elLeft < otherRight) ||
+			(elRight < otherRight && elRight > otherLeft)
+
+		isY := (elTop > otherTop && elTop < otherBottom) ||
+			(elBottom < otherBottom && elBottom > otherTop)
+
+		if isX && isY {
 			return false
 		}
 
-		// Check if rectangles overlap
-		if elRight < otherLeft && elLeft > otherRight &&
-			elBottom > otherTop && elTop < otherBottom {
-			log.Println()
-			return false // collision detected
-		}
 	}
 
 	return true // no collision
 }
 
 // Plus utilisé logique tranférer à la struct Game, garde pour trace
-func (g *Game) MoveUnit(el IElement) error {
+func (g *Game) MoveUnit(el IUnit) error {
 	if el.GetData().GetCurrentObjective() == nil {
 		return ErrUnitHasNoObjective
 	}
@@ -193,6 +206,15 @@ func (g *Game) MoveUnit(el IElement) error {
 		return nil
 	}
 
+	if el.GetData().GetPost().X != el.GetData().GetCurrentObjective().X {
+		el.GetData().UpdatePos(moveX, 0)
+		return nil
+	}
+
+	if el.GetData().GetPost().Y != el.GetData().GetCurrentObjective().Y {
+		el.GetData().UpdatePos(0, moveY)
+		return nil
+	}
 	log.Println("DANS NEXT POSTION NOT WALKABLE")
 
 	el.GetData().SetNewTarget(nil)
