@@ -12,6 +12,7 @@ public:
   ~Player();
   int GetTeam();
   void AddElement(std::shared_ptr<IScreenElement> elem);
+  std::string GetID();
 
   std::vector<std::shared_ptr<IScreenElement>> GetUnits();
 

@@ -82,7 +82,6 @@ void Gateway::PushEvent(std::shared_ptr<IEventOut> ev) {
 size_t Gateway::GetQueueOutSize() { return this->queue_out.size(); }
 
 void Gateway::PopAndSendEvent() {
-  // std::cout << "DANS POP AND SERVER" << std::endl;
   auto event = this->queue_out.front();
   Event::Event protoEvent = event->CreateProtoEvent();
   std::string eventString = protoEvent.SerializeAsString();

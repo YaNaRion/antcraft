@@ -18,6 +18,8 @@ void GameScene::SetCurrentPlayer(std::shared_ptr<Player> player) {
   this->current_player = player;
 }
 
+std::string GameScene::GetGameID() { return this->game_id; }
+
 std::map<std::string, std::shared_ptr<Player>> GameScene::GetPlayers() {
   return this->players;
 }

@@ -21,6 +21,7 @@ type Game struct {
 	gameElements  map[ElementID]IElement
 	gameUnits     map[ElementID]IUnit
 	gameBuildings map[ElementID]IBuilding
+	// gameGrid      [][]Tile
 }
 
 func NewGame() *Game {
@@ -30,7 +31,21 @@ func NewGame() *Game {
 		gameElements:  map[ElementID]IElement{},
 		gameUnits:     map[ElementID]IUnit{},
 		gameBuildings: map[ElementID]IBuilding{},
+		// gameGrid:      PopulationDefaultGameGrid(),
 	}
+}
+
+func PopulationDefaultGameGrid() [][]Tile {
+	width := 1500
+	height := 1500
+	grid := make([][]Tile, width)
+	for x := range width {
+		grid[x] = make([]Tile, height)
+		for y := range height {
+			grid[x][y] = NewTile()
+		}
+	}
+	return grid
 }
 
 func (g *Game) StartGame() {
@@ -94,6 +109,11 @@ func (g *Game) UpdateGameState() {
 func (g *Game) IsNextPositionWalkable(el *ElementData, moveX, moveY float64) bool {
 	newX := el.GetPost().X + moveX
 	newY := el.GetPost().Y + moveY
+
+	// if !g.gameGrid[int(newX)][int(newY)].IsWalkable {
+	// 	return false
+	// }
+
 	elSize := el.GetSize()
 
 	elLeft := newX

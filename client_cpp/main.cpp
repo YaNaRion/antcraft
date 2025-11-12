@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+bool isUnitSelect = false;
+std::shared_ptr<IScreenElement> selected_element;
+
 // TODO: Trouver pourquoi GetElements est un vecteur vide
 void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
 
@@ -20,8 +23,21 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
     std::shared_ptr<IScreenElement> element = pair_element.second;
 
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) &&
+        element->GetElementData()->IsSelected() && isUnitSelect) {
+
+      std::shared_ptr<AttackUnit> attack_unit = std::make_shared<AttackUnit>(
+          AttackUnit(game_scene->GetGameID(), selected_element, element,
+                     game_scene->GetCurrentPlayer()->GetID(),
+                     game_scene->GetCurrentPlayer()->GetTeam()));
+
+      gate->PushEvent(attack_unit);
+      continue;
+    }
+
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) &&
         element->GetElementData()->IsSelected()) {
       element->GetElementData()->SetSelected(false);
+      isUnitSelect = false;
       std::shared_ptr<MoveUnitOut> move_unit = std::make_shared<MoveUnitOut>(
           MoveUnitOut(element->GetElementData()->GetPos(), mouse_position,
                       "playerID", element->GetElementData()->GetID()));
@@ -35,6 +51,8 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
         IsMouseButtonDown(MOUSE_LEFT_BUTTON) &&
         element->GetElementData()->GetTeam() == current_player->GetTeam()) {
       element->GetElementData()->SetSelected(true);
+      isUnitSelect = true;
+      selected_element = element;
     }
     // else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
     //   element->SetSelected(false);

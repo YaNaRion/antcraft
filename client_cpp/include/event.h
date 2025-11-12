@@ -72,3 +72,21 @@ public:
 private:
   std::string game_id;
 };
+
+class AttackUnit : public IEventOut {
+public:
+  AttackUnit(std::string gameID,
+             std::shared_ptr<IScreenElement> attaking_element,
+             std::shared_ptr<IScreenElement> attacked_element,
+             std::string playerID, int team);
+
+  ~AttackUnit() {};
+  Event::Event CreateProtoEvent() override;
+
+private:
+  std::string gameID;
+  std::string playerID;
+  int team;
+  std::shared_ptr<IScreenElement> attaking_element;
+  std::shared_ptr<IScreenElement> attacked_element;
+};

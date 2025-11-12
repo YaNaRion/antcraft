@@ -19,7 +19,6 @@
     - 1 Ressource disponible
 - Avoir un hud de base avec hotkey hardcodé
 
-
 # Feature pour MVP (minimum viable product)
 - Mise en place de partie à deux joueurs pour de vrai
     - [x] Faire une gestion des joueurs lors de la connection à la partie

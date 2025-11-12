@@ -79,5 +79,8 @@ func NewGameManager() *GameManager {
 func (g *GameManager) PopulateWithDefaultGame() {
 	var defaultGameID GameID = "Game1"
 	g.gamesID = append(g.gamesID, defaultGameID)
-	g.games[defaultGameID] = NewGame()
+	game := NewGame()
+	g.games[defaultGameID] = game
+	// PopulationDefaultGameGrid(game.gameGrid)
+
 }

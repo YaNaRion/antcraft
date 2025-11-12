@@ -62,6 +62,11 @@ message EndGame { string game_id = 1; }
 
 message JoinGame {}
 
+message AttackElement  {
+  string attacking_element_id = 1;
+  string attacked_element_id = 2;
+}
+
 message Event {
   string game_id = 1;
   Player player_info = 2;
@@ -71,5 +76,6 @@ message Event {
     EndGame end_game = 5;
     StartGame start_game = 6;
     JoinGame join_game = 7;
+    AttackElement attack_element = 8;
   }
 }

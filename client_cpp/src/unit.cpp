@@ -35,7 +35,6 @@ void Unit::Draw() {
   // if (this->GetElementData()->GetCurrentObjective()->x != -1 &&
   //     this->GetElementData()->GetCurrentObjective()->y != -1) {
   this->MoveUnitPerFrame();
-  // }
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {

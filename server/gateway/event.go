@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"main/service/game"
 	"main/service/math"
+	"math/rand"
+
 	// "math/rand"
 	"time"
 
@@ -31,8 +33,8 @@ func (s *WebsocketManager) JoinGameHandler(
 
 	// TEAM 1 est rouge TEAM 2 est bleu
 	unit := game.NewWorker(math.Vector2{
-		X: float64(50),
-		Y: float64(10),
+		X: float64(rand.Int() % 500),
+		Y: float64(rand.Int() % 500),
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
@@ -40,19 +42,19 @@ func (s *WebsocketManager) JoinGameHandler(
 		len(gameMap.Players)+1,
 	)
 
-	// unit2 := game.NewUnit(math.Vector2{
-	// 	X: float64(rand.Int() % 500),
-	// 	Y: float64(rand.Int() % 500),
-	// }, math.Vector2{
-	// 	X: 10,
-	// 	Y: 10,
-	// },
-	// 	len(gameMap.Players)+1,
-	// )
+	unit2 := game.NewWorker(math.Vector2{
+		X: float64(rand.Int() % 500),
+		Y: float64(rand.Int() % 500),
+	}, math.Vector2{
+		X: 10,
+		Y: 10,
+	},
+		len(gameMap.Players)+1,
+	)
 
 	cc := game.NewTownCenter(math.Vector2{
-		X: float64(100),
-		Y: float64(200),
+		X: float64(rand.Int() % 600),
+		Y: float64(rand.Int() % 600),
 	},
 		len(gameMap.Players)+1,
 	)
@@ -62,11 +64,10 @@ func (s *WebsocketManager) JoinGameHandler(
 		s.log.Println(err)
 	}
 
-	// err = gameMap.AddElement(unit2)
-	// if err != nil {
-	// 	s.log.Println(err)
-	// }
-	//
+	err = gameMap.AddUnit(unit2, unit2)
+	if err != nil {
+		s.log.Println(err)
+	}
 
 	err = gameMap.AddBuilding(cc, cc)
 	if err != nil {
@@ -203,4 +204,15 @@ func (s *WebsocketManager) StartGameHandler(
 	gameID game.GameID,
 ) {
 	s.gameManager.StartGame(game.GameID(gameID))
+}
+
+func (s *WebsocketManager) AttackHandler(
+	ws *websocket.Conn,
+	gameID game.GameID,
+	playerID,
+	attackingElementID,
+	attackedElementID string,
+) {
+	s.log.Println("DANS ATTACK HANDLER")
+
 }
