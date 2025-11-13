@@ -9,9 +9,17 @@
 bool isUnitSelect = false;
 std::shared_ptr<IScreenElement> selected_element;
 
+bool checkCollide(std::vector<std::shared_ptr<IScreenElement>> vec,
+                  std::shared_ptr<IScreenElement> elem1, Vector2 mouse_pos) {
+  for (std::shared_ptr<IScreenElement> elem : vec) {
+    if (elem->GetElementData()->GetID() == elem1->GetElementData()->GetID()) {
+      continue;
+    }
+  }
+}
+
 // TODO: Trouver pourquoi GetElements est un vecteur vide
 void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
-
   std::shared_ptr<Player> current_player = game_scene->GetCurrentPlayer();
   Vector2 mouse_position = GetMousePosition();
   // if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
@@ -31,7 +39,6 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
                      game_scene->GetCurrentPlayer()->GetTeam()));
 
       gate->PushEvent(attack_unit);
-      continue;
     }
 
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) &&

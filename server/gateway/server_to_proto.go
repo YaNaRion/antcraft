@@ -31,7 +31,7 @@ func NewEventSyncGameState(game *game.Game, state GameState) *Event_SyncGameStat
 }
 
 func iElementToProto(el game.IElement) *Element {
-	pos := el.GetData().GetPost()
+	pos := el.GetElement().Data.GetPost()
 	var et ElementType
 
 	switch el.(type) {
@@ -43,10 +43,10 @@ func iElementToProto(el game.IElement) *Element {
 
 	var currentObjective *Vector2 = nil
 
-	if el.GetData().GetCurrentObjective() != nil {
+	if el.GetElement().Data.GetCurrentObjective() != nil {
 		currentObjective = &Vector2{
-			X: int32(el.GetData().GetCurrentObjective().X),
-			Y: int32(el.GetData().GetCurrentObjective().Y),
+			X: int32(el.GetElement().Data.GetCurrentObjective().X),
+			Y: int32(el.GetElement().Data.GetCurrentObjective().Y),
 		}
 	}
 
@@ -56,14 +56,14 @@ func iElementToProto(el game.IElement) *Element {
 			Y: int32(pos.Y),
 		},
 		Size: &Vector2{
-			X: int32(el.GetData().GetSize().X),
-			Y: int32(el.GetData().GetSize().Y),
+			X: int32(el.GetElement().Data.GetSize().X),
+			Y: int32(el.GetElement().Data.GetSize().Y),
 		},
 		CurrentObjective: currentObjective,
 
-		PlayerId:    string(el.GetData().GetPlayerID()),
-		UnitId:      string(el.GetData().GetID()),
+		PlayerId:    string(el.GetElement().Data.GetPlayerID()),
+		UnitId:      string(el.GetElement().Data.GetID()),
 		ElementType: et,
-		Team:        ColorTeam(el.GetData().GetTeam()),
+		Team:        ColorTeam(el.GetElement().Data.GetTeam()),
 	}
 }

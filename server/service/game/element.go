@@ -1,10 +1,21 @@
 package game
 
 import (
-	"main/service/math"
-
 	"github.com/google/uuid"
+	"main/service/math"
 )
+
+type Element struct {
+	Stat ElementStats
+	Data ElementData
+}
+
+type ElementStats struct {
+	hitPoint     int
+	meleeDamage  int
+	rangeDamage  int
+	attack_range float64
+}
 
 type ElementData struct {
 	pos             math.Vector2
@@ -19,17 +30,17 @@ type ElementData struct {
 type ElementID string
 
 type IElement interface {
-	GetData() *ElementData
+	GetElement() *Element
 	Update()
 }
 
 type IUnit interface {
-	GetData() *ElementData
+	GetElement() *Element
 	// MoveElement() error
 }
 
 type IBuilding interface {
-	GetData() *ElementData
+	GetElement() *Element
 	// CreateUnitFactory() *IUnit
 	// SetNewTargetForUnitOut(newTarget math.Vector2)
 }
@@ -55,6 +66,7 @@ func (u *ElementData) GetCurrentObjective() *math.Vector2 {
 func (u *ElementData) GetDirectionVector() *math.Vector2 {
 	return u.directionVector
 }
+
 func (u *ElementData) GetTeam() int {
 	return u.team
 }

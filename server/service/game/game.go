@@ -64,24 +64,24 @@ func (g *Game) AddTargetToElement(
 		return ErrNotUnitFound
 	}
 
-	element.GetData().SetNewTarget(&newTarget)
+	element.GetElement().Data.SetNewTarget(&newTarget)
 	return nil
 }
 
 func (g *Game) AddElement(el IElement) error {
-	g.gameElements[el.GetData().GetID()] = el
+	g.gameElements[el.GetElement().Data.GetID()] = el
 	return nil
 }
 
 func (g *Game) AddUnit(el IElement, u IUnit) error {
-	g.gameUnits[el.GetData().GetID()] = u
-	g.gameElements[el.GetData().GetID()] = el
+	g.gameUnits[el.GetElement().Data.GetID()] = u
+	g.gameElements[el.GetElement().Data.GetID()] = el
 	return nil
 }
 
 func (g *Game) AddBuilding(el IElement, b IBuilding) error {
-	g.gameBuildings[el.GetData().GetID()] = b
-	g.gameElements[el.GetData().GetID()] = el
+	g.gameBuildings[el.GetElement().Data.GetID()] = b
+	g.gameElements[el.GetElement().Data.GetID()] = el
 	return nil
 }
 
@@ -122,12 +122,12 @@ func (g *Game) IsNextPositionWalkable(el *ElementData, moveX, moveY float64) boo
 	elBottom := newY + elSize.Y
 
 	for _, other := range g.gameElements {
-		if other.GetData().GetID() == el.GetID() {
+		if other.GetElement().Data.GetID() == el.GetID() {
 			continue
 		}
 
-		otherPos := other.GetData().GetPost()
-		otherSize := other.GetData().GetSize()
+		otherPos := other.GetElement().Data.GetPost()
+		otherSize := other.GetElement().Data.GetSize()
 
 		otherLeft := otherPos.X
 		otherRight := otherPos.X + otherSize.X
@@ -145,16 +145,16 @@ func (g *Game) IsNextPositionWalkable(el *ElementData, moveX, moveY float64) boo
 
 // Plus utilisé logique tranférer à la struct Game, garde pour trace
 func (g *Game) MoveUnit(el IUnit) error {
-	if el.GetData().GetCurrentObjective() == nil {
+	if el.GetElement().Data.GetCurrentObjective() == nil {
 		return ErrUnitHasNoObjective
 	}
 
 	const speed = 2.0
-	moveX := el.GetData().directionVector.X * speed
-	moveY := el.GetData().directionVector.Y * speed
+	moveX := el.GetElement().Data.directionVector.X * speed
+	moveY := el.GetElement().Data.directionVector.Y * speed
 
-	toTargetX := el.GetData().GetCurrentObjective().X - el.GetData().GetPost().X
-	toTargetY := el.GetData().GetCurrentObjective().Y - el.GetData().GetPost().Y
+	toTargetX := el.GetElement().Data.GetCurrentObjective().X - el.GetElement().Data.GetPost().X
+	toTargetY := el.GetElement().Data.GetCurrentObjective().Y - el.GetElement().Data.GetPost().Y
 
 	if (moveX*toTargetX + moveY*toTargetY) <= 0 {
 		moveX = toTargetX
@@ -164,15 +164,15 @@ func (g *Game) MoveUnit(el IUnit) error {
 	if (moveX*toTargetX + moveY*toTargetY) <= 0 {
 		moveX = toTargetX
 		moveY = toTargetY
-		el.GetData().SetNewTarget(nil)
+		el.GetElement().Data.SetNewTarget(nil)
 	}
 
-	if g.IsNextPositionWalkable(el.GetData(), moveX, moveY) {
-		el.GetData().UpdatePos(moveX, moveY)
+	if g.IsNextPositionWalkable(&(el.GetElement().Data), moveX, moveY) {
+		el.GetElement().Data.UpdatePos(moveX, moveY)
 		return nil
 	}
 
-	el.GetData().SetNewTarget(nil)
+	el.GetElement().Data.SetNewTarget(nil)
 	// return error collision mettre direction vector nil et currentobjective nil
 	return ErrCannotMoveUnitFurder
 }

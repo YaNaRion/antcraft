@@ -6,7 +6,6 @@ import (
 	"main/service/math"
 	"math/rand"
 
-	// "math/rand"
 	"time"
 
 	"golang.org/x/net/websocket"
