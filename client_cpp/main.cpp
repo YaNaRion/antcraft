@@ -112,7 +112,7 @@ void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
 }
 
 int main() {
-  Window window = Window(900, 900, "WINDOW FROM SCENE_MANAGER");
+  Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
   std::vector<std::shared_ptr<IScreenElement>> units_ptr;
   Gateway gate = Gateway();
 
@@ -138,12 +138,12 @@ int main() {
     ClearBackground(BLACK);
     scene_manager.Draw();
 
-    std::string mouse_pos_string =
-        "MOUSE POSITION X: " + std::to_string(mouse_position.x) +
-        "MOUSE POSITION Y: " + std::to_string(mouse_position.y);
-
-    DrawText(mouse_pos_string.c_str(), mouse_position.x, mouse_position.y, 12,
-             WHITE);
+    // std::string mouse_pos_string =
+    //     "MOUSE POSITION X: " + std::to_string(mouse_position.x) +
+    //     "MOUSE POSITION Y: " + std::to_string(mouse_position.y);
+    // DrawText(mouse_pos_string.c_str(), mouse_position.x, mouse_position.y,
+    // 12,
+    //          WHITE);
 
     InputHandler(game_shared, &gate);
     CleanEvenOutQueue(&gate);
