@@ -31,4 +31,6 @@ std::vector<std::shared_ptr<IScreenElement>> Player::GetUnits() {
 
 int Player::GetTeam() { return this->team; }
 
+std::string Player::GetID() { return this->player_id; }
+
 Player::~Player() {};

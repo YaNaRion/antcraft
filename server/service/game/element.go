@@ -1,50 +1,96 @@
 package game
 
 import (
+	"github.com/google/uuid"
 	"main/service/math"
 )
+
+type Element struct {
+	Stat ElementStats
+	Data ElementData
+}
+
+type ElementStats struct {
+	hitPoint     int
+	meleeDamage  int
+	rangeDamage  int
+	attack_range float64
+}
+
+type ElementData struct {
+	pos             math.Vector2
+	size            math.Vector2
+	playerID        PlayerID
+	id              ElementID
+	currentTarget   *math.Vector2
+	directionVector *math.Vector2
+	team            int
+}
 
 type ElementID string
 
 type IElement interface {
-	GetPost() math.Vector2
-	GetSize() math.Vector2
-	GetPlayerID() PlayerID
-	SetPost(math.Vector2)
-	GetID() ElementID
-	SetNewTarget(*math.Vector2)
-	GetCurrentObjective() *math.Vector2
-	GetTeam() int
-
-	GetDirectionVector() *math.Vector2
-	UpdatePos(grid [][]Tile, x, y int)
+	GetElement() *Element
+	Update()
 }
 
 type IUnit interface {
-	MoveElement(mapGrid [][]Tile) error
+	GetElement() *Element
+	// MoveElement() error
 }
 
 type IBuilding interface {
-	CreateUnitFactory() *Unit
-	SetNewTargetForUnitOut(newTarget math.Vector2)
+	GetElement() *Element
+	// CreateUnitFactory() *IUnit
+	// SetNewTargetForUnitOut(newTarget math.Vector2)
 }
 
-type Unit struct {
-	pos             math.Vector2
-	size            math.Vector2
-	playerID        PlayerID
-	id              ElementID
-	currentTarget   *math.Vector2
-	directionVector *math.Vector2
-	team            int
+func NewElementDate(pos math.Vector2, size math.Vector2, team int) ElementData {
+	return ElementData{
+		pos:           pos,
+		size:          size,
+		id:            ElementID(uuid.New().String()),
+		currentTarget: nil,
+		team:          team,
+	}
 }
 
-type TownCenter struct {
-	pos             math.Vector2
-	size            math.Vector2
-	playerID        PlayerID
-	id              ElementID
-	currentTarget   *math.Vector2
-	directionVector *math.Vector2
-	team            int
+func (u *ElementData) GetPost() math.Vector2  { return u.pos }
+func (u *ElementData) SetPost(v math.Vector2) { u.pos = v }
+func (u *ElementData) GetID() ElementID       { return u.id }
+func (u *ElementData) GetSize() math.Vector2  { return u.size }
+func (u *ElementData) GetPlayerID() PlayerID  { return u.playerID }
+func (u *ElementData) GetCurrentObjective() *math.Vector2 {
+	return u.currentTarget
+}
+func (u *ElementData) GetDirectionVector() *math.Vector2 {
+	return u.directionVector
+}
+
+func (u *ElementData) GetTeam() int {
+	return u.team
+}
+
+func (u *ElementData) SetNewTarget(newTarget *math.Vector2) {
+	u.currentTarget = newTarget
+
+	if newTarget == nil {
+		u.directionVector = nil
+		return
+	}
+
+	targetVector := math.SubVec2(*newTarget, u.pos)
+
+	directionVector := math.NewVector2(targetVector.X, targetVector.Y)
+	directionVector.NormalizeVec()
+	u.directionVector = &directionVector
+}
+
+// TODO Mettre collision d'unite
+// Il u a une approximation de la position lors du cast de float a int, ne devrait pas etre grave avec des tres petites tiles comme ici
+// Note pour potentiel future bug
+func (u *ElementData) UpdatePos(x, y float64) {
+	u.pos.X += x
+	u.pos.Y += y
+	u.SetNewTarget(u.currentTarget)
 }

@@ -10,15 +10,12 @@ type Worker struct{ pos Vector2 }
 func (w *Worker) GetPost() Vector2  { return w.pos }
 func (w *Worker) SetPost(v Vector2) { w.pos = v }
 
-func NewMapGridToSyncGameState(grid *game.MapGrid, state GameState) *SyncGameState {
+func NewMapGridToSyncGameState(game *game.Game, state GameState) *SyncGameState {
 	var element []*Element
 
-	for _, row := range grid.Grid {
-		for _, elem := range row {
-			if elem.Element != nil {
-				element = append(element, iElementToProto(elem))
-			}
-		}
+	for _, el := range game.GetElements() {
+		element = append(element, iElementToProto(el))
+
 	}
 
 	return &SyncGameState{
@@ -27,36 +24,29 @@ func NewMapGridToSyncGameState(grid *game.MapGrid, state GameState) *SyncGameSta
 	}
 }
 
-func NewEventSyncGameState(grid *game.MapGrid, state GameState) *Event_SyncGameState {
+func NewEventSyncGameState(game *game.Game, state GameState) *Event_SyncGameState {
 	return &Event_SyncGameState{
-		SyncGameState: NewMapGridToSyncGameState(grid, state),
+		SyncGameState: NewMapGridToSyncGameState(game, state),
 	}
 }
 
-func iElementToProto(tile game.Tile) *Element {
-	if tile.Element == nil {
-		return nil
-	}
-
-	pos := tile.Element.GetPost()
+func iElementToProto(el game.IElement) *Element {
+	pos := el.GetElement().Data.GetPost()
 	var et ElementType
 
-	switch tile.Element.(type) {
-	case *game.Unit:
-		et = ElementType_WORKER
+	switch el.(type) {
+	case *game.Worker:
+		et = ElementType_UNIT
 	case *game.TownCenter:
-		et = ElementType_BASE
+		et = ElementType_BUILDING
 	}
 
-	currentObjective := &Vector2{
-		X: -1,
-		Y: -1,
-	}
+	var currentObjective *Vector2 = nil
 
-	if tile.Element.GetCurrentObjective() != nil {
+	if el.GetElement().Data.GetCurrentObjective() != nil {
 		currentObjective = &Vector2{
-			X: int32(tile.Element.GetCurrentObjective().X),
-			Y: int32(tile.Element.GetCurrentObjective().Y),
+			X: int32(el.GetElement().Data.GetCurrentObjective().X),
+			Y: int32(el.GetElement().Data.GetCurrentObjective().Y),
 		}
 	}
 
@@ -66,14 +56,14 @@ func iElementToProto(tile game.Tile) *Element {
 			Y: int32(pos.Y),
 		},
 		Size: &Vector2{
-			X: int32(tile.Element.GetSize().X),
-			Y: int32(tile.Element.GetSize().Y),
+			X: int32(el.GetElement().Data.GetSize().X),
+			Y: int32(el.GetElement().Data.GetSize().Y),
 		},
 		CurrentObjective: currentObjective,
 
-		PlayerId:    string(tile.Element.GetPlayerID()),
-		UnitId:      string(tile.Element.GetID()),
+		PlayerId:    string(el.GetElement().Data.GetPlayerID()),
+		UnitId:      string(el.GetElement().Data.GetID()),
 		ElementType: et,
-		Team:        ColorTeam(tile.Element.GetTeam()),
+		Team:        ColorTeam(el.GetElement().Data.GetTeam()),
 	}
 }

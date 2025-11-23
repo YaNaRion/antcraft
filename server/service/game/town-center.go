@@ -2,8 +2,6 @@ package game
 
 import (
 	"main/service/math"
-
-	"github.com/google/uuid"
 )
 
 var TOWN_CENTER_SIZE_CONST = math.Vector2{
@@ -11,73 +9,49 @@ var TOWN_CENTER_SIZE_CONST = math.Vector2{
 	Y: 100.0,
 }
 
+type TownCenter struct {
+	element Element
+}
+
 func NewTownCenter(pos math.Vector2, team int) *TownCenter {
 	return &TownCenter{
-		pos:           pos,
-		size:          TOWN_CENTER_SIZE_CONST,
-		id:            ElementID(uuid.New().String()),
-		currentTarget: nil,
-		team:          team,
+		element: Element{
+			Data: NewElementDate(pos, TOWN_CENTER_SIZE_CONST, team),
+			Stat: ElementStats{
+				hitPoint:     1,
+				meleeDamage:  1,
+				rangeDamage:  1,
+				attack_range: 1,
+			},
+		},
 	}
 }
 
-func (u *TownCenter) GetPost() math.Vector2  { return u.pos }
-func (u *TownCenter) SetPost(v math.Vector2) { u.pos = v }
-func (u *TownCenter) GetID() ElementID       { return u.id }
-func (u *TownCenter) GetSize() math.Vector2  { return u.size }
-func (u *TownCenter) GetPlayerID() PlayerID  { return u.playerID }
-
-func (u *TownCenter) UpdatePos(grid [][]Tile, x, y int) {
-	grid[int(u.pos.X)][int(u.pos.Y)].Element = nil
-	u.pos.X += x
-	u.pos.Y += y
-	grid[int(u.pos.X)][int(u.pos.Y)].Element = u
+func (tc *TownCenter) GetElement() *Element {
+	return &tc.element
 }
 
-func (u *TownCenter) GetCurrentObjective() *math.Vector2 {
-	return u.currentTarget
-}
+func (tc *TownCenter) Update() {}
 
-func (u *TownCenter) GetDirectionVector() *math.Vector2 {
-	return u.directionVector
-}
-
-func (u *TownCenter) SetNewTarget(newTarget *math.Vector2) {
-	u.currentTarget = newTarget
-
-	if newTarget == nil {
-		u.directionVector = nil
-		return
-	}
-	directionVector := math.SubVec2(*newTarget, u.pos)
-
-	directionVector.NormalizeVec()
-	u.directionVector = &directionVector
-}
-
-func (u *TownCenter) GetTeam() int {
-	return u.team
-}
-
-func (u *TownCenter) SetNewTargetForUnitOut(newTarget math.Vector2) {
-	directionVector := math.SubVec2(newTarget, u.pos)
+func (tc *TownCenter) SetNewTargetForUnitOut(newTarget math.Vector2) {
+	directionVector := math.SubVec2(newTarget, tc.element.Data.pos)
 	directionVector.NormalizeVec()
 
-	u.directionVector = &directionVector
-	u.currentTarget = &newTarget
+	tc.element.Data.directionVector = &directionVector
+	tc.element.Data.currentTarget = &newTarget
 }
 
-func (u *TownCenter) CreateUnitFactory() *Unit {
+func (tc *TownCenter) CreateUnitFactory() *Worker {
 	pos := math.Vector2{
-		X: u.pos.X + u.size.X + 10,
-		Y: u.pos.Y + u.size.Y + 10,
+		X: tc.element.Data.pos.X + tc.element.Data.size.X + 10,
+		Y: tc.element.Data.pos.Y + tc.element.Data.size.Y + 10,
 	}
-	unit := NewUnit(pos, math.Vector2{
+	unit := NewWorker(pos, math.Vector2{
 		X: 10,
 		Y: 10,
-	}, u.team)
+	}, tc.element.Data.team)
 
-	unit.currentTarget = u.currentTarget
-	unit.directionVector = u.directionVector
+	unit.element.Data.currentTarget = tc.element.Data.currentTarget
+	unit.element.Data.directionVector = tc.element.Data.directionVector
 	return unit
 }

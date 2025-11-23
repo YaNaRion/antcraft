@@ -6,9 +6,20 @@
 #include <string>
 #include <vector>
 
+bool isUnitSelect = false;
+std::shared_ptr<IScreenElement> selected_element;
+
+bool checkCollide(std::vector<std::shared_ptr<IScreenElement>> vec,
+                  std::shared_ptr<IScreenElement> elem1, Vector2 mouse_pos) {
+  for (std::shared_ptr<IScreenElement> elem : vec) {
+    if (elem->GetElementData()->GetID() == elem1->GetElementData()->GetID()) {
+      continue;
+    }
+  }
+}
+
 // TODO: Trouver pourquoi GetElements est un vecteur vide
 void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
-
   std::shared_ptr<Player> current_player = game_scene->GetCurrentPlayer();
   Vector2 mouse_position = GetMousePosition();
   // if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
@@ -20,8 +31,20 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
     std::shared_ptr<IScreenElement> element = pair_element.second;
 
     if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) &&
+        element->GetElementData()->IsSelected() && isUnitSelect) {
+
+      std::shared_ptr<AttackUnit> attack_unit = std::make_shared<AttackUnit>(
+          AttackUnit(game_scene->GetGameID(), selected_element, element,
+                     game_scene->GetCurrentPlayer()->GetID(),
+                     game_scene->GetCurrentPlayer()->GetTeam()));
+
+      gate->PushEvent(attack_unit);
+    }
+
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) &&
         element->GetElementData()->IsSelected()) {
       element->GetElementData()->SetSelected(false);
+      isUnitSelect = false;
       std::shared_ptr<MoveUnitOut> move_unit = std::make_shared<MoveUnitOut>(
           MoveUnitOut(element->GetElementData()->GetPos(), mouse_position,
                       "playerID", element->GetElementData()->GetID()));
@@ -35,6 +58,8 @@ void InputHandler(std::shared_ptr<GameScene> game_scene, Gateway *gate) {
         IsMouseButtonDown(MOUSE_LEFT_BUTTON) &&
         element->GetElementData()->GetTeam() == current_player->GetTeam()) {
       element->GetElementData()->SetSelected(true);
+      isUnitSelect = true;
+      selected_element = element;
     }
     // else if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
     //   element->SetSelected(false);
@@ -87,7 +112,7 @@ void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
 }
 
 int main() {
-  Window window = Window(900, 900, "WINDOW FROM SCENE_MANAGER");
+  Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
   std::vector<std::shared_ptr<IScreenElement>> units_ptr;
   Gateway gate = Gateway();
 
@@ -113,12 +138,12 @@ int main() {
     ClearBackground(BLACK);
     scene_manager.Draw();
 
-    std::string mouse_pos_string =
-        "MOUSE POSITION X: " + std::to_string(mouse_position.x) +
-        "MOUSE POSITION Y: " + std::to_string(mouse_position.y);
-
-    DrawText(mouse_pos_string.c_str(), mouse_position.x, mouse_position.y, 12,
-             WHITE);
+    // std::string mouse_pos_string =
+    //     "MOUSE POSITION X: " + std::to_string(mouse_position.x) +
+    //     "MOUSE POSITION Y: " + std::to_string(mouse_position.y);
+    // DrawText(mouse_pos_string.c_str(), mouse_position.x, mouse_position.y,
+    // 12,
+    //          WHITE);
 
     InputHandler(game_shared, &gate);
     CleanEvenOutQueue(&gate);

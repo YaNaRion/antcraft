@@ -2,6 +2,7 @@
 #include "player.h"
 #include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 
 class IScene {
@@ -39,6 +40,8 @@ public:
 private:
   // Key is ElementID, UnitID
   std::map<std::string, std::shared_ptr<IScreenElement>> elements;
+
+  std::map<std::pair<int, int>, std::shared_ptr<IScreenElement>> elements_pair;
   // std::vector<std::shared_ptr<IScreenElement>> elements;
   std::map<std::string, std::shared_ptr<Player>> players;
   Event::GameState state;

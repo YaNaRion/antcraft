@@ -1,5 +1,5 @@
 build/
 bin/
-proto/
+proto/*
 include/event_name.pb.h
 *.o

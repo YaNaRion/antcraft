@@ -82,7 +82,6 @@ void Gateway::PushEvent(std::shared_ptr<IEventOut> ev) {
 size_t Gateway::GetQueueOutSize() { return this->queue_out.size(); }
 
 void Gateway::PopAndSendEvent() {
-  // std::cout << "DANS POP AND SERVER" << std::endl;
   auto event = this->queue_out.front();
   Event::Event protoEvent = event->CreateProtoEvent();
   std::string eventString = protoEvent.SerializeAsString();
@@ -118,22 +117,30 @@ void Gateway::SyncGameEventHandler(const Event::SyncGameState &game_state) {
     };
 
     Vector2 currentObjectif = Vector2{
-        .x = (float)element.currentobjective().x(),
-        .y = (float)element.currentobjective().y(),
+        .x = -1,
+        .y = -1,
     };
 
-    if (element.element_type() == Event::ElementType::WORKER) {
-      Unit unit =
-          Unit(pos, currentObjectif, size, element.unit_id(), element.team());
+    if (element.has_currentobjective()) {
+      currentObjectif = Vector2{
+          .x = (float)element.currentobjective().x(),
+          .y = (float)element.currentobjective().y(),
+      };
+    }
+
+    if (element.element_type() == Event::ElementType::UNIT) {
+      Unit unit = Unit(pos, size, element.unit_id(), element.team());
       std::shared_ptr<Unit> unit_shared = std::make_shared<Unit>(unit);
+      unit_shared->GetElementData()->SetCurrentObjective(currentObjectif);
       vector.push_back(unit_shared);
     }
 
-    if (element.element_type() == Event::ElementType::BASE) {
-      Building building = Building(pos, currentObjectif, size,
-                                   element.unit_id(), element.team());
+    if (element.element_type() == Event::ElementType::BUILDING) {
+      Building building =
+          Building(pos, size, element.unit_id(), element.team());
       std::shared_ptr<Building> building_shared =
           std::make_shared<Building>(building);
+      building_shared->GetElementData()->SetCurrentObjective(currentObjectif);
       vector.push_back(building_shared);
     }
   }

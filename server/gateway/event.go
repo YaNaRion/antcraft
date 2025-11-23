@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"main/service/game"
 	"main/service/math"
-	// "math/rand"
+	"math/rand"
+
 	"time"
 
 	"golang.org/x/net/websocket"
@@ -30,14 +31,9 @@ func (s *WebsocketManager) JoinGameHandler(
 	newPlayer = game.NewPlayer(game.NewPlayerConn(ws), game.PlayerID(playerID))
 
 	// TEAM 1 est rouge TEAM 2 est bleu
-	unit := game.NewUnit(math.Vector2{
-<<<<<<< HEAD:server/gateway/event.go
-		X: float64(100),
-		Y: float64(10),
-=======
-		X: rand.Int() % 500,
-		Y: rand.Int() % 500,
->>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730:go-server/gateway/event.go
+	unit := game.NewWorker(math.Vector2{
+		X: float64(rand.Int() % 500),
+		Y: float64(rand.Int() % 500),
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
@@ -45,24 +41,9 @@ func (s *WebsocketManager) JoinGameHandler(
 		len(gameMap.Players)+1,
 	)
 
-<<<<<<< HEAD:server/gateway/event.go
-	// unit2 := game.NewUnit(math.Vector2{
-	// 	X: float64(rand.Int() % 500),
-	// 	Y: float64(rand.Int() % 500),
-	// }, math.Vector2{
-	// 	X: 10,
-	// 	Y: 10,
-	// },
-	// 	len(gameMap.Players)+1,
-	// )
-
-	cc := game.NewTownCenter(math.Vector2{
-		X: float64(100),
-		Y: float64(200),
-=======
-	unit2 := game.NewUnit(math.Vector2{
-		X: rand.Int() % 500,
-		Y: rand.Int() % 500,
+	unit2 := game.NewWorker(math.Vector2{
+		X: float64(rand.Int() % 500),
+		Y: float64(rand.Int() % 500),
 	}, math.Vector2{
 		X: 10,
 		Y: 10,
@@ -71,29 +52,23 @@ func (s *WebsocketManager) JoinGameHandler(
 	)
 
 	cc := game.NewTownCenter(math.Vector2{
-		X: rand.Int() % 500,
-		Y: rand.Int() % 500,
->>>>>>> 64fdb68e278de4d7faac8aae7e5988bd60756730:go-server/gateway/event.go
+		X: float64(rand.Int() % 600),
+		Y: float64(rand.Int() % 600),
 	},
 		len(gameMap.Players)+1,
 	)
 
-	newPlayer.AddElement(unit)
-	// newPlayer.AddElement(unit2)
-
-	newPlayer.AddElement(cc)
-
-	err := gameMap.AddElement(unit)
+	err := gameMap.AddUnit(unit, unit)
 	if err != nil {
 		s.log.Println(err)
 	}
 
-	// err = gameMap.AddElement(unit2)
-	// if err != nil {
-	// 	s.log.Println(err)
-	// }
-	//
-	err = gameMap.AddElement(cc)
+	err = gameMap.AddUnit(unit2, unit2)
+	if err != nil {
+		s.log.Println(err)
+	}
+
+	err = gameMap.AddBuilding(cc, cc)
 	if err != nil {
 		s.log.Println(err)
 	}
@@ -154,7 +129,7 @@ func (s *WebsocketManager) GameLoop(gameID game.GameID) {
 
 		var eventRespond Event
 		mapGrid := NewEventSyncGameState(
-			s.gameManager.GetMap(gameID),
+			s.gameManager.GetGame(gameID),
 			GameState(gameMap.GameState),
 		)
 
@@ -197,13 +172,13 @@ func (s *WebsocketManager) MoveElementHandler(
 	s.log.Printf("Moving: %s", unit.MoveElement.GetUnitId())
 
 	elementNewPos := math.Vector2{
-		X: int(unit.MoveElement.GetNewPos().X),
-		Y: int(unit.MoveElement.GetNewPos().Y),
+		X: float64(unit.MoveElement.GetNewPos().X),
+		Y: float64(unit.MoveElement.GetNewPos().Y),
 	}
 
 	elementOldPos := math.Vector2{
-		X: int(unit.MoveElement.GetOldPos().X),
-		Y: int(unit.MoveElement.GetOldPos().Y),
+		X: float64(unit.MoveElement.GetOldPos().X),
+		Y: float64(unit.MoveElement.GetOldPos().Y),
 	}
 
 	err := s.gameManager.AddTargetToElement(
@@ -228,4 +203,15 @@ func (s *WebsocketManager) StartGameHandler(
 	gameID game.GameID,
 ) {
 	s.gameManager.StartGame(game.GameID(gameID))
+}
+
+func (s *WebsocketManager) AttackHandler(
+	ws *websocket.Conn,
+	gameID game.GameID,
+	playerID,
+	attackingElementID,
+	attackedElementID string,
+) {
+	s.log.Println("DANS ATTACK HANDLER")
+
 }

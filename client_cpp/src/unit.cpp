@@ -1,59 +1,64 @@
 #include "unit.h"
 #include "raylib.h"
 #include <cmath>
+#include <cstdio>
 #include <iostream>
 // #include <print>
 
-Building::Building(Vector2 pos, Vector2 currentObj, Vector2 size,
-                   std::string id, int team) {
-  this->data = std::make_shared<ElementData>(
-      ElementData(pos, currentObj, size, id, team));
+Building::Building(Vector2 pos, Vector2 size, std::string id, int team) {
+  this->data = std::make_shared<ElementData>(ElementData(pos, size, id, team));
 }
 
 void Building::Draw() {
-  std::cout << "UNIT POS X: " << this->data->GetPos().x;
-  std::cout << "UNIT POS Y: " << this->data->GetPos().y << std::endl;
+  // std::cout << "UNIT POS X: " << this->data->GetPos().x;
+  // std::cout << "UNIT POS Y: " << this->data->GetPos().y << std::endl;
 
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {
     DrawRectangleRec(this->data->GetRec(), this->data->color);
   }
+  std::string str = "X: " + std::to_string(this->data->GetPos().x) +
+                    " Y: " + std::to_string(this->data->GetPos().y);
+  DrawText(str.c_str(), this->data->GetPos().x, this->data->GetPos().y, 10,
+           WHITE);
 };
 
 ScreenElementType Building::GetType() { return ScreenElementType::Base; }
 std::shared_ptr<ElementData> Building::GetElementData() { return this->data; };
 
-Unit::Unit(Vector2 pos, Vector2 currentObj, Vector2 size, std::string id,
-           int team) {
-  this->data = std::make_shared<ElementData>(
-      ElementData(pos, currentObj, size, id, team));
+Unit::Unit(Vector2 pos, Vector2 size, std::string id, int team) {
+  this->data = std::make_shared<ElementData>(ElementData(pos, size, id, team));
 }
 
 void Unit::Draw() {
+  // if (this->GetElementData()->GetCurrentObjective()->x != -1 &&
+  //     this->GetElementData()->GetCurrentObjective()->y != -1) {
   this->MoveUnitPerFrame();
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {
     DrawRectangleRec(this->data->GetRec(), this->data->color);
   }
+  // std::string drawString = "X: " + std::to_string(this->data->GetPos().x) +
+  //                          " Y: " + std::to_string(this->data->GetPos().y);
+  // DrawText(drawString.c_str(), this->data->GetPos().x,
+  // this->data->GetPos().y,
+  //          12, WHITE);
 };
 
 ScreenElementType Unit::GetType() { return ScreenElementType::Unit; }
 
 void Unit::MoveUnitPerFrame() {
+  this->GetElementData()->SetDirectionVector();
   if (this->data->direction_vector_normalize.get() != nullptr) {
-    // std::printf("CURRENT POS: X = %f, Y = %f \n", this->data->current_pos.x,
-    //             this->data->current_pos.y);
-    // std::printf("CURRENT OBJ: X = %f, Y = %f \n",
-    // this->data->current_objective->x,
-    //             this->data->current_objective->y);
     if ((this->data->current_pos.x == this->data->current_objective->x &&
          this->data->current_pos.y == this->data->current_objective->y) ||
         (this->data->current_objective->x < 0 &&
          this->data->current_objective->y < 0)) {
       return;
     }
+
     const float speed = 1.0;
     float moveX = this->data->direction_vector_normalize->x * speed;
     float moveY = this->data->direction_vector_normalize->y * speed;
@@ -63,9 +68,6 @@ void Unit::MoveUnitPerFrame() {
         .y = this->data->current_objective->y - this->data->current_pos.y,
     };
 
-    // std::cout << "MOVEMENT DES PIECES AVANT IF COLLIDE\n";
-    // std::cout << this->data->current_pos.x << std::endl;
-    // std::cout << this->data->current_pos.y << std::endl;
     if ((moveX * toTarget.x + moveY * toTarget.y) <= 0) {
       moveX = toTarget.x;
       moveY = toTarget.y;
@@ -76,14 +78,6 @@ void Unit::MoveUnitPerFrame() {
 
     this->data->rectangle.x = this->data->current_pos.x;
     this->data->rectangle.y = this->data->current_pos.y;
-
-    // std::cout << "MOVEMENT DES PIECES\n";
-    // std::cout << this->data->current_pos.x << std::endl;
-    // std::cout << this->data->current_pos.y << std::endl;
-    // std::printf("VALEUR DE CURRENT OBJ: x = %f, y = %f\n",
-    //             this->data->GetCurrentObjective()->x,
-    //             this->data->GetCurrentObjective()->y);
-    // std::printf("VALEUR DE MOUVEMENT: x += %d, y += %d\n", moveX, moveY);
   };
 }
 
@@ -100,9 +94,7 @@ ElementData::ElementData(Rectangle rec) {
 
 std::shared_ptr<ElementData> Unit::GetElementData() { return this->data; };
 
-ElementData::ElementData(Vector2 pos, Vector2 currentObj, Vector2 size,
-                         std::string id, int team) {
-  this->current_objective = std::make_shared<Vector2>(currentObj);
+ElementData::ElementData(Vector2 pos, Vector2 size, std::string id, int team) {
   this->current_pos = pos;
   this->rectangle = Rectangle{
       .x = pos.x,
@@ -144,6 +136,7 @@ void ElementData::SetCurrentObjective(Vector2 vec2) {
 
 void ElementData::SetCurrentObjective(std::shared_ptr<Vector2> vec2) {
   this->current_objective = vec2;
+  this->SetDirectionVector();
 };
 
 std::string ElementData::GetID() { return this->id; }
@@ -153,6 +146,9 @@ std::shared_ptr<Vector2> ElementData::GetCurrentObjective() {
 }
 
 void ElementData::SetDirectionVector() {
+  if (this->current_objective == nullptr) {
+    return;
+  }
   Vector2 direction_vector =
       Vector2{.x = this->current_objective->x - this->current_pos.x,
               .y = this->current_objective->y - this->current_pos.y};

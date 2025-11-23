@@ -88,3 +88,35 @@ Event::Event StartGameOut::CreateProtoEvent() {
   start_game->set_game_id(this->game_id);
   return event;
 };
+
+AttackUnit::AttackUnit(std::string gameID,
+                       std::shared_ptr<IScreenElement> attaking_element,
+                       std::shared_ptr<IScreenElement> attacked_element,
+                       std::string playerID, int team) {
+  this->gameID = gameID;
+  this->attacked_element = attacked_element;
+  this->attaking_element = attaking_element;
+  this->playerID = playerID;
+  this->team = team;
+}
+
+Event::Event AttackUnit::CreateProtoEvent() {
+  Event::Event event = Event::Event();
+  event.set_game_id(this->gameID);
+
+  Event::Player *player = event.mutable_player_info();
+  player->set_player_id(this->playerID);
+
+  // A noter que cest pas la best facon de faire
+  player->set_color(Event::ColorTeam(this->team));
+
+  Event::AttackElement *attack_event = event.mutable_attack_element();
+
+  attack_event->set_attacked_element_id(
+      this->attacked_element->GetElementData()->GetID());
+
+  attack_event->set_attacking_element_id(
+      this->attaking_element->GetElementData()->GetID());
+
+  return event;
+};

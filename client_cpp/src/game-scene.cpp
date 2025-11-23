@@ -18,6 +18,8 @@ void GameScene::SetCurrentPlayer(std::shared_ptr<Player> player) {
   this->current_player = player;
 }
 
+std::string GameScene::GetGameID() { return this->game_id; }
+
 std::map<std::string, std::shared_ptr<Player>> GameScene::GetPlayers() {
   return this->players;
 }
@@ -52,6 +54,8 @@ void GameScene::Update(std::vector<std::shared_ptr<IScreenElement>> vectorIN,
       this->elements[unit->GetElementData()->GetID()] = unit;
     } else {
       if (unit->GetElementData()->GetCurrentObjective().get() != nullptr) {
+        foundElement->second->GetElementData()->SetPos(
+            unit->GetElementData()->GetPos());
         foundElement->second->GetElementData()->SetCurrentObjective(
             unit->GetElementData()->GetCurrentObjective());
         foundElement->second->GetElementData()->SetDirectionVector();
