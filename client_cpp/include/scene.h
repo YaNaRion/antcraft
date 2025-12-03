@@ -1,5 +1,6 @@
 #include "event_name.pb.h"
 #include "player.h"
+#include "raylib.h"
 #include <map>
 #include <memory>
 #include <utility>
@@ -16,6 +17,9 @@ public:
   MenuScene();
   ~MenuScene();
   void Draw() override;
+
+  Texture2D PlayButtonTex;
+  Vector2 PlayButtonVec2;
 };
 
 class GameScene : public IScene {
@@ -51,9 +55,12 @@ private:
 
 class SceneManager {
 public:
-  SceneManager(std::vector<std::shared_ptr<IScene>> scenes);
+  SceneManager(std::shared_ptr<GameScene> game_scene,
+               std::shared_ptr<MenuScene> menu_scene);
   ~SceneManager();
-  std::vector<std::shared_ptr<IScene>> scenes;
   std::shared_ptr<IScene> current_scene;
+  std::shared_ptr<MenuScene> menu_scene;
+  std::shared_ptr<GameScene> game_scene;
+
   void Draw();
 };

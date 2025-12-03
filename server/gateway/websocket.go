@@ -74,7 +74,7 @@ func (s *WebsocketManager) readLoop(ws *websocket.Conn) {
 			s.StartGameHandler(ws, game.GameID(event.GameId))
 		case *Event_AttackElement:
 			s.log.Println("NEW EVENT: ATTACKING ELEMENT")
-			// s.AttackHandler(ws, game.GameID(event.GameId), )
+			s.AttackHandler(ws, game.GameID(event.GameId), event.PlayerInfo.PlayerId, event.GetAttackElement().AttackingElementId, event.GetAttackElement().GetAttackedElementId())
 		}
 	}
 }

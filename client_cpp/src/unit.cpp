@@ -10,14 +10,13 @@ Building::Building(Vector2 pos, Vector2 size, std::string id, int team) {
 }
 
 void Building::Draw() {
-  // std::cout << "UNIT POS X: " << this->data->GetPos().x;
-  // std::cout << "UNIT POS Y: " << this->data->GetPos().y << std::endl;
 
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {
     DrawRectangleRec(this->data->GetRec(), this->data->color);
   }
+
   std::string str = "X: " + std::to_string(this->data->GetPos().x) +
                     " Y: " + std::to_string(this->data->GetPos().y);
   DrawText(str.c_str(), this->data->GetPos().x, this->data->GetPos().y, 10,
@@ -28,23 +27,50 @@ ScreenElementType Building::GetType() { return ScreenElementType::Base; }
 std::shared_ptr<ElementData> Building::GetElementData() { return this->data; };
 
 Unit::Unit(Vector2 pos, Vector2 size, std::string id, int team) {
+  this->animation_frame = 0;
   this->data = std::make_shared<ElementData>(ElementData(pos, size, id, team));
+
+  // this->image =
+  // LoadImageAnim("~/Projet/antcraft/client_cpp/assets/basic_pack/"
+  //                             "basic_huma_II_anim/Elf Lord/ElfLord.gif",
+  //                             &this->animation_frame);
+  //
+  // this->tex = LoadTextureFromImage(this->image);
+
+  // this->tex = LoadTexture(
+  //     "./assets/basic_pack/basic_huma_II_anim/Elf Lord/ElfLord.png");
+}
+
+Unit::~Unit() {
+  // UnloadTexture(this->tex);
+  // UnloadImage(this->image);
 }
 
 void Unit::Draw() {
-  // if (this->GetElementData()->GetCurrentObjective()->x != -1 &&
-  //     this->GetElementData()->GetCurrentObjective()->y != -1) {
+  this->tex = LoadTexture(
+      "./assets/rpg/Tiny RPG Character Asset Pack v1.03 -Free "
+      "Soldier&Orc/Characters(100x100)/Soldier/Soldier/Soldier-Walk.png");
+  this->frame_counter++;
+  // if (this->frame_counter >= this->frame_delay) {
+  //   this->currentAnimFrame++;
+  //   if (currentAnimFrame >= this->animation_frame)
+  //     currentAnimFrame = 0;
+  //
+  //   nextFrameDataOffset =
+  //       this->image.width * this->image.height * 4 * currentAnimFrame;
+  //
+  //   UpdateTexture(this->tex,
+  //                 ((unsigned char *)this->image.data) + nextFrameDataOffset);
+  //
+  //   this->frame_counter = 0;
+  // }
   this->MoveUnitPerFrame();
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {
-    DrawRectangleRec(this->data->GetRec(), this->data->color);
+    DrawTexture(this->tex, this->data->GetRec().x, this->data->GetRec().y,
+                WHITE);
   }
-  // std::string drawString = "X: " + std::to_string(this->data->GetPos().x) +
-  //                          " Y: " + std::to_string(this->data->GetPos().y);
-  // DrawText(drawString.c_str(), this->data->GetPos().x,
-  // this->data->GetPos().y,
-  //          12, WHITE);
 };
 
 ScreenElementType Unit::GetType() { return ScreenElementType::Unit; }
@@ -80,12 +106,6 @@ void Unit::MoveUnitPerFrame() {
     this->data->rectangle.y = this->data->current_pos.y;
   };
 }
-
-// Building::Building(Vector2 pos, Vector2 currentObj, Vector2 size,
-//                    std::string id, int team) {
-//   this->data = std::make_shared<ElementData>(
-//       ElementData(pos, currentObj, size, id, team));
-// }
 
 ElementData::ElementData(Rectangle rec) {
   this->rectangle = rec;

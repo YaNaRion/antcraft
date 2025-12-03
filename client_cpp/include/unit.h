@@ -68,7 +68,7 @@ public:
 class Unit : public IScreenElement {
 public:
   Unit(Vector2 pos, Vector2 size, std::string id, int team);
-  ~Unit() {};
+  ~Unit();
   void Draw() override;
   std::shared_ptr<ElementData> GetElementData() override;
   ScreenElementType GetType() override;
@@ -76,6 +76,13 @@ public:
 
 private:
   std::shared_ptr<ElementData> data;
+  int animation_frame;
+  Image image;
+  Texture2D tex;
+  int frame_counter = 0;
+  int frame_delay = 0;
+  int currentAnimFrame = 0;
+  unsigned int nextFrameDataOffset = 0;
 };
 
 class Building : public IScreenElement {

@@ -1,28 +1,26 @@
 #include "scene.h"
 #include "raylib.h"
 #include <iostream>
+#include <string>
+
+const std::string Play_Button_String = "./assets/Playbutton2.png";
 
 void MenuScene::Draw() {
-  std::string menu_scene = "VOICI LA SCENE DU MENU";
-  int fontSize = 40;
-  DrawText(menu_scene.c_str(),
-           (GetScreenWidth() / 2) - (menu_scene.size() * 10),
-           GetScreenHeight() / 2 - (fontSize / 2), 40, RED);
+  DrawTexture(this->PlayButtonTex, (GetScreenWidth() / 2) - 256 / 2,
+              GetScreenHeight() / 2 - 62 / 2, WHITE);
 }
 
-MenuScene::MenuScene() { std::cout << "MENU SCENE\n"; };
+MenuScene::MenuScene() {
+  this->PlayButtonTex = LoadTexture(Play_Button_String.c_str());
+};
 
 MenuScene::~MenuScene() {};
 
-SceneManager::SceneManager(std::vector<std::shared_ptr<IScene>> scenes) {
-  this->scenes = scenes;
-
-  // TODO Faire meilleur facon de faire le choix de scene
-  if (this->scenes.size() > 1) {
-    this->current_scene = scenes[1];
-  } else if (this->scenes.size() > 0) {
-    this->current_scene = scenes[0];
-  }
+SceneManager::SceneManager(std::shared_ptr<GameScene> game_scene,
+                           std::shared_ptr<MenuScene> menu_scene) {
+  this->game_scene = game_scene;
+  this->menu_scene = menu_scene;
+  this->current_scene = menu_scene;
 }
 
 SceneManager::~SceneManager() {}
