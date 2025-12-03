@@ -1,3 +1,4 @@
+#include "button.h"
 #include "event_name.pb.h"
 #include "player.h"
 #include "raylib.h"
@@ -14,12 +15,15 @@ public:
 
 class MenuScene : public IScene {
 public:
-  MenuScene();
+  MenuScene()
+      : play_button(Vector2{(float)GetScreenWidth() / 2,
+                            (float)GetScreenHeight() / 3 + 20}) {};
   ~MenuScene();
   void Draw() override;
+  void SetBackgoundTexture();
 
-  Texture2D PlayButtonTex;
-  Vector2 PlayButtonVec2;
+  Button play_button;
+  Texture2D backgound_texture;
 };
 
 class GameScene : public IScene {
@@ -40,6 +44,7 @@ public:
   std::map<std::string, std::shared_ptr<Player>> GetPlayers();
 
   std::map<std::string, std::shared_ptr<IScreenElement>> GetElements();
+  Texture2D backgound_texture;
 
 private:
   // Key is ElementID, UnitID

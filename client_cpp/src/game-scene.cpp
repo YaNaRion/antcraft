@@ -1,14 +1,21 @@
 #include "event_name.pb.h"
+#include "raylib.h"
 #include "scene.h"
+
+const std::string game_backgound_texture_path =
+    "./assets/game_scene_background.jpg";
 
 GameScene::GameScene() {
   this->elements = {};
   this->players = {};
+  this->backgound_texture = LoadTexture(game_backgound_texture_path.c_str());
 };
 
 GameScene::~GameScene() {};
 
 void GameScene::Draw() {
+  DrawText("DEBUG: GAME SCENE", 10, 10, 36, BLACK);
+  DrawTexture(this->backgound_texture, 0, 0, WHITE);
   for (auto &element : this->elements) {
     element.second->Draw();
   }

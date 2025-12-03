@@ -3,15 +3,17 @@
 #include <iostream>
 #include <string>
 
-const std::string Play_Button_String = "./assets/Playbutton2.png";
+const std::string backgound_texture_path = "./assets/menu_background.png";
 
 void MenuScene::Draw() {
-  DrawTexture(this->PlayButtonTex, (GetScreenWidth() / 2) - 256 / 2,
-              GetScreenHeight() / 2 - 62 / 2, WHITE);
+
+  DrawTexture(this->backgound_texture, 0, 0, WHITE);
+  DrawText("DEBUG: MENU SCENE", 10, 10, 36, BLACK);
+  this->play_button.Draw();
 }
 
-MenuScene::MenuScene() {
-  this->PlayButtonTex = LoadTexture(Play_Button_String.c_str());
+void MenuScene::SetBackgoundTexture() {
+  this->backgound_texture = LoadTexture(backgound_texture_path.c_str());
 };
 
 MenuScene::~MenuScene() {};

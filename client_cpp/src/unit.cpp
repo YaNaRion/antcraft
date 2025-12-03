@@ -29,16 +29,6 @@ std::shared_ptr<ElementData> Building::GetElementData() { return this->data; };
 Unit::Unit(Vector2 pos, Vector2 size, std::string id, int team) {
   this->animation_frame = 0;
   this->data = std::make_shared<ElementData>(ElementData(pos, size, id, team));
-
-  // this->image =
-  // LoadImageAnim("~/Projet/antcraft/client_cpp/assets/basic_pack/"
-  //                             "basic_huma_II_anim/Elf Lord/ElfLord.gif",
-  //                             &this->animation_frame);
-  //
-  // this->tex = LoadTextureFromImage(this->image);
-
-  // this->tex = LoadTexture(
-  //     "./assets/basic_pack/basic_huma_II_anim/Elf Lord/ElfLord.png");
 }
 
 Unit::~Unit() {
@@ -47,29 +37,11 @@ Unit::~Unit() {
 }
 
 void Unit::Draw() {
-  this->tex = LoadTexture(
-      "./assets/rpg/Tiny RPG Character Asset Pack v1.03 -Free "
-      "Soldier&Orc/Characters(100x100)/Soldier/Soldier/Soldier-Walk.png");
-  this->frame_counter++;
-  // if (this->frame_counter >= this->frame_delay) {
-  //   this->currentAnimFrame++;
-  //   if (currentAnimFrame >= this->animation_frame)
-  //     currentAnimFrame = 0;
-  //
-  //   nextFrameDataOffset =
-  //       this->image.width * this->image.height * 4 * currentAnimFrame;
-  //
-  //   UpdateTexture(this->tex,
-  //                 ((unsigned char *)this->image.data) + nextFrameDataOffset);
-  //
-  //   this->frame_counter = 0;
-  // }
   this->MoveUnitPerFrame();
   if (this->data->IsSelected()) {
     DrawRectangleRec(this->data->GetRec(), GREEN);
   } else {
-    DrawTexture(this->tex, this->data->GetRec().x, this->data->GetRec().y,
-                WHITE);
+    DrawRectangleRec(this->data->GetRec(), this->GetElementData()->color);
   }
 };
 
