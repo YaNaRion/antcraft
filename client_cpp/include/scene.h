@@ -16,8 +16,8 @@ public:
 class MenuScene : public IScene {
 public:
   MenuScene()
-      : play_button(Vector2{(float)GetScreenWidth() / 2,
-                            (float)GetScreenHeight() / 3 + 20}) {};
+      : play_button("Play", Vector2{(float)GetScreenWidth() / 2,
+                                    (float)GetScreenHeight() / 3 + 20}) {};
   ~MenuScene();
   void Draw() override;
   void SetBackgoundTexture();

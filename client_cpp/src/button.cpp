@@ -1,15 +1,16 @@
 #include "button.h"
 #include "raylib.h"
-#include <string>
 
-const std::string Play_Button_String = "./assets/Playbutton2.png";
+const std::string Play_Button_String = "./assets/play_button_3.png";
 
-Button::Button(Vector2 position) {
+Button::Button(std::string message, Vector2 position) {
   this->texture = LoadTexture(Play_Button_String.c_str());
   this->position = position;
 
   this->position.x -= (float)this->texture.width / 2;
   this->position.y -= (float)this->texture.height / 2;
+
+  this->message = message;
 }
 
 Button::~Button() {}
@@ -41,9 +42,19 @@ void Button::Draw() {
       .height = this->GetSize().y,
   };
 
-  if (CheckCollisionPointRec(GetMousePosition(), rec)) {
-    DrawTexture(this->texture, this->position.x, this->position.y, PURPLE);
-  } else {
-    DrawTexture(this->texture, this->position.x, this->position.y, WHITE);
-  }
+  int font_size = 36;
+  int text_width = MeasureText(this->message.c_str(), font_size);
+
+  Vector2 TextPosition = Vector2{
+      .x = rec.x + rec.width / 2 - text_width / 2,
+      .y = rec.y + rec.height / 2 - font_size / 2,
+  };
+
+  Color color = WHITE;
+  if (CheckCollisionPointRec(GetMousePosition(), rec))
+    color = PURPLE;
+
+  DrawTexture(this->texture, this->position.x, this->position.y, color);
+  DrawText(this->message.c_str(), TextPosition.x, TextPosition.y, font_size,
+           color);
 }

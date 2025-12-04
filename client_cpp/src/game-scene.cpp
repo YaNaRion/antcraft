@@ -14,8 +14,8 @@ GameScene::GameScene() {
 GameScene::~GameScene() {};
 
 void GameScene::Draw() {
-  DrawText("DEBUG: GAME SCENE", 10, 10, 36, BLACK);
   DrawTexture(this->backgound_texture, 0, 0, WHITE);
+  DrawText("DEBUG: GAME SCENE", 10, 10, 36, WHITE);
   for (auto &element : this->elements) {
     element.second->Draw();
   }

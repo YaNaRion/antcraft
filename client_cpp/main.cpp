@@ -123,6 +123,7 @@ void CleanEvenInQueue(Gateway *gate, std::shared_ptr<GameScene> game_scene) {
 
 int main() {
   Window window = Window(1920, 1080, "WINDOW FROM SCENE_MANAGER");
+  InitAudioDevice();
 
   std::vector<std::shared_ptr<IScreenElement>> units_ptr;
   Gateway gate = Gateway();
@@ -142,6 +143,11 @@ int main() {
   vectorScene.push_back(game_shared);
   SceneManager scene_manager = SceneManager(game_shared, menu_shared);
 
+  Music menu_theme = LoadMusicStream("./assets/sound/Foundation Main "
+                                     "Theme [Official Music Video].mp3");
+
+  PlayMusicStream(menu_theme);
+
   std::cout << "Initialisation done" << std::endl;
   while (!window.ShouldWindowClose()) {
     Vector2 mouse_position = GetMousePosition();
@@ -149,12 +155,13 @@ int main() {
     ClearBackground(WHITE);
     scene_manager.Draw();
 
-    // std::string mouse_pos_string =
-    //     "MOUSE POSITION X: " + std::to_string(mouse_position.x) +
-    //     "MOUSE POSITION Y: " + std::to_string(mouse_position.y);
-    // DrawText(mouse_pos_string.c_str(), mouse_position.x, mouse_position.y,
-    // 12,
-    //          WHITE);
+    UpdateMusicStream(menu_theme);
+
+    std::string mouse_pos_string =
+        "MOUSE POSITION X: " + std::to_string(mouse_position.x) +
+        "MOUSE POSITION Y: " + std::to_string(mouse_position.y);
+    DrawText(mouse_pos_string.c_str(), mouse_position.x, mouse_position.y, 12,
+             WHITE);
 
     InputHandler(&scene_manager, &gate);
     CleanEvenOutQueue(&gate);
